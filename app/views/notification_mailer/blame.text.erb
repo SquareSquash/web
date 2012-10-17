@@ -1,0 +1,40 @@
+A new exception has occurred on <%= @bug.environment.project.name %>, and Squash
+suspects that it's your fault.
+
+<%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug %>
+
+Project:       <%= @bug.environment.project.name %>
+Environment:   <%= @bug.environment.name %>
+Revision:      <%= @bug.revision %>
+Blamed Commit: <%= @bug.blamed_revision %>
+
+<%= @bug.class_name %>
+<% if @bug.displayable_file? %>
+in <%= @bug.file %>:<%= @bug.line %>
+<% end %>
+
+<%= @bug.message_template %>
+
+----
+
+Is it your fault?
+
+    Under "Management," assign it to yourself, then commit the fix. Mark the bug
+    as fixed when the fix is pushed.
+
+Is it someone else's fault?
+
+    Under "Management," assign it to that person -- they will receive an email
+    notification.
+
+Is this not really a bug?
+
+    Under "Management," mark the bug as "no one will fix this." You will no
+    longer receive notifications about this non-bug. You can also simply delete
+    the bug if it was a one-time test.
+
+You should take one of the above three actions -- don't just let the bug sit
+there!
+
+        Yours truly,
+        Squash

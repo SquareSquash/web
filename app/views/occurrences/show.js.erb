@@ -1,0 +1,15 @@
+$(document).ready(function() {
+  $('#first-occurrence').liveUpdate();
+  $('#occurred-at').liveUpdate();
+
+  $('.complex-object').valueInspector();
+
+  $('.show-library-files').click(function(e) {
+    $(e.currentTarget).parent().parent().find('li.lib, li.filtered').slideToggle();
+  });
+
+  $('.backtrace-link').click(function(event) {
+    $($(event.target).attr('href')).slideToggle();
+    return false;
+  });
+});

@@ -1,0 +1,30 @@
+$(document).ready(function() {
+  new MemberPanel($('#members'),
+                  "<%= escape_javascript @project.name %>",
+                  "<%= @project.to_param %>",
+                  "<%= users_url %>",
+                  "<%= project_memberships_url(@project, format: 'json') %>",
+                  "<%= project_membership_url(@project, 'USERID', format: 'json') %>",
+                  "<%= project_url(@project, format: 'json') %>",
+                  "<%= current_user.role(@project).to_s %>",
+                  false);
+
+  $('#insert-prefab').click(function() {
+    var lines;
+    var prefabMenu = $('#prefab');
+
+    switch(prefabMenu.val()) {
+      case 'rails':
+        lines = ["vendor/"];
+        break;
+      default: lines = [];
+    }
+
+    if (lines)
+      $('#project_filter_paths_string').val(($('#project_filter_paths_string').val() + "\n" + lines.join("\n")).replace(/^\n/, ''));
+
+    prefabMenu.val('');
+
+    return false;
+  });
+});

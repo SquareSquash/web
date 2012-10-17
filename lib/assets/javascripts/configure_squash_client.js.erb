@@ -1,0 +1,17 @@
+<% unless Squash::Ruby.send :configuration, :disabled %>
+  <% class SprocketsHelperMethods_; extend ActionView::Helpers::JavaScriptHelper; end %>
+
+  (function() {
+    // first the settings imported from the ruby client
+    SquashJavascript.instance().configure({
+      revision:    "<%= Squash::Ruby.send :current_revision %>",
+      APIKey:      "<%= Squash::Ruby.send :configuration, :api_key %>",
+      APIHost:     "<%= Squash::Ruby.send :configuration, :api_host %>",
+      notifyPath:  "<%= Squash::Ruby.send :configuration, :notify_path %>",
+      environment: "<%= Rails.env %>"
+    });
+
+    // then the JavaScript-specific overrides
+    SquashJavascript.instance().configure(<%= Squash::Configuration.javascript_dogfood.to_json %>);
+  })();
+<% end %>

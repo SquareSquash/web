@@ -1,0 +1,18 @@
+Bug #<%= @bug.number %> on <%= @bug.environment.project.name %> is occurring
+a lot. Perhaps someone should look into it.
+
+<%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug %>
+
+Project:     <%= @bug.environment.project.name %>
+Environment: <%= @bug.environment.name %>
+Revision:    <%= @bug.revision %>
+
+<%= @bug.class_name %>
+<% if @bug.displayable_file? %>
+in <%= @bug.file %>:<%= @bug.line %>
+<% end %>
+
+<%= @bug.message_template %>
+
+        Yours truly,
+        Squash

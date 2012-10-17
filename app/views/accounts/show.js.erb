@@ -1,0 +1,33 @@
+$(document).ready(function() {
+  new DynamicSearchField($('#project-filter'), processProjectSearchResults);
+  new EmailAliasForm($('#email-aliases'),
+                     "<%= account_emails_url format: 'json' %>",
+                     "<%= account_emails_url format: 'json' %>");
+
+  // pre-populate with most recent projects
+  processProjectSearchResults('');
+});
+
+function processProjectSearchResults(query) {
+  $.ajax('<%= account_memberships_url(format: 'json') %>?query=' + encodeURIComponent(query), {
+    type:    'GET',
+    success: function(results) {
+      var resultList = $('#project-results');
+      resultList.find('li').remove();
+      $.each(results, function(_, membership) {
+        var li = $('<li/>').appendTo(resultList);
+
+        $('<h5/>').append($('<a/>').text(membership.project.name).attr('href', membership.project.url)).appendTo(li);
+        var p = $('<p/>').text(' — ' + (membership.role == 'owner' ? 'created' : 'joined') + ' ' + membership.created_string).appendTo(li);
+        if (membership.role == 'owner')
+          $('<button/>').attr({href: membership.project.url + '?show_environments=true#change_owner', type: 'button'}).
+                  text("Change Ownership").autoButton().prependTo(li);
+        else
+          $('<button/>').attr({ 'data-method': 'DELETE', href: membership.delete_url }).
+                  addClass('warning').text("Leave Project").autoButton().prependTo(li);
+        $('<strong/>').text(membership.human_role).prependTo(p);
+      });
+    },
+    error:   function() { new Flash('alert').text("Error retrieving search results."); }
+  });
+}

@@ -1,0 +1,43 @@
+$(document).ready(function() {
+  // set up the magic bugs table
+  var table = new SortableTable($('#bugs'),
+                                "<%= project_environment_bugs_url(@project, @environment, format: 'json') %>",
+                                [
+                                  { key: 'class_message', title: "Message", sortable: false, htmlGenerator: function(bug) {
+                                    var sp = $('<span/>').addClass('long-words').text(bug.message_template);
+                                    $('<br/>').prependTo(sp);
+                                    $('<tt/>').text(bug.class_name).prependTo(sp);
+                                    return sp;
+                                  } },
+                                  { title: "File", sortable: false, textGenerator: formatBugFile },
+                                  { key: 'occurrences', title: "Counts", sortable: 'desc', htmlGenerator: function(bug) {
+                                    var sp = $('<span/>');
+                                    $('<span/>').text(bug.occurrences_count).addClass('occurrences_count').appendTo(sp);
+                                    $('<i/>').addClass('icon-exclamation-sign').appendTo(sp);
+                                    sp.append(' ');
+                                    $('<span/>').text(bug.comments_count).addClass('comments_count').appendTo(sp);
+                                    $('<i/>').addClass('icon-comment').appendTo(sp);
+                                    return sp;
+                                  } },
+                                  { key: 'latest', title: "Latest", sortable: 'desc', htmlGenerator: function(bug) {
+                                    return $('<time/>').attr('datetime', bug.latest_occurrence).liveUpdate();
+                                  } }
+                                ],
+                                {
+                                  sort_key:    'latest',
+                                  params:      function() {
+                                    return $('#filter').serializeObject();
+                                  },
+                                  scroll_with: 'number'
+                                }
+  );
+
+  var refresh = function() {
+    var spinner = $('<i/>').addClass('icon-refresh').appendTo($('#filter').find('>p:first-child'));
+    table.refreshData(function() { spinner.remove(); }, true);
+  };
+
+  // changing a filter value refreshes the table
+  $('#filter').find('select').change(refresh);
+  new DynamicSearchField($('#filter_search'), refresh);
+});

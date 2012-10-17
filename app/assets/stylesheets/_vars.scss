@@ -1,0 +1,112 @@
+// ----- SIZES
+
+$base-font-size: 12px;
+$nav-font-size: 14px;
+$control-font-size: 14px;
+
+$h1-size: 36px;
+$h2-size: 30px;
+$h3-size: 24px;
+$h4-size: 18px;
+$h5-size: 14px;
+$h6-size: 12px;
+
+$radius-size: 4px;
+$nav-height: 50px;
+
+// ----- COLORS
+
+$gray6: #eaeaea;
+$gray5: #dfdfdf;
+$gray4: #b3b3b3;
+$gray3: #727272;
+$gray2: #434343;
+$gray1: #212121;
+
+$red: #fd8f90;
+$orange: #fdbf65;
+$yellow: #fff994;
+$green: #cce4c2;
+$blue: #c6e2fe;
+
+$darkblue: #b0cae3;
+$darkgreen: #aec9a3;
+
+// ----- GRID
+
+$columns: 16;
+
+$widescreen-size: 1200px;
+$widescreen-column-width: $widescreen-size/$columns;
+
+$desktop-size: 960px;
+$desktop-column-width: $desktop-size/$columns;
+
+$ipad-size: 768px;
+$ipad-column-width: $ipad-size/$columns;
+
+$iphone-landscape-size: 480px;
+$iphone-landscape-column-width: $iphone-landscape-size/$columns;
+
+$iphone-portrait-size: 320px;
+$iphone-portrait-column-width: $iphone-portrait-size/$columns;
+
+// ----- RESPONSIVE
+
+@mixin iphone-portrait {
+  @media (max-width: $iphone-landscape-size - 1px) {
+    @content;
+  }
+}
+
+@mixin iphone-landscape {
+  @media (min-width: $iphone-landscape-size) and (max-width: $ipad-size - 1px) {
+    @content;
+  }
+}
+
+@mixin iphone-landscape-and-smaller {
+  @media (max-width: $ipad-size - 1px) {
+    @content;
+  }
+}
+
+@mixin ipad {
+  @media (min-width: $ipad-size) and (max-width: $desktop-size - 1px) {
+    @content;
+  }
+}
+
+@mixin ipad-and-larger {
+  @media (min-width: $ipad-size) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $desktop-size) and (max-width: $widescreen-size - 1px) {
+    @content;
+  }
+}
+
+@mixin widescreen {
+  @media (min-width: $widescreen-size) {
+    @content;
+  }
+}
+
+// ---- OTHER
+
+@mixin field-options {
+  padding: 5px 10px;
+  font-size: $control-font-size;
+  font-weight: bold;
+  box-sizing: border-box; // 100% width means 100%, dammit!
+  background-color: $gray6;
+
+  &[disabled], .disabled {
+    background-color: white;
+    border: 3px solid $gray6;
+    color: $gray4;
+  }
+}

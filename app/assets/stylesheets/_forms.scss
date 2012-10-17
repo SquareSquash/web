@@ -1,0 +1,154 @@
+@import "vars";
+
+form#new_project {
+  p { margin: 0 0 10px 0; }
+
+  p.help-block {
+    font-size: 90%;
+    color: $gray3;
+  }
+}
+
+// forms lack the padding granted by empty grid columns when in stacked layout.
+// add some padding to compensate.
+@include iphone-landscape-and-smaller {
+  form {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+
+// use for large, complex forms
+form.labeled {
+  fieldset {
+    margin-top: 40px;
+    &:first-of-type { margin-top: 0; }
+
+    legend, h5 {
+      //TODO legend doesn't respect margin-bottom; using h5 instead
+      width: 100%;
+      font-size: $h4-size;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid $gray5;
+    }
+  }
+
+  label {
+    display: block;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: bold;
+
+    // fix up spacing between label and help block
+    &.checkbox-label { margin-bottom: 0; }
+
+    input[type=checkbox] {
+      display: inline;
+      margin-right: 5px;
+    }
+  }
+
+  input:not([type=checkbox]), select, textarea {
+    display: block;
+    width: auto;
+  }
+
+  .field-group {
+    label, input, select {
+      display: inline;
+      width: auto;
+    }
+  }
+
+  .form-actions {
+    padding: 20px 30px 0 30px;
+
+    input[type=submit], input[type=button], input[type=reset] {
+      display: inline;
+    }
+  }
+
+  blockquote {
+    margin-left: 50px;
+    margin-right: 50px;
+
+    label:first-of-type { margin-top: 5px; }
+  }
+}
+
+form.whitewashed {
+  margin: 20px 0;
+  padding: 20px 0;
+  border-radius: $radius-size;
+
+  input[type=text], input[type=email], input[type=password], input[type=search], input[type=tel], input[type=number], textarea {
+    background-color: white;
+
+    &.disabled, &[disabled] {
+      background-color: $gray6;
+      border: 3px solid white;
+    }
+  }
+
+  .input-prepend>span, .input-append>span {
+    background-color: white;
+    &.disabled { border: 3px solid white; }
+  }
+}
+
+@mixin input-affix {
+  &>span {
+    @include field-options;
+    line-height: 20px; //TODO determine programatically
+    min-width: 15px;
+
+    &.disabled {
+      border: 3px solid $gray6;
+    }
+  }
+
+  &>input { display: inline !important; }
+}
+
+.input-prepend {
+  @include input-affix;
+
+  &>span {
+    border-top-left-radius: $radius-size;
+    border-bottom-left-radius: $radius-size;
+    margin-right: 0;
+    padding-right: 0;
+
+    &.disabled { border-right: none; }
+  }
+
+  &>input {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: 0;
+
+    &.disabled { border-left: none; }
+  }
+}
+
+.input-append {
+  @include input-affix;
+
+  &>span {
+    border-top-right-radius: $radius-size;
+    border-bottom-right-radius: $radius-size;
+    margin-left: 0;
+    padding-left: 0;
+
+    &.disabled { border-left: none; }
+  }
+
+  &>input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-right: 0;
+
+    &.disabled { border-right: none; }
+  }
+}

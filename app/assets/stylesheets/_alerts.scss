@@ -1,0 +1,14 @@
+@import "vars";
+
+.alert {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  margin: 20px 0;
+
+  &.error { background-color: $red; }
+  &.important { background-color: $orange; }
+  &.warning { background-color: $yellow; }
+  &.success { background-color: $green; }
+  &.info { background-color: $blue; }
+}

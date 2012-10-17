@@ -1,0 +1,63 @@
+@import "vars";
+
+@mixin button($color) {
+  background: $color;
+  border: none;
+  border-radius: $radius-size;
+  display: inline-block;
+  color: $gray3;
+  font-size: $control-font-size;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 5px 10px;
+
+  &:hover { cursor: pointer; }
+
+  &:active {
+    position: relative;
+    top: 1px;
+  }
+
+  &[disabled], &.disabled {
+    background: lighten($color, 15%);
+    color: $gray5;
+  }
+
+  &.small {
+    font-size: 11px;
+    padding: 2px 5px;
+  }
+}
+
+input[type=button], input[type=submit], button, .button {
+  @include button($darkblue);
+  &.default { @include button($orange); }
+  &.success { @include button($darkgreen); }
+  &.warning { @include button($red); }
+}
+
+input[type=text], input[type=email], input[type=password], input[type=search], input[type=tel], input[type=number], textarea {
+  @include field-options;
+  width: 100%;
+  border: none;
+  border-radius: $radius-size;
+}
+
+select {
+  font-size: $control-font-size;
+  width: 100%;
+  padding: 5px 10px;
+}
+
+input[type=search] {
+  -webkit-appearance: textfield;
+  border-radius: $radius-size*2;
+  width: 100%; // webkit likes to fix these at 125px
+}
+
+input.error, select.error, textarea.error {
+  background-color: $red !important;
+}
+
+*:invalid { border: 1px solid $red !important; }

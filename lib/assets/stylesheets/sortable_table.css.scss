@@ -1,0 +1,16 @@
+@import "vars";
+@import "tables";
+
+table.sortable {
+  @include table;
+
+  th {
+    &.sortable:hover { cursor: pointer; }
+    &.sorted { background-color: $gray5; }
+
+    i {
+      margin-left: 5px;
+      float: right;
+    }
+  }
+}

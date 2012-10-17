@@ -1,0 +1,65 @@
+@import "vars";
+
+@mixin table {
+  th {
+    font-weight: bold;
+    font-size: 11px;
+    color: $gray2;
+    text-transform: uppercase;
+    text-align: left;
+    background-color: $gray6;
+    padding: 10px 20px;
+    white-space: nowrap;
+  }
+
+  tr { background-color: #f4f4f4; }
+  tbody>tr:hover:not(.no-highlight) { background-color: white; }
+
+  td {
+    padding: 10px 20px;
+    border-bottom: 1px solid $gray5;
+
+    &.table-notice {
+      padding-top: 20px;
+      color: $gray4;
+      font-size: 30px;
+      font-weight: bold;
+      text-align: center;
+      cursor: inherit;
+      background-color: transparent !important;
+    }
+  }
+
+  .no-results {
+    padding-top: 20px;
+    color: $gray4;
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  a.rowlink {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  tr:hover a.rowlink { text-decoration: underline; }
+
+  @include iphone-landscape-and-smaller {
+    // for small screens, turn the table on its head: stack the cells of a row
+    // and create a clear division between these groups
+
+    tr {
+      display: block;
+      border-bottom: 3px solid $gray4;
+    }
+
+    thead>tr {
+      border-top: 3px solid $gray4;
+    }
+
+    td, th { display: block; }
+    td { border-bottom: 1px solid $gray5; }
+    td:last-child { border-bottom: none; }
+  }
+}

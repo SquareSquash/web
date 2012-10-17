@@ -1,0 +1,4 @@
+---
+disabled: true
+api_key: YOUR_PRODUCTION_SQUASH_API_KEY
+api_host: YOUR_URL

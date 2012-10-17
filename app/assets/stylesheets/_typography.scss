@@ -1,0 +1,74 @@
+@import "vars";
+
+h1 { font-size: $h1-size; }
+h2 { font-size: $h2-size; }
+h3 { font-size: $h3-size; }
+h4 { font-size: $h4-size; }
+h5 { font-size: $h5-size; }
+h6 { font-size: $h6-size; }
+
+@include iphone-landscape-and-smaller {
+  h1 { font-size: $h3-size; }
+  h2 { font-size: $h4-size; }
+  h3 { font-size: $h5-size; }
+  h4 { font-size: $h6-size; }
+  h5 { font-size: 11px; font-weight: bold; text-transform: uppercase; }
+  h6 { font-size: 11px; text-transform: uppercase; }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+
+  &:first-child { margin-top: 0; }
+}
+
+p { margin-top: 0.5em; margin-bottom: 0.5em; }
+
+a {
+  color: black;
+  cursor: pointer;
+}
+
+strong { font-weight: bold; }
+em { font-style: italic; }
+table { width: 100%; }
+p.small, small { font-size: 80%; }
+
+dl {
+  dt { font-weight: bold; }
+  dd { margin: 5px 0 10px 10px; }
+}
+
+tt, kbd, code, samp, pre { font-family: Menlo, monospace; }
+// tt is used for code atoms such as variable or class names
+tt { font-weight: bold; }
+// kbd is used for keyboard input strings
+kbd { font-style: italic; }
+// samp is used for output from the computer
+samp { color: $gray2; }
+// code is used for inline code snippets
+code { border-bottom: 1px solid $gray5; }
+code.short { border-bottom: none; }
+// pre is used for large code blocks
+pre {
+  background-color: #f9f9f9;
+  border-radius: $radius-size;
+  padding: 20px;
+
+  &.scrollable {
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+}
+
+.aux {
+  font-style: italic;
+  color: $gray3;
+}
+
+// apply this to content that might have long words (e.g., file paths)
+.long-words {
+  word-wrap: break-word;
+  word-break: break-all;
+}

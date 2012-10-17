@@ -1,0 +1,165 @@
+@import "vars";
+
+nav {
+  font-size: $nav-font-size;
+  z-index: 99;
+  color: white;
+
+  &#expanded-nav {
+    display: none;
+
+    &.shown { display: block; }
+    &>ul { display: block; }
+  }
+
+  a { text-decoration: none; }
+  a, i { color: white; }
+
+  &>ul {
+    width: 100%;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: box;
+
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    box-orient: horizontal;
+
+    $nav-horiz-margin: 10px;
+    &>li {
+      margin: 0 $nav-horiz-margin;
+      line-height: $nav-height;
+
+      &#logo {
+        margin-right: 40px;
+        text-transform: uppercase;
+
+        img {
+          margin-right: 6px;
+          width: $nav-font-size; // height will be the same
+        }
+      }
+
+      i { margin-left: 10px; }
+
+      &#quicknav-container {
+        position: relative;
+        -webkit-box-flex: 1;
+        -moz-box-flex: 1;
+        box-flex: 1;
+
+        #quicknav {
+          padding-left: 0;
+          padding-right: 0;
+          background-color: $gray2;
+          color: white;
+          font-weight: normal;
+
+          &:focus {
+            width: 100%;
+            -webkit-transition: width 0.5s;
+            -moz-transition: width 0.5s;
+            transition: width 0.5s;
+            outline: none;
+            background-color: $gray3;
+          }
+
+          &:not(:focus) {
+            width: 50%;
+            @include iphone-landscape-and-smaller { width: 100%; }
+
+            -webkit-transition: width 0.5s;
+            -moz-transition: width 0.5s;
+            transition: width 0.5s;
+          }
+        }
+
+        ul#search-suggestions {
+          position: absolute;
+          top: $nav-height;
+          left: 0;
+          border: 1px solid rgba(black, 0.5);
+          box-shadow: 0 2px 2px rgba(black, 0.5);
+          background-color: white;
+          color: black;
+          margin: 0;
+          padding: 0;
+          line-height: 12px;
+
+          @include iphone-landscape-and-smaller { display: none; }
+
+          &>li {
+            color: $gray3;
+            background-color: white;
+            margin: 0;
+            padding: 10px;
+
+            &.hint {
+              color: $gray4;
+              font-weight: bold;
+
+              em { font-weight: normal; }
+            }
+
+            a { color: $gray3; }
+
+            span.newline {
+              color: $gray4;
+              font-weight: bold;
+              float: right;
+              padding-left: 10px;
+            }
+          }
+        }
+      }
+
+      // large-screen dropdown nav menu
+      @include ipad-and-larger {
+        &.with-dropdown {
+          position: relative;
+
+          &>ul {
+            display: none;
+            position: absolute;
+            top: $nav-height + 1px; // shift down one so the border doesn't overlap the navbar
+            left: -$nav-horiz-margin; // line it up with the nav item
+            border-bottom: 3px solid white;
+            border-left: 3px solid white;
+            border-right: 3px solid white;
+            z-index: 99;
+
+            &.shown {
+              display: block;
+              width: 300px;
+            }
+
+            li {
+              background-color: #212121;
+              padding: 10px;
+              border-bottom: 1px solid $gray2;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              line-height: normal;
+              margin: 0;
+
+              &.divider {
+                height: 2px;
+                padding: 0;
+                margin: 0;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // small-screen dropdown nav menu
+  ul.subnav {
+    display: none;
+
+    &.shown { display: block; }
+    &>li { list-style-type: none; }
+  }
+}

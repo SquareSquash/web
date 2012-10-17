@@ -1,0 +1,74 @@
+@import "vars";
+
+@mixin columns($width) {
+  .one.column       { width: $width; }
+  .two.columns      { width: $width*2; }
+  .three.columns    { width: $width*3; }
+  .four.columns     { width: $width*4; }
+  .five.columns     { width: $width*5; }
+  .six.columns      { width: $width*6; }
+  .seven.columns    { width: $width*7; }
+  .eight.columns    { width: $width*8; }
+  .nine.columns     { width: $width*9; }
+  .ten.columns      { width: $width*10; }
+  .eleven.columns   { width: $width*11; }
+  .twelve.columns   { width: $width*12; }
+  .thirteen.columns { width: $width*13; }
+  .fourteen.columns { width: $width*14; }
+  .fifteen.columns  { width: $width*15; }
+  .sixteen.columns  { width: $width*16; }
+}
+
+.container {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.row {
+  display: -webkit-box;
+  display: -moz-box;
+  display: box;
+  -webkit-box-orient: horizontal;
+  -moz-box-orient: horizontal;
+  box-orient: horizontal;
+
+  .remaining.columns {
+    -webkit-box-flex: 1;
+    box-flex: 1;
+  }
+}
+
+@mixin single-column-layout {
+  // no horizontal columns
+  .row { display: block !important; }
+  .columns { width: auto !important; }
+}
+
+@include widescreen {
+  .container { width: $widescreen-size; }
+  .row { @include columns($widescreen-column-width); }
+}
+
+@include desktop {
+  .container { width: $desktop-size; }
+  .row { @include columns($desktop-column-width); }
+}
+
+@include ipad {
+  .container { width: $ipad-size; }
+  .row { @include columns($ipad-column-width); }
+}
+
+@include iphone-landscape {
+  .container { width: $iphone-landscape-size; }
+  .row { @include columns($iphone-landscape-column-width); }
+
+  @include single-column-layout;
+}
+
+@include iphone-portrait {
+  .container { width: $iphone-portrait-size; }
+  .row { @include columns($iphone-portrait-column-width); }
+
+  @include single-column-layout;
+}

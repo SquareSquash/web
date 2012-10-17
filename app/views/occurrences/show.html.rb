@@ -1,0 +1,464 @@
+# encoding: utf-8
+
+# Copyright 2012 Square Inc.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+require 'rexml/document'
+require Rails.root.join('app', 'views', 'layouts', 'application.html.rb')
+
+module Views
+  # @private
+  module Occurrences
+    # @private
+    class Show < Views::Layouts::Application
+      needs :project, :environment, :bug, :occurrence
+
+      protected
+
+      def page_title() "Occurrence of Bug ##{number_with_delimiter @bug.number} (#{@project.name} #{@environment.name.capitalize})" end
+
+      def body_content
+        full_width_section do
+          return truncated_info if @occurrence.truncated?
+
+          div(id: 'occurrence-header') do
+            h1 @bug.class_name
+            if @occurrence.server?
+              h4 @occurrence.hostname
+            elsif @occurrence.web?
+              h4 @occurrence.host
+            elsif @occurrence.client?
+              h4 @occurrence.device_type
+            end
+          end
+
+          basic_info
+
+          h5 "Message"
+          pre @occurrence.message, class: 'scrollable'
+
+          other_occurrence_info
+        end
+        tabbed_section -> { tab_header }, -> { tab_content }
+      end
+
+      def tab_header
+        ul(class: 'tab-header') do
+          li(class: 'active') { a "Backtrace", href: '#backtrace', rel: 'tab' }
+          li { a "Parents", href: '#parents', rel: 'tab' } if @occurrence.nested?
+          li { a "Rails", href: '#rails', rel: 'tab' } if @occurrence.rails?
+          li { a "Request", href: '#request', rel: 'tab' } if @occurrence.request?
+          li { a "Process", href: '#process', rel: 'tab' } if @occurrence.server?
+          li { a "Device", href: '#device', rel: 'tab' } if @occurrence.client? || @occurrence.geo? || @occurrence.mobile?
+          li { a "Browser", href: '#browser', rel: 'tab' } if @occurrence.browser? || @occurrence.screen?
+          li { a "User Data", href: '#user_data', rel: 'tab' } if @occurrence.additional?
+        end
+      end
+
+      def breadcrumbs() [@project, @environment, @bug, @occurrence] end
+
+      private
+
+      def truncated_info
+        if @occurrence.redirect_target
+          p(class: 'alert info') do
+            text "This occurrence has been moved. (This typically happens when symbolication changes the bug's static analysis.) "
+            a "Continue to the moved occurrence.",
+              href: project_environment_bug_occurrence_url(@project, @environment, @occurrence.redirect_target.bug, @occurrence.redirect_target)
+          end
+        else
+          p "This occurrence has been truncated. Only basic information is available.", class: 'alert error'
+        end
+        basic_info
+      end
+
+      def basic_info
+        p do
+          text "Occurred "
+          time id: 'occurred-at', datetime: @occurrence.occurred_at.xmlschema
+          text " on revision "
+          text! commit_link(@project, @occurrence.revision)
+          text ". Reported by the #{@occurrence.client} client library."
+        end
+      end
+
+      def other_occurrence_info
+        if @occurrence.web?
+          h5 "Request"
+          pre "#{@occurrence.request_method} #{@occurrence.url.to_s}", class: 'scrollable'
+        end
+      end
+
+      def tab_content
+        div(class: 'tab-content tab-primary') do
+          div(class: 'active', id: 'backtrace') { backtrace_tab }
+          div(id: 'parents') { parents_tab } if @occurrence.nested?
+          div(id: 'rails') { rails_tab } if @occurrence.rails?
+          div(id: 'request') { request_tab } if @occurrence.request?
+          div(id: 'process') { process_tab } if @occurrence.server?
+          div(id: 'device') { device_tab } if @occurrence.client? || @occurrence.geo? || @occurrence.mobile?
+          div(id: 'browser') { browser_tab } if @occurrence.browser? || @occurrence.screen?
+          div(id: 'user_data') { user_data_tab } if @occurrence.additional?
+        end
+      end
+
+      def backtrace_tab
+        render_backtraces @occurrence.backtraces, 'root'
+      end
+
+      def render_backtraces(backtraces, identifier)
+        p(style: 'text-align: right') do
+          input type: 'checkbox', class: 'show-library-files', id: 'show-library-files', checked: 'checked'
+          label "Show library files in backtrace", for: 'show-library-files', style: 'display: inline'
+        end
+
+        if !@occurrence.symbolicated? && !@occurrence.symbolication
+          p "Portions of the backtrace have not yet been symbolicated. If you would like a meaningful backtrace, please upload a symbolication file using your language’s client library.", class: 'alert info'
+        end
+        if !@occurrence.sourcemapped? #&& !@occurrence.source_map
+          p "Portions of the backtrace have not yet been source-mapped. If you would like a meaningful backtrace, please upload a JavaScript source map using the Squash JavaScript client library.", class: 'alert info'
+        end
+        unless @occurrence.deobfuscated?
+          p "Portions of the backtrace contain obfuscated Java code. If you would like a more meaningful backtrace, please upload a renamelog file using the Squash Java Ruby gem.", class: 'alert info'
+        end
+
+        ul(class: 'pills backtrace-tabs') do
+          backtraces.each_with_index do |(name, faulted, _), index|
+            li(class: (faulted ? 'active' : nil)) { a name, href: "#backtrace-#{identifier}-#{index}", rel: 'tab', class: (faulted ? 'faulted' : nil) }
+          end
+        end
+
+        div(class: 'tab-content') do
+          backtraces.each_with_index do |(_, faulted, backtrace), index|
+            div(id: "backtrace-#{identifier}-#{index}", class: (faulted ? 'active' : nil)) do
+              p("This thread raised or crashed.", class: 'alert info') if faulted
+              ul(class: 'backtrace') do
+                backtrace.each_with_index do |element, lindex|
+                  if element.size == 3
+                    # NORMAL BACKTRACE ELEMENT
+                    file, line, method = *element
+                    if @project.path_type(file) == :library
+                      li format_backtrace_element(file, line, method), class: 'lib long-words'
+                    else
+                      li(class: (@project.path_type(file) == :filtered ? 'filtered' : nil)) do
+                        p { a format_backtrace_element(file, line, method), href: "#backtrace-#{identifier}-#{index}-info-#{lindex}", class: 'backtrace-link long-words' }
+                        div(id: "backtrace-#{identifier}-#{index}-info-#{lindex}", style: 'display: none') do
+                          blockquote do
+                            text! editor_link 'textmate', @project, file, line; br
+                            text! editor_link 'sublime', @project, file, line; br
+                            text! editor_link 'vim', @project, file, line; br
+                            text! editor_link 'emacs', @project, file, line
+                          end
+                          pre class: 'context', :'data-project' => @project.to_param, :'data-revision' => @occurrence.revision, :'data-file' => file, :'data-line' => line
+                        end
+                      end
+                    end
+                  else
+                    # NON-NORMAL BACKTRACE ELEMENT
+                    case element.first
+                      when '_RETURN_ADDRESS_'
+                        li "0x#{element.last.to_s(16).rjust(8, '0').upcase}", class: 'lib long-words'
+                      when '_JS_ASSET_'
+                        line_portion = if element[2] && element[3] then "#{element[2]}:#{element[3]}"
+                                       elsif element[2] then element[2].to_s
+                                       else nil end
+                        li_text = element[1]
+                        li_text << " : " << line_portion if line_portion
+                        li_text << " (in #{element[4]})" if element[4]
+                        if element[5] # context
+                          li do
+                            p { a li_text, href: "#backtrace-#{identifier}-#{index}-info-#{lindex}", class: 'backtrace-link long-words' }
+                            div(id: "backtrace-#{identifier}-#{index}-info-#{lindex}", style: 'display: none') do
+                              pre_class = "brush: js; toolbar: false; unindent: false"
+                              line_count = element[5].size
+                              if element[2] # line number
+                                first_line = element[2] - line_count/2
+                                pre_class << "; ruler: true; first-line: " << first_line.to_s << "; highlight: " << (first_line + line_count/2).to_s
+                              else
+                                pre_class << "; ruler: false; highlight: " << line_count/2 + 1
+                              end
+                              pre element[5].join("\n"), class: pre_class
+                            end
+                          end
+                        else
+                          li li_text, class: 'long-words'
+                        end
+                      when '_JAVA_'
+                        li format_backtrace_element(element[1], element[2], element[3]), class: 'lib long-words'
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+
+      def parents_tab
+        @occurrence.parent_exceptions.each_with_index do |parent, index|
+          details do
+            summary do
+              tt parent['class_name']
+              if parent['association'].present?
+                text " (via "
+                tt parent['association']
+                text ")"
+              end
+            end
+            h6 "Message"
+            pre parent['message'], class: 'scrollable'
+
+            ul(class: 'pills backtrace-tabs') do
+              li(class: 'active') { a "Backtraces", href: "#backtraces#{index}", rel: 'tab' }
+              li { a "Instance Variables", href: "#ivars#{index}", rel: 'tab' }
+            end
+
+            div(class: 'tab-content', id: 'parents-tab-content') do
+              div(class: 'active', id: "backtraces#{index}") { render_backtraces parent['backtraces'], "parent#{index}" }
+              div(id: "ivars#{index}") { parameter_table parent['ivars'] }
+            end
+          end
+        end
+      end
+
+      def rails_tab
+        dl do
+          dt "Controller"
+          dd @occurrence.controller
+          dt "Action"
+          dd @occurrence.action
+        end
+
+        if @occurrence.session
+          h4 "Session"
+          parameter_table @occurrence.session
+        end
+
+        if @occurrence.flash
+          h4 "Flash"
+          parameter_table @occurrence.flash
+        end
+      end
+
+      def request_tab
+        dl do
+          dt "XMLHttpRequest (Ajax)"
+          dd(@occurrence.xhr? ? 'Yes' : 'No')
+        end
+
+        h4 "Parameters"
+        parameter_table @occurrence.params
+
+        h4 "Headers"
+        parameter_table @occurrence.headers
+      end
+
+      def process_tab
+        dl do
+          dt "Hostname"
+          dd @occurrence.hostname
+          dt "PID"
+          dd @occurrence.pid
+          if @occurrence.root?
+            dt "Root"
+            dd @occurrence.root
+          end
+          if @occurrence.arguments
+            dt "Launch Arguments"
+            dd { kbd @occurrence.arguments }
+          end
+        end
+
+        h4 "UNIX Environment"
+        parameter_table @occurrence.env_vars
+      end
+
+      def device_tab
+        h4 "Device"
+        dl do
+          if @occurrence.device_id?
+            dt "Device ID"
+            dd @occurrence.device_id
+          end
+          dt "Type"
+          dd @occurrence.device_type
+          dt "Operating System"
+          dd @occurrence.operating_system
+          if @occurrence.physical_memory
+            dt "Physical Memory"
+            dd number_to_human_size(@occurrence.physical_memory)
+          end
+          if @occurrence.power_state
+            dt "Power State"
+            dd @occurrence.power_state
+          end
+          if @occurrence.orientation
+            dt "Orientation"
+            dd @occurrence.orientation
+          end
+        end
+
+        h4 "Application"
+        dl do
+          if @occurrence.version?
+            dt "Version"
+            dd @occurrence.version
+          end
+          dt "Build"
+          dd @occurrence.build
+        end
+
+        if @occurrence.geo?
+          h4 "Geolocation"
+
+          geotag = CGI.escape([@occurrence.lat, @occurrence.lon].join(','))
+          iframe height: 350, frameborder: 0, scrolling: 0, marginheight: 0, marginwidth: 0, src: "http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&q=#{geotag}&aq=&ie=UTF8&t=m&z=13&output=embed"
+
+          dl do
+            dt "Latitude"
+            dd number_to_dms @occurrence.lat, :lat
+            dt "Longitude"
+            dd number_to_dms @occurrence.lon, :lon
+            if @occurrence.altitude?
+              dt "Altitude"
+              dd "#{number_with_delimiter @occurrence.altitude} m"
+            end
+            if @occurrence.location_precision?
+              dt "Precision"
+              dd number_with_delimiter(@occurrence.location_precision)
+            end
+            if @occurrence.heading?
+              dt "Heading"
+              dd "#{@occurrence.heading}°"
+            end
+            if @occurrence.speed?
+              dt "Speed"
+              dd "#{number_with_delimiter @occurrence.speed} m/s"
+            end
+          end
+        end
+
+        if @occurrence.mobile?
+          h4 "Mobile Network"
+          dl do
+            dt "Operator"
+            dd @occurrence.network_operator
+            dt "Type"
+            dd @occurrence.network_type
+            if @occurrence.connectivity?
+              dt "Connectivity Source"
+              dd @occurrence.connectivity
+            end
+          end
+        end
+      end
+
+      def browser_tab
+        if @occurrence.browser?
+          dl do
+            dt "Browser"
+            dd "#{@occurrence.browser_name} — version #{@occurrence.browser_version}"
+            dt "Operating System"
+            dd @occurrence.browser_os
+            dt "Render Engine"
+            dd "#{@occurrence.browser_engine} — version #{@occurrence.browser_engine_version}"
+          end
+        end
+
+        if @occurrence.screen?
+          dl do
+            if @occurrence.screen_width
+              dt "Screen Dimensions"
+              dd "#{@occurrence.screen_width} × #{@occurrence.screen_height}"
+            end
+            if @occurrence.window_width
+              dt "Window Dimensions"
+              dd "#{@occurrence.window_width} × #{@occurrence.window_height}"
+            end
+            if @occurrence.color_depth
+              dt "Color Depth"
+              dd "#{@occurrence.color_depth}-bit"
+            end
+          end
+        end
+      end
+
+      def user_data_tab
+        if @occurrence.ivars.present?
+          h4 "Instance Variables"
+          parameter_table @occurrence.ivars
+        end
+
+        if @occurrence.user_data.present?
+          h4 "User Data"
+          parameter_table @occurrence.user_data
+        end
+
+        if @occurrence.extra_data.present?
+          h4 "Unrecognized Fields"
+          parameter_table @occurrence.extra_data
+        end
+      end
+
+      def parameter_table(values)
+        table(class: 'parameter') do
+          thead do
+            tr do
+              th "Name"
+              th "Class"
+              th "Value"
+            end
+          end
+          if values.empty?
+            td "No values", colspan: 3, class: 'no-results'
+          else
+            values.sort.each do |(name, value)|
+              if parameter_invalid?(value)
+                tr(class: 'error') do
+                  td(colspan: 3) do
+                    text "Parameter "
+                    tt name
+                    text " has an invalid format. This is a bug in the #{@occurrence.client} client library."
+                  end
+                end
+                next
+              end
+
+              tr do
+                td { tt name }
+                td do
+                  klass = parameter_class(value)
+                  klass.start_with?('(') ? text(klass) : tt(klass)
+                end
+                td do
+                  if parameter_unformatted?(value)
+                    text! format_parameter(value)
+                  elsif parameter_primitive?(value)
+                    samp value.inspect
+                  else
+                    if parameter_complex?(value) && (xml = value['keyed_archiver'].presence)
+                      value['keyed_archiver'] = ''
+                      REXML::Document.new(xml).write(value['keyed_archiver'], 1)
+                    end
+                    div class: 'complex-object', :'data-object' => value.to_json
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+end

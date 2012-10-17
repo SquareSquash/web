@@ -1,0 +1,12 @@
+transmit_timeout: 60
+ignored_exception_classes:
+- ActionController::RoutingError
+- ActionController::MethodNotAllowed
+- ActionController::ActionNotFound
+ignored_exception_messages:
+  SignalException:
+  - SIGTERM
+  "ActiveRecord::StatementInvalid":
+  - This connection has been closed.
+failsafe_log: log/squash.failsafe.log
+disabled: true

@@ -1,0 +1,98 @@
+@import "vars";
+
+// applies to account page too
+ul.project-search-results {
+  li {
+    padding: 10px 0;
+    border-bottom: 1px solid $gray5;
+    &:last-child { border-bottom: none; }
+    clear: right;
+
+    h5 {
+      font-weight: bold;
+      margin-top: 0;
+      margin-bottom: 4px;
+      a { text-decoration: none; }
+    }
+
+    p { margin-bottom: 0; }
+
+    span.project-created { float: right; }
+    button {
+      float: right;
+      margin-right: 20px;
+    }
+  }
+}
+
+body#projects-index {
+  div.wide { margin: 0 10px; }
+
+  #find {
+    &>p { margin-bottom: 20px; }
+  }
+
+  a.icon-star { text-decoration: none; }
+}
+
+body#projects-show {
+  .environment {
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: $gray5;
+    border-radius: $radius-size;
+
+    h3 {
+      margin-bottom: 5px;
+      a { text-decoration: none; }
+    }
+
+    .info {
+      color: $gray3;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+  }
+
+  #install-squash {
+    font-size: 16px;
+    text-align: center;
+  }
+}
+
+body#projects-edit {
+  // make the configure-project modal fixed-width so that the PREs can scroll
+  // rather than expanding the modal beyond the right edge
+  #configure-project { width: 75%; }
+
+  h3 .step-number {
+    $step-size-increase: 5px;
+    padding: $step-size-increase;
+
+    // make it a circle
+    display: inline-block;
+    border-radius: $h3-size/2 + $step-size-increase;
+    width: $h3-size;
+
+    background-color: $darkblue;
+    color: white;
+    text-align: center;
+
+    margin-right: 10px;
+  }
+}
+
+body.projects {
+  #members {
+    ul.results li {
+      margin-top: 15px;
+      h5 { margin-bottom: 0; }
+    }
+  }
+
+  .modal {
+    ul.results li {
+      p { margin: 5px 0 10px 0; }
+    }
+  }
+}

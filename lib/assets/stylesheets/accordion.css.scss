@@ -1,0 +1,33 @@
+@import "vars";
+
+.accordion {
+  margin: 10px 0;
+
+  &>.accordion-pair {
+    &>h5 {
+      background-color: $gray5;
+      margin: 0;
+      padding: 10px 20px;
+      border-radius: $radius-size;
+      margin-top: 5px;
+
+      a { text-decoration: none; }
+    }
+
+    &:first-child>h5 { margin-top: 0; }
+
+    &>div {
+      padding: 10px 20px;
+      background-color: white;
+      border-bottom-left-radius: $radius-size;
+      border-bottom-right-radius: $radius-size;
+    }
+
+    &.shown {
+      &>h5 {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+  }
+}

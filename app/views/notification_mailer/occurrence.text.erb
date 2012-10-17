@@ -1,0 +1,48 @@
+There has been a new occurrence of this bug.
+
+Bug:        <%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug %>
+Occurrence: <%= project_environment_bug_occurrence_url @bug.environment.project, @bug.environment, @bug, @occurrence %>
+
+THE BUG
+
+<%= @bug.class_name %>
+<% if @bug.displayable_file? %>
+in <%= @bug.file %>:<%= @bug.line %>
+<% end %>
+
+<%= @bug.message_template %>
+
+THE OCCURRENCE
+
+<%= @occurrence.message %>
+
+<% if @occurrence.web? %>
+Request: <%=  @occurrence.request_method %> <%= @occurrence.url.to_s %>
+<% end %>
+<% if @occurrence.rails? %>
+Controller: <%= @occurrence.controller %>
+Action: <%= @occurrence.action %>
+<% end %>
+<% if @occurrence.server? %>
+Hostname: <%= @occurrence.hostname %>
+PID: <%= @occurrence.pid %>
+<% end %>
+<% if @occurrence.client? %>
+Build: <%= @occurrence.build %>
+Device: <%= @occurrence.device_type %>
+OS: <%= @occurrence.operating_system %>
+<% end %>
+<% if @occurrence.mobile? %>
+Network Operator: <%= @occurrence.network_operator %>
+Network Type: <%= @occurrence.network_type %>
+<% end %>
+<% if @occurrence.browser? %>
+Web Browser: <%= @occurrence.browser_name %> (<%= @occurrence.browser_version %>)
+<% end %>
+
+        Yours truly,
+        Squash
+---
+
+If you wish to stop receiving these emails, visit the bug page:
+<%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug, anchor: 'notifications' %>

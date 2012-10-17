@@ -1,0 +1,28 @@
+# Copyright 2012 Square Inc.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+FactoryGirl.define do
+  factory :project do
+    association :owner, factory: :user
+    sequence(:name) { |i| "Project #{i}" }
+    sequence(:repository_url) { |i| "git://github.com/RISCfuture/project#{i}.git" }
+    filter_paths %w( vendor/ config/initializers/mysql_connection_fix.rb )
+    whitelist_paths %w( vendor/plugins/internal )
+
+    after(:create) do |project, _|
+      # there's a uniqueness constraint on repo URLs, but we need a real repo with real commits
+      project.instance_variable_set :@repo, Project.new { |pp| pp.repository_url = 'git://github.com/RISCfuture/better_caller.git' }.repo
+    end
+  end
+end

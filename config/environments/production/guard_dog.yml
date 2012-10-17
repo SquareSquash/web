@@ -1,0 +1,11 @@
+---
+acl:
+- permission:
+    resource: /api/1.0/notify
+    method: POST
+  allow:
+  - stageweb
+  - web
+  - squash
+  - regulator
+  - irf

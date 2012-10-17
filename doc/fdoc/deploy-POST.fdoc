@@ -1,0 +1,73 @@
+---
+description: |
+  Notify Squash of a new deploy (hosted projects) or release (distributed
+  projects). Creates the environment if it doesn't exist.
+
+  `hostname` is required for hosted projects; `build` is required for released
+  projects.
+responseCodes:
+- status: 422
+  successful: false
+  description: |
+   * Missing required API parameter.
+   * Squash already knows about that deploy.
+   * Invalid value for `revision`,  `build`, `hostname` or `deployed_at`.
+- status: 403
+  successful: false
+  description: Unknown API key.
+- status: 200
+  successful: true
+requestParameters:
+  properties:
+    project:
+      description: Hash of fields used to find the project.
+      required: true
+      type: object
+      properties:
+        api_key:
+          description: Your project's API key.
+          required: true
+          type: string
+          example: fff57d88-e5ab-44e1-ac24-a2a1ab1ef86f
+    environment:
+      description: Hash of fields used to find or create the environment.
+      required: true
+      type: object
+      properties:
+        name:
+          description: The name of the environment.
+          required: true
+          type: string
+          example: production
+    deploy:
+      description: Hash of properties for the deploy or release.
+      required: true
+      type: object
+      properties:
+        deployed_at:
+          description: The time at which the deploy or release was made.
+          required: true
+          type: string
+          format: date-time
+          example: 2012-09-19 21:46:24 -07:00
+        revision:
+          description: |
+            The SHA1 of the Git revision of the code that was deployed or
+            released.
+          required: true
+          type: string
+          example: 2dc20c984283bede1f45863b8f3b4dd9b5b554cc
+        hostname:
+          description: |
+            The hostname of the computer that initiated the deploy. Required for
+            hosted projects.
+          required: false
+          type: string
+          example: myhost.local
+        build:
+          description: |
+            The unique internal version identifier for this release. Required
+            for distributed projects.
+          required: false
+          type: string
+          example: '6318'

@@ -1,0 +1,5 @@
+-o doc/js
+--title "Squash Front-End JavaScript Documentation"
+
+lib/assets/javascripts
+app/assets/javascripts

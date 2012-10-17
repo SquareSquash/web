@@ -1,0 +1,4 @@
+---
+priority_threshold: 50
+pool_size: 20
+max_threads: 100

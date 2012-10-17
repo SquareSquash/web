@@ -1,0 +1,71 @@
+---
+by_extension:
+  .ant: xml
+  .applejs: javascript
+  .as: actionscript3
+  .as3: actionscript3
+  .atom: xml
+  .atom.erb: ! 'ruby; html-script: true'
+  .bash: shell
+  .builder: ruby
+  .c: cpp
+  .cc: cpp
+  .cf: coldfusion
+  .cpp: cpp
+  .cs: c-sharp
+  .css: css
+  .diff: diff
+  .erl: erlang
+  .es: actionscript3
+  .fx: javafx
+  .gemspec: ruby
+  .groovy: groovy
+  .h: obj-c
+  .hpp: cpp
+  .htm: xml
+  .html: xml
+  .html.erb: ! 'ruby; html-script: true'
+  .java: java
+  .jnlp: xml
+  .jruby: ruby
+  .js: javascript
+  .js2: actionscript3
+  .json: javascript
+  .m: obj-c
+  .pas: delphi
+  .patch: diff
+  .pch: obj-c
+  .php: ! 'php; html-script: true'
+  .pl: perl
+  .pm: perl
+  .ps: powershell
+  .py: python
+  .rake: ruby
+  .rb: ruby
+  .rhtml: ! 'ruby; html-script: true'
+  .rjs: ruby
+  .rss: xml
+  .rss.erb: ! 'ruby; html-script: true'
+  .ru: ruby
+  .rxml: ruby
+  .sass: sass
+  .scala: scala
+  .scpt: applescript
+  .scss: sass
+  .sh: shell
+  .shtm: xml
+  .shtml: xml
+  .sql: sql
+  .vb: vb
+  .wsdl: xml
+  .xml: xml
+  .xml.erb: ! 'ruby; html-script: true'
+  .xsl: xml
+  .xslt: xml
+  .yaml: yaml
+  .yml: yaml
+by_filename:
+  Capfile: ruby
+  Gemfile: ruby
+  Rakefile: ruby
+default: plain

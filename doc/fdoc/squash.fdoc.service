@@ -1,0 +1,7 @@
+---
+name: Squash
+basePath: '/api/1.0'
+description: |
+  The API for Squash allows client libraries to notify Squash of exceptions and
+  deploys, and upload data that Squash can use to analyze incoming exceptions
+   (e.g., source maps, symbolication data, etc.).

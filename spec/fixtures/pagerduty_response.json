@@ -1,0 +1,15 @@
+HTTP/1.1 200 OK
+Server: nginx/1.0.14
+Date: Wed, 14 Nov 2012 04:09:11 GMT
+Content-Type: application/json; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Status: 200 OK
+X-UA-Compatible: IE=Edge,chrome=1
+Cache-Control: no-cache
+X-Request-Id: 20436b8395ad658aa642721c14fda3ef
+X-Runtime: 0.019127
+X-Rack-Cache: invalidate, pass
+Set-Cookie: uid=CqQdA1CjGWdd8GH+jTjOAg==; expires=Thu, 31-Dec-37 23:55:55 GMT; domain=pagerduty.com; path=/
+
+{"status":"success","message":"You did it!"}

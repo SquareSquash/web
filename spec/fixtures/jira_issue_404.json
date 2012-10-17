@@ -1,0 +1,14 @@
+HTTP/1.1 404 Not Found
+Date: Wed, 14 Nov 2012 22:33:22 GMT
+X-AREQUESTID: 1353x39200x1
+X-Seraph-LoginReason: OK
+X-ASESSIONID: u08r0a
+X-AUSERNAME: tim
+Cache-Control: no-cache, no-store, no-transform
+Content-Type: application/json;charset=UTF-8
+Set-Cookie: JSESSIONID=7EEAD8D3F2AE657AF60461E813ADF1B7; Path=/jira; HttpOnly
+Set-Cookie: atlassian.xsrf.token=ALMX-0SVV-VVCK-3Y73|b3d297f61c2c261383332a358e39c371759e0f54|lin; Path=/jira
+Connection: close
+Transfer-Encoding: chunked
+
+{"errorMessages":["Issue Does Not Exist"],"errors":{}}

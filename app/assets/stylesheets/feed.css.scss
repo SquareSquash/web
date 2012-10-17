@@ -1,0 +1,78 @@
+@import "vars";
+
+ul#events {
+  $events-border-color: #ddd;
+  margin: 20px 0;
+  &:first-child { margin-top: 0; }
+
+  li.event {
+    position: relative;
+    margin-bottom: 15px;
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    box-orient: horizontal;
+
+    @include ipad-and-larger {
+      display: -webkit-box;
+      display: -moz-box;
+      display: box;
+    }
+
+    &:last-child { margin-bottom: 0; }
+
+    // left element
+    i {
+      display: block;
+
+      @include iphone-landscape-and-smaller {
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    }
+
+    // middle element (expands)
+    div.event-content {
+      -webkit-box-flex: 1;
+      -moz-box-flex: 1;
+      box-flex: 1;
+      padding: 0 15px;
+    }
+    // right element
+    time {
+      display: block;
+      font-size: 10px;
+
+      @include ipad-and-larger { text-align: right; }
+      @include iphone-landscape-and-smaller {
+        padding: 0 15px;
+      }
+    }
+
+    blockquote { margin: 10px 15px; }
+  }
+
+  li.event-group {
+    border-top: 1px solid $gray5;
+    padding: 10px 10px 30px 10px;
+
+    h5 a {
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    ul { margin: 10px 0; }
+  }
+
+  // colors for feed icons
+
+  i.icon-exclamation-sign { color: #880000; } // occur
+  i.icon-warning-sign { color: #dc143c; }     // reopen
+  i.icon-truck { color: #8b4513; }            // deploy
+  i.icon-user { color: #2f4f4f; }             // assign
+  i.icon-ok-sign { color: #008200; }          // fixed
+  i.icon-remove-sign { color: #6495ed; }      // unimportant
+  i.icon-comment { color: #483d8b; }          // comment
+  i.icon-copy { color: #7f007f; }             // dupe
+  i.icon-envelope { color: #555555; }         // email
+}

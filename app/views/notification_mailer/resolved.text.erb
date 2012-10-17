@@ -1,0 +1,23 @@
+<%= @resolver.try(:name) || "Someone" %> has <%= @bug.fixed? ? "resolved a bug" : "marked a bug as irrelevant" %>
+that you were assigned to:
+
+<%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug %>
+
+Project:       <%= @bug.environment.project.name %>
+Environment:   <%= @bug.environment.name %>
+Revision:      <%= @bug.revision %>
+Blamed Commit: <%= @bug.blamed_revision %>
+
+<%= @bug.class_name %>
+<% if @bug.displayable_file? %>
+in <%= @bug.file %>:<%= @bug.line %>
+<% end %>
+
+<%= @bug.message_template %>
+
+        Yours truly,
+        Squash
+---
+
+If you wish to stop receiving these emails, visit your account page:
+<%= account_url %>

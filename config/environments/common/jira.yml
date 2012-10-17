@@ -1,0 +1,9 @@
+---
+disabled: true
+authentication:
+  strategy: basic
+  user: YOUR_USERNAME
+  password: YOUR_PASSWORD
+api_host: "https://yourcompany.com"
+api_root: "/jira"
+create_issue_details: "/secure/CreateIssueDetails!init.jspa"

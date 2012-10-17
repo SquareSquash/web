@@ -1,0 +1,16 @@
+@import "vars";
+
+$badge-padding: 4px;
+
+span.badge {
+  background-color: $gray3;
+  color: white;
+  padding: $badge-padding;
+  border-radius: $radius-size;
+
+  &.critical { background-color: $red; }
+  &.important { background-color: $orange; color: black; }
+  &.warning { background-color: $yellow; color: black; }
+  &.success { background-color: $green; color: black; }
+  &.info { background-color: $blue; color: black; }
+}

@@ -1,0 +1,47 @@
+@import "vars";
+
+#lean_overlay {
+  position: fixed;
+  z-index: 100;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+  background: black;
+  display: none;
+}
+
+.modal {
+  display: none;
+
+  &>a.close {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgba(black, 0.5);
+    text-decoration: none;
+    &:hover { color: black; }
+  }
+
+  &>.modal-body {
+    background-color: $gray5;
+    border-bottom-left-radius: $radius-size;
+    border-bottom-right-radius: $radius-size;
+    padding: 10px 50px;
+
+    .accordion {
+      .accordion-pair>h5 { background-color: $gray4; }
+
+    }
+  }
+
+  h1 {
+    background-color: white;
+    padding: 40px 35px 20px 35px;
+    margin: 0;
+  }
+
+  p { margin: 5px 10px 15px 10px; }
+}

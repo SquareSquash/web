@@ -1,0 +1,4 @@
+---
+default_url_options:
+  host: YOUR_HOSTNAME
+  protocol: https

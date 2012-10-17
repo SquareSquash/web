@@ -1,0 +1,5 @@
+$(document).ready(function() {
+  new EmailAliasForm($('#email-aliases'),
+                     "<%= project_my_membership_emails_url format: 'json' %>",
+                     "<%= project_my_membership_emails_url format: 'json' %>");
+});

@@ -1,0 +1,124 @@
+@import "vars";
+
+$tab-bg-color: $gray6;
+
+body {
+  // bleed the tab background color all the way to the bottom
+  &.tabbed { background-color: $tab-bg-color;  }
+}
+
+// in order to get the background colors of the fluid grid to bleed out to the
+// edge of the page, we have to wrap every "container" element with its own
+// custom container of 100% width, and set the style of that div according to
+// the container's role (navbar, breadcrumbs, content, etc.).
+
+#navbar-container {
+  background-color: #212121;
+}
+
+#breadcrumbs-container {
+  background-color: white;
+  border-bottom: 1px solid $gray5;
+}
+
+.content-container {
+  background-color: white;
+  padding-top: $nav-height;
+  padding-bottom: 35px;
+}
+
+.content-container-alt {
+  background-color: $tab-bg-color;
+  padding-top: $nav-height;
+  padding-bottom: 35px;
+}
+
+.tab-header-container {
+  background-color: $gray4;
+
+  ul {
+    width: 100%;
+
+    display: -webkit-box;
+    display: -moz-box;
+    display: box;
+
+    -webkit-box-orient: horizontal;
+    -moz-box-orient: horizontal;
+    box-orient: horizontal;
+
+    @include iphone-landscape-and-smaller {
+      display: block;
+    }
+
+    li {
+      background-color: $gray4;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 14px;
+
+      -webkit-box-flex: 1;
+      -moz-box-flex: 1;
+      box-flex: 1;
+
+      &.active { background-color: $tab-bg-color; }
+      &.with-table.active { background-color: #e6e6e6; }
+
+      a { text-decoration: none; }
+    }
+  }
+}
+
+.tab-container {
+  background-color: $tab-bg-color;
+
+  .tab-content>div {
+    padding: 50px;
+    @include iphone-landscape-and-smaller {
+      padding: 10px 0;
+    }
+  }
+
+  .tab-content>.with-table {
+    padding: 0;
+
+    @include iphone-landscape-and-smaller {
+      // remove the top border to make the table flush with the bottom of the tabs
+      &>table thead>tr { border-top: none; }
+    }
+  }
+}
+
+.modal-container>.row {
+  // adds a top margin to the content grid for modal-type views to separate it
+  // from the navbar
+  margin-top: 20px;
+
+  &>.twelve.columns {
+    background-color: $gray2;
+    color: white;
+    text-align: center;
+    padding-top: 40px;
+    border-top-left-radius: $radius-size;
+    border-top-right-radius: $radius-size;
+
+    .body-portion {
+      margin-top: 40px;
+      background-color: $gray6;
+      color: black;
+      text-align: left;
+      padding: 50px 0;
+
+      .inset {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+    }
+  }
+}
+
+.tab-content>* {
+  display: none;
+  &.active { display: block; }
+}

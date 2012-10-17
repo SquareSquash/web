@@ -1,0 +1,62 @@
+@import "vars";
+
+// ----- RESPONSIVE
+
+@include ipad-and-larger {
+  .compact-only { display: none; }
+}
+
+@include iphone-landscape-and-smaller {
+  .full-size-only { display: none; }
+}
+
+// ----- LAYOUT
+
+// bleed background colors to the bottom of the page
+body {
+  background-color: white;
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-size: $base-font-size;
+}
+
+@import "typography";
+
+// ----- PAGE ELEMENTS
+
+a.favorite {
+  text-decoration: none;
+  &:hover { text-decoration: none; }
+  i { color: $orange; }
+}
+
+.no-results {
+  padding-top: 20px;
+  color: $gray4;
+  font-size: $h2-size;
+  font-weight: bold;
+  text-align: center;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+// apply to a div containing a gravatar to the left of profile data
+.profile-widget img {
+  width: 40%;
+  margin-right: 10px;
+  float: left;
+}
+
+// ----- IMPORTS
+
+@import "alerts";
+@import "badges";
+@import "breadcrumbs";
+@import "containers";
+@import "controls";
+@import "forms";
+@import "modal";
+@import "navbar";
+@import "pills";

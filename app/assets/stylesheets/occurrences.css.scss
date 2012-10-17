@@ -1,0 +1,90 @@
+@import "vars";
+@import "tables";
+
+body#occurrences-show {
+
+  // color the tabbed portion gray by coloring out the global portion as white
+  #mainbar { background-color: $gray6; }
+  #global-portion { background-color: white; }
+
+  #occurrence-header {
+    h1 { margin-bottom: 5px; }
+    h4 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      border-bottom: 1px solid $gray5;
+      padding-bottom: 20px;
+    }
+  }
+
+  ul.backtrace {
+    a { text-decoration: none; }
+
+    >li {
+      margin-bottom: 5px;
+
+      &.lib, &>p {
+        // hang the first line in case it wraps
+        text-indent: -20px;
+        padding-left: 20px;
+      }
+
+      &, p>a {
+        font-family: Menlo, monospace;
+        color: $gray2;
+      }
+      &.lib { color: $gray4; }
+      &.filtered p>a { color: $gray3; }
+      p { margin: 0; }
+
+      div {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+
+      blockquote {
+        font-size: 11px;
+        margin: 10px 0;
+      }
+    }
+  }
+
+  .backtrace-tabs a.faulted {
+    color: $red;
+  }
+
+  #parents-tab-content {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}
+
+.value-inspector {
+  summary { font-weight: bold; }
+  summary i { margin-right: 4px; }
+
+  table td {
+    vertical-align: top;
+    padding: 2px 4px;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    &.nowrap { white-space: pre; }
+  }
+}
+
+table.parameter { @include table; }
+
+.value-inspector {
+  width: 67%;
+
+  .modal-body {
+    max-height: 460px;
+    overflow-y: auto;
+    padding-bottom: 30px;
+
+    input[type=checkbox] { margin-top: 5px; }
+    table { width: auto; }
+  }
+}

@@ -1,0 +1,17 @@
+body#membership-edit {
+  .row { padding-bottom: 30px; }
+
+  form {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  #project-owner img {
+    float: left;
+    margin-right: 10px;
+  }
+}
+
+#email-aliases {
+  input[type=search] { margin-bottom: 10px; }
+}

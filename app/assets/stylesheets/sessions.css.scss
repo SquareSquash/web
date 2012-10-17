@@ -1,0 +1,23 @@
+@import "vars";
+
+body.sessions {
+  .modal-container p { font-size: $h5-size; }
+
+  .body-portion {
+    h3 { margin-top: 50px; }
+
+    form {
+      &>div {
+        margin: 10px 0;
+        &:last-child { margin-bottom: 0; }
+      }
+
+      .row .columns {
+        padding: 0 5px;
+        &:first-child { padding-left: 0; }
+        &:last-child { padding-right: 0; }
+      }
+      input[type=submit] { width: 100%; }
+    }
+  }
+}

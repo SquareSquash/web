@@ -1,0 +1,19 @@
+@import "vars";
+
+ul.autocomplete {
+  z-index: 99;
+  position: absolute;
+  left: 0;
+  min-width: 200px;
+  border: 1px solid $gray4;
+  box-shadow: 0 4px 4px rgba(black, 0.5);
+  background-color: white;
+  display: none;
+  &.shown { display: block; }
+
+  li {
+    padding: 5px 10px;
+    &.selected { background-color: $blue; }
+    &:hover { cursor: pointer; }
+  }
+}

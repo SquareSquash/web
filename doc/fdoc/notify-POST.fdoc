@@ -1,0 +1,62 @@
+---
+description: |
+  Notify Squash of an exception or crash. Any parameters in the request JSON
+  that are not `class_name`, `api_key` or `environment` are included as part of
+  the resulting Occurrence record. See the Occurrence class documentation for
+  details on the (many) fields you can pass. As an example, the required fields
+  are documented below (though there is a bevvy of additional optional fields).
+responseCodes:
+- status: 403
+  successful: false
+  description: Unknown API key.
+- status: 422
+  successful: false
+  description: |
+    * Invalid exception data; see Squash server log for details.
+    * Missing required parameter.
+- status: 200
+  successful: true
+requestParameters:
+  additionalProperties: true
+  properties:
+    environment:
+      description: The name of the environment in which the error occurred.
+      required: true
+      type: string
+      example: production
+    api_key:
+      description: You project's API key.
+      required: true
+      type: string
+      example: fff57d88-e5ab-44e1-ac24-a2a1ab1ef86f
+    class_name:
+      description: The error object's class.
+      required: true
+      type: string
+      example: ArgumentError
+    message:
+      description: The error message.
+      required: true
+      type: string
+      example: Expected 4 arguments for myMethod, got 3.
+    backtraces:
+      description: |
+        An array describing the backtraces of any active threads or fibers at
+        the time of the exception. This array can take one of a number of
+        formats; see the Occurrence class documentation for more information.
+      required: true
+      type: array
+      example: ["Active Thread/Fiber", true, [["some/file.rb", 14, "some_method"], ["some/file.rb", 2, "main"]]]
+    revision:
+      description: |
+        The SHA1 of the Git revision of the code that caused the exception.
+      required: true
+      type: string
+      example: 2dc20c984283bede1f45863b8f3b4dd9b5b554cc
+    occurred_at:
+      description: |
+        The time at which the exception was raised or the crash occurred.
+      required: true
+      type: string
+      format: date-time
+      example: 2012-09-19 21:46:24 -07:00

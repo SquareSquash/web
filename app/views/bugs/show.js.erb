@@ -1,0 +1,323 @@
+$(document).ready(function() {
+  new PageManager().setup();
+});
+
+function PageManager() {
+  this.setup = function() {
+    this.setupManagementForm();
+    this.setupCommentForm();
+    this.setupCommitDropdown();
+    this.loadEvents();
+    this.loadComments();
+    this.occurrencesTable = this.setupOccurrencesTable();
+    this.setupTabCounts();
+    this.setupWatchButton();
+    this.setupAggregation();
+    this.setupNotifications();
+    this.setupMagicFixedCheckbox();
+    this.setupJoinLink();
+    this.setupNotificationForm();
+    this.setupHistogram();
+    <% unless Squash::Configuration.jira.disabled? %>
+      this.setupJIRALink();
+      this.loadJIRAProjects();
+    <% end %>
+  };
+
+  this.setupManagementForm = function() {
+    return new SmartForm($('#management-form'), function() {
+      new Flash('success').text("Changes saved.");
+    });
+  };
+
+  this.setupCommentForm = function() {
+    var self = this;
+    return new SmartForm($('#new_comment'), function() {
+      $('#new_comment textarea').val("");
+      self.loadComments();
+    });
+  };
+
+  this.loadEvents = function() {
+    new Feed("<%= project_environment_bug_events_url(@project, @environment, @bug, format: 'json') %>", $('#events'));
+  };
+
+  this.setupCommitDropdown = function() {
+    var commits = JSON.parse("<%= escape_javascript @project.repo.log(10).to_json %>");
+    $('#bug_resolution_revision').autocomplete({
+      suggestions: commits,
+      elementBuilder: function(li, commit) {
+        li.append($('<div/>').text(commit.message));
+        $('<tt/>').text(commit.sha.slice(0, 6)).appendTo(li);
+      },
+      filterSuggestions: function(string, suggestions) {
+        return suggestions.filter(function(commit) {
+          return commit.sha.indexOf(string.toLowerCase()) == 0 || commit.message.toLowerCase().indexOf(string.toLowerCase()) == 0;
+        });
+      },
+      fieldValue: function(suggestion) { return suggestion.sha; }
+    });
+  };
+
+  this.loadComments = function() {
+    var self = this;
+    $('#comments-list').empty();
+
+    $.ajax("<%= project_environment_bug_comments_url(@project, @environment, @bug, format: 'json') %>", {
+      type: 'GET',
+      success: function(comments) {
+        $.each(comments, function(_, comment) {
+          var row = $('<div/>').addClass('comment').appendTo('#comments-list');
+          var author = $('<h5/>').addClass('comment-author').appendTo(row);
+          $('<img/>').attr('src', comment.user.gravatar).appendTo(author);
+          $('<a/>').attr('href', comment.user_url).text(comment.user.name).appendTo(author);
+          var times = $('<span/>').text("written ").addClass('aux times').appendTo(author);
+          $('<time/>').attr('datetime', comment.created_at).liveUpdate().appendTo(times);
+          if (comment.updated_at != comment.created_at) {
+            times.append("; last edited ");
+            $('<time/>').attr('datetime', comment.updated_at).liveUpdate().appendTo(times);
+          }
+          $('<img/>').attr('src', "<%= image_path 'comment-arrow.png' %>").appendTo(row);
+          var viewDiv = $('<div/>').addClass('comment-body').html(comment.body_html).appendTo(row);
+
+          if (comment.user.username == "<%= current_user.username %>" || <%= (current_user.role(@project) == :admin || current_user.role(@project) == :owner).inspect %>) {
+            var editDiv = $('<div/>').addClass('comment-body').appendTo(row).hide();
+            var form = $('<form/>').attr({ 'accept-charset': 'UTF-8', action: comment.url, method: 'post' }).appendTo(editDiv);
+            var extras = $('<div/>').css({ margin: 0, padding: 0, display: 'inline' }).appendTo(form);
+            $('<input/>').attr({ name: 'utf8', type: 'hidden', value: '✓' }).appendTo(extras);
+            $('<input/>').attr({ name: '_method', type: 'hidden', value: 'put' }).appendTo(extras);
+            $('<input/>').attr({ name: $('meta[name=csrf-param]').attr('content'), type: 'hidden', value: $('meta[name=csrf-token]').attr('content') }).appendTo(extras);
+            $('<textarea/>').attr({ name: 'comment[body]', rows: 4 }).val(comment.body).appendTo(form);
+            var buttons = $('<p/>').appendTo(form);
+            $('<input/>').addClass('default').attr({ name: 'commit', type: 'submit', value: 'Update' }).appendTo(buttons);
+            buttons.append(" ");
+            $('<input/>').attr({ type: 'button', value: 'Cancel' }).appendTo(buttons).click(function() {
+              editDiv.hide();
+              viewDiv.show();
+              return false;
+            });
+            new SmartForm(form, function() { self.loadComments(); return false; });
+
+            buttons = $('<p/>').addClass('actions').appendTo(viewDiv);
+            $('<input/>').addClass('small').attr({ type: 'button', value: 'Edit' }).appendTo(buttons).click(function() {
+              editDiv.show();
+              viewDiv.hide();
+              return false;
+            });
+            buttons.append(" ");
+            $('<input/>').addClass('small warning').attr({ type: 'button', value: 'Delete' }).appendTo(buttons).click(function() {
+              if (!confirm("Are you sure you want to delete " + comment.user.name + "’s comment?")) return;
+              $.ajax(comment.url, {
+                type: 'DELETE',
+                //success: function() { self.loadComments(); },
+                error: function() { new Flash('alert').text("Couldn’t delete the comment."); }
+              });
+              return false;
+            });
+          }
+        });
+      },
+      error: function() { new Flash('alert').text("Couldn’t load comments."); }
+    });
+  };
+
+  this.setupOccurrencesTable = function() {
+    return new SortableTable($('#occurrences-table'),
+                      "<%= project_environment_bug_occurrences_url(@project, @environment, @bug, format: 'json') %>",
+                      [
+                        { key: 'occurred_at', title: "Time", sortable: 'desc', htmlGenerator: function(occurrence) {
+                          return $('<time/>').attr('datetime', occurrence.occurred_at).liveUpdate();
+                        } },
+                        { key: 'message', title: 'Message', sortable: false },
+                        <% OccurrencesController::INDEX_FIELDS[@bug.client].each do |key| %>
+                          { key: "<%= key %>", title: "<%= Occurrence.human_attribute_name(key).titleize %>", sortable: false },
+                        <% end %>
+                      ],
+                      {
+                        sort_key:    'occurred_at',
+                        scroll_with: 'number'
+                      }
+    );
+  };
+
+  this.setupTabCounts = function() {
+    $('#first-occurrence').liveUpdate();
+    $('#latest-occurrence').liveUpdate();
+  };
+
+  this.setupWatchButton = function() {
+    $('#watch').click(function() {
+      $.ajax("<%= watch_project_environment_bug_url(@project, @environment, @bug, format: 'json') %>", {
+        type: 'POST',
+        success: function(_, _, xhr) {
+          if (xhr.status == 204) $('#watch').removeClass('icon-star').addClass('icon-star-empty');
+          else if (xhr.status == 201) $('#watch').removeClass('icon-star-empty').addClass('icon-star');
+          else
+            new Flash('alert').text("Couldn’t watch or unwatch this bug.");
+        },
+        error: function() { new Flash('alert').text("Couldn’t watch or unwatch this bug."); },
+        dataType: 'text'
+      });
+      return false;
+    });
+  };
+
+  this.setupAggregation = function() {
+    var agg = new Aggregation($('#aggregation-charts'),
+                              $('#aggregation-filter'),
+                              "<%= aggregate_project_environment_bug_occurrences_url(@project, @environment, @bug, format: 'json') %>");
+    $('#aggregation-filter').submit(function(e) { agg.load(); return false; });
+  };
+
+  this.setupNotifications = function() {
+    var deploy_input = $('#notify_on_deploy');
+    deploy_input.change(function() {
+      deploy_input[0].disabled = true;
+      $.ajax("<%= notify_deploy_project_environment_bug_url(@project, @environment, @bug, format: 'json') %>", {
+        type: 'POST',
+        complete: function() { deploy_input[0].disabled = false; },
+        success: function(bug) {
+          deploy_input[0].checked = bug.notify_on_deploy;
+        },
+        error: function() {
+          new Flash('alert').text("Error updating email settings.");
+          deploy_input[0].checked = !deploy_input[0].checked;
+        }
+      })
+    });
+
+    var occurrence_input = $('#notify_on_occurrence');
+    occurrence_input.change(function() {
+      occurrence_input[0].disabled = true;
+      $.ajax("<%= notify_occurrence_project_environment_bug_url(@project, @environment, @bug, format: 'json') %>", {
+        type: 'POST',
+        complete: function() { occurrence_input[0].disabled = false; },
+        success: function(bug) {
+          occurrence_input[0].checked = bug.notify_on_occurrence;
+        },
+        error: function() {
+          new Flash('alert').text("Error updating email settings.");
+          occurrence_input[0].checked = !occurrence_input[0].checked;
+        }
+      })
+    });
+  };
+
+  this.setupMagicFixedCheckbox = function() {
+    $('#bug_resolution_revision').change(function() {
+      if ($('#bug_resolution_revision').val().length > 0) {
+        $('#bug_fixed')[0].checked = true;
+        $('#bug_fix_deployed').removeAttr('disabled');
+      }
+    });
+
+    $('#bug_fixed').change(function() {
+      if ($('#bug_fixed')[0].checked) $('#bug_fix_deployed').removeAttr('disabled');
+      else $('#bug_fix_deployed').attr('disabled', 'disabled');
+    });
+    if (!('#bug_fix_deployed')[0].checked) $('#bug_fix_deployed').attr('disabled', 'disabled');
+  };
+
+  this.setupJoinLink = function() {
+    $('#join-link').click(function(e) {
+      $.ajax($(e.currentTarget).attr('href') + '.json', {
+        type: 'POST',
+        success: function() { window.location.reload(); },
+        error: function() { new Flash('alert').text("Couldn’t join project."); }
+      });
+      return false;
+    });
+  };
+
+  this.setupNotificationForm = function() {
+    return new SmartForm($('#notification-form'), function() {
+      new Flash('success').text("Notification set.");
+    });
+  };
+
+  this.setupHistogram = function() {
+    new Histogram($('#histogram'), "<%= histogram_project_environment_bug_occurrences_url(@project, @environment, @bug, format: 'json') %>");
+  };
+
+  <% unless Squash::Configuration.jira.disabled? %>
+    this.setupJIRALink = function() {
+      var field = $('#bug_jira_issue'),
+          info = $('#jira-name'),
+          status = $('#jira-status'),
+          statusSelector = $('#bug_jira_status_id'),
+          statusesLoaded = false;
+
+      var fieldChanged = function() {
+        info.empty();
+        status.empty();
+        statusSelector.attr('disabled', 'disabled');
+
+        if (field.val() == '') return;
+
+        $('<i/>').addClass('icon-refresh').appendTo(status);
+        $.ajax("<%= jira_issue_url('REPLACEME') %>".replace('REPLACEME', field.val()), {
+          type: 'GET',
+          success: function(issue) {
+            status.empty();
+            $('<i/>').addClass('icon-ok text-success').appendTo(status);
+            var url = "<%= Squash::Configuration.jira.api_host %><%= Squash::Configuration.jira.api_root %>/browse/" + issue.key;
+            $('<a/>').attr({href: url, target: '_blank'}).text(issue.fields.summary).appendTo(info);
+            if (statusesLoaded) statusSelector.removeAttr('disabled');
+          },
+          error: function(xhr) {
+            status.empty();
+            $('<i/>').addClass('icon-remove text-error').appendTo(status);
+            if (xhr.status == 404)
+              $('<span/>').addClass('text-error').text("Couldn’t find that JIRA issue.").appendTo(info);
+            else
+              $('<span/>').addClass('text-error').text("Problem loading JIRA issue.").appendTo(info);
+          }
+        });
+      };
+      fieldChanged();
+      field.change(fieldChanged);
+
+      $.ajax("<%= jira_statuses_url(format: 'json') %>", {
+        type: 'GET',
+        success: function(statuses) {
+          statusSelector.empty();
+          $('<option/>').attr('value', '').text('').appendTo(statusSelector);
+          $.each(statuses, function(_, status) {
+            $('<option/>').attr('value', status.id).text(status.name).appendTo(statusSelector);
+          });
+          statusesLoaded = true;
+          if (field.val().length > 0) statusSelector.removeAttr('disabled');
+          statusSelector.val("<%= @bug.jira_status_id || '' %>");
+        },
+        error: function() {
+          statusSelector.attr('disabled', 'disabled');
+          $('#bug_jira_status_id option').text("Error");
+        }
+      });
+    };
+
+    this.loadJIRAProjects = function() {
+      var dropdown = $('#jira-projects');
+      $.ajax("<%= jira_projects_url(format: 'json') %>", {
+        type: 'GET',
+        success: function(projects) {
+          $('<option/>').attr('selected', 'selected').appendTo(dropdown);
+          $.each(projects, function(_, project) {
+            $('<option/>').attr('value', project.id).text(project.name).appendTo(dropdown);
+          });
+
+          dropdown.change(function() {
+            if (dropdown.val() == '') return false;
+            var url = "<%= @new_issue_url %>&pid=" + dropdown.val();
+            var opened = window.open(url);
+            if (!opened || opened.closed)
+              prompt("You have a pop-up blocker enabled. Visit this URL:", url);
+            return false;
+          });
+          dropdown.removeAttr('disabled');
+        },
+        error: function() { new Flash('alert').text("Couldn’t load the list of JIRA projects."); }
+      });
+    };
+  <% end %>
+}

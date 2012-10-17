@@ -1,0 +1,6 @@
+---
+disabled: true
+authentication:
+  strategy: token
+  token: YOUR_AUTH_TOKEN
+api_url: "https://events.pagerduty.com/generic/2010-04-15/create_event.json"

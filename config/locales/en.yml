@@ -1,0 +1,348 @@
+en:
+  activerecord:
+    errors:
+      models:
+        bug:
+          attributes:
+            assigned_user_id:
+              not_member: is not a project member
+            blamed_revision:
+              invalid: is not a valid commit ID
+            duplicate_of_id:
+              already_duplicate: already marked as duplicate of a bug
+              foreign_bug: can only be the duplicate of a bug in the same environment
+              has_duplicates: cannot be marked as duplicate because other bugs have been marked as duplicates of this bug
+              is_a_duplicate: cannot be the duplicate of a bug that’s marked as a duplicate
+              not_found: unknown bug number
+            fix_deployed:
+              not_fixed: cannot be true when the bug is not marked as fixed
+            resolution_revision:
+              invalid: is not a valid commit ID
+              set_on_unfixed: cannot be set without also marking the bug as fixed
+            revision:
+              invalid: is not a valid commit ID
+        comment:
+          attributes:
+            bug_id:
+              not_allowed: You don’t have permission to comment on this bug.
+        deploy:
+          attributes:
+            revision:
+              invalid: is not a valid commit ID
+        email:
+          attributes:
+            email:
+              taken: is already being handled by someone else
+              is_your_primary: is already your main email address
+              has_global_redirect: is already globally handled by you
+            primary:
+              must_be_set: cannot be unset without setting another email as primary
+              not_allowed: cannot be set for project-specific email redirects
+            project_id:
+              not_a_member: not a member
+        occurrence:
+          attributes:
+            revision:
+              invalid: is not a valid commit ID
+        project:
+          attributes:
+            default_environment_id:
+              wrong_project: is not an environment in this project
+            repository_url:
+              unreachable: is not accessible
+              taken: already has a Squash project
+        user:
+          attributes:
+            password:
+              exclusion: is too common
+              confirmation: didn’t match
+        watch:
+          attributes:
+            bug_id:
+              no_permission: is not part of a project you are a member of
+    attributes:
+      bug:
+        assigned_user_id: assigned user
+        blamed_revision: commit at fault
+        class_name: exception class name
+        client: Squash client library
+        duplicate_of_id: bug that this is a duplicate of
+        duplicate_of_number: this bug is a duplicate of
+        file: relevant file
+        fixed: fixed
+        fixed_at: time fixed
+        fix_deployed: fix has been deployed
+        irrelevant: irrelevant
+        jira_issue: JIRA issue
+        jira_status_id: JIRA issue status
+        line: relevant line
+        message_template: exception message
+        number: number
+        resolution_revision: fix commit
+        revision: revision of first occurrence
+      comment:
+        number: number
+        body: body
+      deploy:
+        build: internal version identifier
+        revision: repository revision
+        deployed_at: time deployed
+      email:
+        email: email address
+      environment:
+        name: name
+        sends_emails: Sends emails
+        notifies_pagerduty: Notifies PagerDuty
+      membership:
+        admin: administrator
+      notification_threshold:
+        period: period of time
+        threshold: number of exceptions
+      occurrence:
+        action: Web action
+        altitude: geolocated altitude
+        arguments: process arguments
+        backtraces: stack traces
+        browser_name: Web browser name
+        browser_version: Web browser version
+        browser_engine: Web browser engine
+        browser_os: Web browser OS
+        browser_engine_version: Web browser engine version
+        build: client build
+        client: Squash client library
+        color_depth: color depth
+        cookies: cookies hash
+        connectivity: network connectivity
+        controller: Web controller
+        device_id: client device ID
+        device_type: client device type
+        env_vars: environment variables
+        flash: flash hash
+        headers: request headers
+        heading: geolocated heading
+        host: host
+        hostname: hostname
+        ivars: instance variables
+        lat: geolocated latitude
+        location_precision: geolocation precision
+        lon: geolocated longitude
+        message: exception message
+        network_operator: network operator
+        network_type: network type
+        number: number
+        occurred_at: time of occurrence
+        operating_system: client operating system
+        orientation: device orientation
+        params: params hash
+        parent_exceptions: parent exceptions
+        path: path
+        pid: PID
+        physical_memory: device physical memory
+        port: port
+        power_state: device power state
+        query: query string
+        request_method: request method
+        revision: repository revision
+        root: source root
+        rooted: device rooted
+        schema: schema
+        screen_width: screen width
+        screen_height: screen height
+        session: session hash
+        speed: geolocated speed
+        user_data: user data
+        version: client version
+        window_width: window width
+        window_height: window height
+      project:
+        all_mailing_list: all exceptions mailing list
+        api_key: API key
+        commit_url_format: commit URL format
+        critical_mailing_list: critical exceptions mailing list
+        critical_threshold: critical threshold
+        filter_paths: filtered paths
+        filter_paths_string: filtered paths
+        locale: email locale
+        name: name
+        pagerduty_enabled: notify PagerDuty for new occurrences
+        pagerduty_service_key: service key
+        repository_url: repository URL
+        sender: sender
+        sends_emails_outside_team: notify unknown email addresses
+        trusted_email_domain: trusted domain for unknown email addresses
+        whitelist_paths_string: whitelisted paths
+        whitelist_paths_string: whitelisted paths
+      user:
+        crypted_password: password
+        email_address: email address
+        first_name: first name
+        last_name: last name
+        password: password
+        password_confirmation: confirm password
+        username: username
+
+  date:
+    formats:
+      short: "%b %d, %Y"
+      compact: "%m/%d/%y"
+  errors:
+    messages:
+      accepted: must be accepted
+      blank: can’t be blank
+      confirmation: doesn’t match confirmation
+      empty: can’t be empty
+      equal_to: must be equal to %{count}
+      even: must be even
+      exclusion: reserved
+      greater_than: must be greater than %{count}
+      greater_than_or_equal_to: must be greater than or equal to %{count}
+      inclusion: not acceptable
+      incorrect_type: incorrect type
+      invalid: invalid
+      invalid_email: not a valid email address
+      invalid_url: is not a valid URL
+      less_than: must be less than %{count}
+      less_than_or_equal_to: must be less than or equal to %{count}
+      not_a_number: not a number
+      not_an_integer: not an integer
+      odd: must be odd
+      taken: already taken
+      too_long: must be %{count} characters or shorter
+      too_short: must be %{count} characters or longer
+      wrong_length: must be be %{count} characters long
+      invalid_date: not a valid date
+      invalid_time: not a valid time
+      invalid_datetime: not a valid date and time
+      is_at: must be at %{restriction}
+      before: must be before %{restriction}
+      on_or_before: must be on or before %{restriction}
+      after: must be after %{restriction}
+      on_or_after: must be on or after %{restriction}
+      unknown_revision: does not exist in the repository
+  helpers:
+    submit:
+      comment:
+        create: Post
+        update: Update
+      email:
+        create: Add
+      membership:
+        update: Save Changes
+      notification_threshold:
+        create: Set
+        update: Update
+      project:
+        create: Create Project
+        update: Update Configuration
+      user:
+        create: Sign Up
+        update: Save Changes
+    application:
+      number_to_dms:
+        coordinate: "%{degrees}° %{minutes}ʹ %{seconds}ʺ %{hemisphere}"
+        north: N
+        west: W
+        south: S
+        east: E
+  time:
+    formats:
+      full_date: "%B %-d, %Y"
+      full_time: "%-I:%M:%S %P"
+      git: "%a %b %-d %H:%M:%S %Y %z"
+      short_date: "%b %d, %Y"
+      compact: "%Y/%-m/%-d %-H:%M:%S"
+  models:
+    membership:
+      role:
+        owner: owner
+        admin: administrator
+        member: project member
+    user:
+      name: "%{first_name} %{last_name}"
+    bug:
+      name: "Bug #%{number}"
+    occurrence:
+      name: "Occurrence #%{number}"
+  controllers:
+    accounts:
+      update:
+        success: "Your profile has been updated."
+    application:
+      mass_assignment_security: The previous request was malformed.
+    authentication:
+      login_required: You must be logged in to continue.
+    bugs:
+      destroy:
+        deleted: "Bug #%{number} was deleted."
+      show:
+        jira_link:
+          description: |
+            %{class_name} in %{file}:%{line}
+
+            %{message}
+
+            First occurred in revision %{revision}. More information: %{url}
+          not_applicable: N/A
+          summary: "%{class_name} on %{file_name}:%{line}"
+    project:
+      membership:
+        destroy:
+          deleted: You are no longer a member of the %{name} project.
+        must_not_be_owner: You cannot revoke your membership in a project that you own. Transfer ownership to someone else first.
+    projects:
+      destroy:
+        deleted: Project %{name} was deleted.
+      context:
+        commit_not_found: Couldn’t find that commit or file.
+        line_out_of_bounds: Line number is out of range.
+        missing_param: Missing required parameter.
+        repo_nil: Couldn’t load project repository.
+      rekey:
+        success: The API key for %{name} is now %{api_key}.
+    sessions:
+      create:
+        logged_in: Welcome to Squash, %{name}!
+        incorrect_login: Username and password didn’t match.
+        ldap_error: There was an error connecting to the LDAP server.
+        missing_field: You must provide a username and a password.
+      destroy:
+        logged_out: You have been logged out.
+    users:
+      create:
+        success: "Welcome to Squash, %{name}!"
+  mailers:
+    notifier:
+      initial:
+        subject: "[Squash] %{class} in %{filename} (%{project} %{environment})"
+      critical:
+        subject: "[!!!] %{class} in %{filename} (%{project} %{environment})"
+      blame:
+        subject: "[Squash] %{class} in %{filename} (%{project} %{environment})"
+      assign:
+        subject: "[Squash] You have been assigned to bug #%{number} of %{project}"
+      resolved:
+        subject:
+          fixed: "[Squash] Bug #%{number} of %{project} was resolved"
+          irrelevant: "[Squash] Bug #%{number} of %{project} was marked irrelevant"
+      comment:
+        subject: "[Squash] A comment has been added to bug #%{number} of %{project}"
+      occurrence:
+        subject: "[Squash] New occurrence of bug #%{number} of %{project}"
+      deploy:
+        subject: "[Squash] The fix for bug #%{number} of %{project} was deployed"
+      threshold:
+        subject: "[Squash] Bug #%{number} of %{project} is occurring a lot"
+      reopened:
+        subject: "[Squash] Reopened: %{class} in %{filename} (%{project} %{environment})"
+  workers:
+    pagerduty:
+      acknowledge:
+        description:
+          assigned: "%{class_name} in %{file_name} was assigned to %{user}."
+          irrelevant: "%{class_name} in %{file_name} was marked as irrelevant on Squash."
+          fixed: "%{class_name} in %{file_name} was marked as resolved on Squash."
+      incident:
+        description: "%{class_name} in %{file_name}:%{line}: %{message}"
+      not_applicable: "(N/A)"
+      resolve:
+        description: "The fix for %{class_name} in %{file_name} on Squash was deployed."

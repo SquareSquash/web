@@ -1,0 +1,25 @@
+@import "vars";
+
+ul.pills {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  text-align: center;
+  border-bottom: 1px solid $gray4;
+
+  &:first-child { margin-top: 0; }
+
+  li {
+    display: inline;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-right: 1px solid black;
+    margin-top: 30px;
+    margin-bottom: 10px;
+
+    &:last-child { border-right: none; }
+    &.active { font-weight: bold; }
+
+    a { text-decoration: none; }
+  }
+}

@@ -1,0 +1,9 @@
+@import "vars";
+
+body#users-show {
+  h1 img {
+    height:  $h1-size;
+    vertical-align: bottom;
+    margin-right: 10px;
+  }
+}

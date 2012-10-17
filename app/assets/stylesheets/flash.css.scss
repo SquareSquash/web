@@ -1,0 +1,50 @@
+@import "vars";
+
+#flashes {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+}
+
+@mixin flash($color) {
+  font-weight: bold;
+  padding: 10px 20px;
+  border-top-right-radius: $radius-size;
+  border-bottom-right-radius: $radius-size;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: $color;
+
+  // prepare for slide-in animation
+  position: relative;
+  left: -100%;
+
+  [class^="icon-"], [class*=" icon-"] { margin-right: 10px; }
+  a {
+    float: right;
+    font-weight: bold;
+    opacity: 0.5;
+    &:hover { opacity: 1; }
+  }
+}
+
+.flash-alert { @include flash($red); }
+.flash-notice { @include flash($blue); }
+.flash-success { @include flash($green); }
+
+$flash-animation-duration: 0.5s;
+
+.flash-shown {
+  left: 0%;
+  -webkit-transition: left $flash-animation-duration ease-out;
+  -moz-transition: left $flash-animation-duration ease-out;
+  transition: left $flash-animation-duration ease-out;
+}
+
+.flash-hidden {
+  left: -100%;
+  -webkit-transition: left $flash-animation-duration ease-in;
+  -moz-transition: left $flash-animation-duration ease-in;
+  transition: left $flash-animation-duration ease-in;
+}

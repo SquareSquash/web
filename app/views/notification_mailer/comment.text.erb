@@ -1,0 +1,21 @@
+<%= @comment.user.name %> has commented on this bug:
+
+<%= @bug.class_name %>
+<% if @bug.displayable_file? %>
+in <%= @bug.file %>:<%= @bug.line %>
+<% end %>
+
+<%= @bug.message_template %>
+
+His comment was:
+
+<%= email_quote @comment.body %>
+
+More details at <%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug, anchor: 'comments' %>
+
+        Yours truly,
+        Squash
+---
+
+If you wish to stop receiving these emails, visit your account page:
+<%= account_url %>
