@@ -325,7 +325,8 @@ class InitialSchema < ActiveRecord::Migration
           deployed_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
           environment_id INTEGER NOT NULL REFERENCES environments(id) ON DELETE CASCADE,
           hostname CHARACTER VARYING(126),
-          revision CHARACTER(40) NOT NULL
+          revision CHARACTER(40) NOT NULL,
+          version CHARACTER VARYING(126)
       )
     SQL
 

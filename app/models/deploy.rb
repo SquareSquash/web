@@ -52,9 +52,10 @@
 # Releases only
 # -------------
 #
-# |         |                                                 |
-# |:--------|:------------------------------------------------|
-# | `build` | The internal version identifier of the release. |
+# |           |                                                 |
+# |:----------|:------------------------------------------------|
+# | `build`   | The internal version identifier of the release. |
+# | `version` | The human readable version number.              |
 
 class Deploy < ActiveRecord::Base
   belongs_to :environment, inverse_of: :deploys
@@ -81,6 +82,9 @@ class Deploy < ActiveRecord::Base
             length:     {maximum: 40},
             uniqueness: {scope: :environment_id},
             allow_nil:  true
+  validates :version,
+            length:    {maximum: 126},
+            allow_nil: true
 
   after_commit(on: :create) do |deploy|
     worker = DeployFixMarker.new(deploy)
@@ -89,6 +93,7 @@ class Deploy < ActiveRecord::Base
   set_nil_if_blank :hostname, :build
 
   scope :builds, where('build IS NOT NULL')
+  scope :by_time, order('deployed_at DESC')
 
   # @return [Git::Object::Commit] The Commit for this Deploy's `revision`.
   def commit() environment.project.repo.object revision end

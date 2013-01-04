@@ -53,7 +53,10 @@ module Views
 
             if @environment.deploys.builds.any?
               text " that occurred in build "
-              select_tag 'filter[deploy_id]', options_for_select(@environment.deploys.builds.map { |d| [d.build, d.id] }.unshift(['any', nil])), class: 'input-small'
+              select_tag 'filter[deploy_id]',
+                         options_for_select(@environment.deploys.builds.by_time.map do |d|
+                           ["#{d.build} (#{d.version})", d.id]
+                         end.unshift(['any', nil])), class: 'input-small'
             end
           end
           p do
