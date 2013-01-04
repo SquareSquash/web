@@ -593,10 +593,6 @@ class InitialSchema < ActiveRecord::Migration
     SQL
 
     execute <<-SQL
-      CREATE UNIQUE INDEX projects_repo ON projects (LOWER(repository_url))
-    SQL
-
-    execute <<-SQL
       CREATE INDEX slugs_for_record ON slugs (sluggable_type, sluggable_id, active)
     SQL
 

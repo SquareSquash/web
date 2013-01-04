@@ -144,7 +144,6 @@ class Project < ActiveRecord::Base
             #format:     {with: /[0-9a-f\-]+/}
   validates :repository_url,
             presence:   true,
-            uniqueness: {case_sensitive: false},
             length:     {maximum: 255}
   validate :default_environment_belongs_to_project
   validate :can_clone_repo, if: :validate_repo_connectivity
