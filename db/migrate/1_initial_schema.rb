@@ -377,6 +377,14 @@ class InitialSchema < ActiveRecord::Migration
     SQL
 
     execute <<-SQL
+      CREATE TABLE device_bugs (
+          bug_id INTEGER NOT NULL REFERENCES bugs(id) ON DELETE CASCADE,
+          device_id CHARACTER VARYING(126) NOT NULL,
+          PRIMARY KEY (bug_id, device_id)
+      )
+    SQL
+
+    execute <<-SQL
       CREATE TABLE emails (
           id SERIAL PRIMARY KEY,
           "primary" BOOLEAN DEFAULT FALSE NOT NULL,

@@ -168,6 +168,21 @@ describe Occurrence do
         }.to_not change{ bug.reload.any_occurrence_crashed }
       end
     end
+
+    context "[device bugs]" do
+      it "should create a device bug if the occurrence has a device" do
+        bug = FactoryGirl.create(:bug)
+
+        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
+        occurrence.bug.device_bugs.where(device_id: 'hello').should exist
+        expect {
+          FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
+        }.to_not change{ bug.device_bugs.where(device_id: 'hello').count }
+
+        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'goodbye')
+        occurrence.bug.device_bugs.where(device_id: 'goodbye').should exist
+      end
+    end
   end
 
   describe "#faulted_backtrace" do

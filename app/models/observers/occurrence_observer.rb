@@ -31,5 +31,13 @@ class OccurrenceObserver < ActiveRecord::Observer
   # @private
   def after_create(occurrence)
     occurrence.bug.update_attribute(:any_occurrence_crashed, true) if occurrence.crashed?
+
+    if occurrence.device_id.present?
+      DeviceBug.transaction do
+        if occurrence.bug.device_bugs.where(device_id: occurrence.device_id).none?
+          occurrence.bug.device_bugs.create device_id: occurrence.device_id
+        end
+      end
+    end
   end
 end
