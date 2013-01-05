@@ -109,7 +109,7 @@ class Bug < ActiveRecord::Base
   has_many :comments, dependent: :delete_all, inverse_of: :bug
   has_many :events, dependent: :delete_all, inverse_of: :bug
   has_many :watches, dependent: :delete_all, inverse_of: :bug
-  has_many :notification_thresholds, dependent: :delete_all, inverse_of: :user
+  has_many :notification_thresholds, dependent: :delete_all, inverse_of: :bug
 
   # @return [User, Occurrence, JIRA::Resource::Issue] The User who is currently
   #   modifying this Bug, or the Occurrence that is causing this bug to be
