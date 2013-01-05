@@ -12,7 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# This observer on the {Occurrence} model sends an email when a Bug is critical.
+# This observer on the {Occurrence} model:
+#
+# * sends an email when a Bug is critical, and
+# * updates `any_occurrence_crashed` field on the associated {Bug}s.
 
 class OccurrenceObserver < ActiveRecord::Observer
   # @private
@@ -23,5 +26,10 @@ class OccurrenceObserver < ActiveRecord::Observer
 
     # notify pagerduty
     Multithread.spinoff("PagerDutyNotifier:#{occurrence.id}", 80) { PagerDutyNotifier.perform(occurrence.id) }
+  end
+
+  # @private
+  def after_create(occurrence)
+    occurrence.bug.update_attribute(:any_occurrence_crashed, true) if occurrence.crashed?
   end
 end
