@@ -97,6 +97,10 @@ describe Occurrence do
 
     context "[PagerDuty integration]" do
       before :each do
+        FakeWeb.register_uri :post,
+                             Squash::Configuration.pagerduty.api_url,
+                             response: File.read(Rails.root.join('spec', 'fixtures', 'pagerduty_response.json'))
+
         @project = FactoryGirl.create(:project, pagerduty_service_key: 'abc123', critical_threshold: 2, pagerduty_enabled: true)
         @environment = FactoryGirl.create(:environment, project: @project, notifies_pagerduty: true)
         @bug = FactoryGirl.create(:bug, environment: @environment)
