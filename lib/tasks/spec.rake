@@ -12,11 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'rspec/core'
-require 'rspec/core/rake_task'
+begin
+  require 'rspec/core'
+  require 'rspec/core/rake_task'
 
-RSpec::Core::RakeTask.new(:spec) do |t|
-  t.pattern = "./spec/**/*_spec.rb"
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    t.pattern = "./spec/**/*_spec.rb"
+  end
+
+  task default: :spec
+rescue LoadError
+  # that's ok
 end
-
-task default: :spec
