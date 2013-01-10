@@ -18,6 +18,7 @@
 # `display: none` without the "shown" class./
 #
 $(window).ready ->
+  # Clicking on a dropdown link toggles the dropdown
   $('a[rel=dropdown]').click (e) ->
     link = $(e.currentTarget)
     target = $(link.attr('href'))
@@ -31,6 +32,15 @@ $(window).ready ->
       link.find('.icon-chevron-up').removeClass('icon-chevron-up').addClass 'icon-chevron-down'
       if link.hasClass('icon-chevron-up')
         link.removeClass('icon-chevron-up').addClass 'icon-chevron-down'
+
+  # Clicking elsewhere hides all dropdowns
+  $('body').click (e) =>
+    # don't roll up dropdowns if we are clicking inside a dropdown
+    return if $(e.target).closest('[rel=dropdown]').length > 0
+    return if $(e.target).closest('.shown').length > 0
+
+    $('a[rel=dropdown]>.icon-chevron-up').removeClass('icon-chevron-up').addClass 'icon-chevron-down'
+    $('.shown').removeClass 'shown'
 
     return false
 
