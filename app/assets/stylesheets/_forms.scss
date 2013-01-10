@@ -81,7 +81,9 @@ form.whitewashed {
   margin: 20px 0;
   padding: 20px 0;
   border-radius: $radius-size;
+}
 
+.whitewashed {
   input[type=text], input[type=email], input[type=password], input[type=search], input[type=tel], input[type=number], textarea {
     background-color: white;
 

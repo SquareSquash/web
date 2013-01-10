@@ -116,7 +116,7 @@ class root.MemberPanel
     false
 
   buildFilter: ->
-    div = $('<div/>').appendTo(@element)
+    div = $('<div/>').addClass('whitewashed').appendTo(@element)
     @filter = $('<input/>').attr({ type: 'search', placeholder: "Filter by name" }).appendTo(div)
     @filter_results = $('<ul/>').addClass('results').appendTo(div)
     p = $('<p/>').appendTo(div)

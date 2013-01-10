@@ -29,8 +29,8 @@ module Views
       def breadcrumbs() [@project] end
 
       def body_content
-        full_width_section { project_info }
-        full_width_section(true) { environments_grid }
+        full_width_section { environments_grid }
+        full_width_section(true) { project_info }
       end
 
       private
