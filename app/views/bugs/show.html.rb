@@ -366,7 +366,6 @@ module Views
 
       def aggregation_tab
         div(class: 'inset-content') do
-          h4 "Aggregation"
           aggregation_options
           div id: 'aggregation-charts'
         end
