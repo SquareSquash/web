@@ -42,7 +42,7 @@ $(window).ready ->
     $('a[rel=dropdown]>.icon-chevron-up').removeClass('icon-chevron-up').addClass 'icon-chevron-down'
     $('.shown').removeClass 'shown'
 
-    return false
+    return true
 
 # Applies menu-expansion dropdown behavior to a navigation bar or tab header
 # item when that bar/header is displayed in compact (stacked) view. Normally
