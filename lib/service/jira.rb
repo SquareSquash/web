@@ -66,13 +66,11 @@ module Service
     # @return [Array<JIRA::Resource::Project>] All known JIRA projects.
     def projects() client.Project.all end
 
-    private
-
     def url(path)
       "#{Squash::Configuration.jira.api_host}#{Squash::Configuration.jira.api_root}#{path}"
     end
 
-    def client
+    def client(additional_options={})
       @client ||= begin
         options = {
             site:         Squash::Configuration.jira.api_host,
@@ -80,15 +78,24 @@ module Service
             timeout:      2,
             open_timeout: 2,
             read_timeout: 2
-        }
+        }.merge(additional_options)
         case Squash::Configuration.jira.authentication.strategy
           when 'basic'
             options[:auth_type] = :basic
             options[:username]  = Squash::Configuration.jira.authentication.user
             options[:password]  = Squash::Configuration.jira.authentication.password
+          when 'oauth'
+            options[:private_key_file] = Squash::Configuration.jira.authentication.private_key_file
+            options[:consumer_key]     = Squash::Configuration.jira.authentication.consumer_key
         end
 
-        ::JIRA::Client.new options
+        cl = ::JIRA::Client.new options
+
+        if Squash::Configuration.jira.authentication[:token] && Squash::Configuration.jira.authentication[:secret]
+          cl.set_access_token Squash::Configuration.jira.authentication.token, Squash::Configuration.jira.authentication.secret
+        end
+
+        cl
       end
     end
   end

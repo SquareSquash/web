@@ -444,3 +444,15 @@ In order to integrate Squash with JIRA, you must
 1. configure the `config/environments/common/jira.yml` file with your
    JIRA authentication credentials and installation location, and
 2. add a cron job or other periodic task that runs `rake jira:update`.
+
+JIRA integration works out-of-the-box if you use username/password
+authentication. OAuth authentication requires a few more steps. Because OAuth
+authentication requires user actions, you will need to obtain an access token
+and secret which the JIRA client can use without needing to prompt the user. You
+can do this by running the `jira_oauth.rb` script:
+
+```` ruby
+rails runner script/jira_oauth.rb
+````
+
+Follow the instructions to set up your JIRA integration.
