@@ -177,14 +177,14 @@ puts "I'll ask you some questions to help configure Squash for your needs.",
      "to fully support your particular environment."
 puts
 puts "If something's not right, you can abort this script at any time; it's",
-     "resumable Simply rerun it when you are ready."
+     "resumable. Simply rerun it when you are ready."
 
 say
 say "Checking the basic environment..."
 
 if File.absolute_path(Dir.getwd) != File.absolute_path(File.dirname(__FILE__))
   say "You are not running this script from the Rails project's root directory.".red.bold
-  say "Please cd into the web/ directory and re-run this script.".magenta
+  say "Please cd into the project root and re-run this script.".magenta
   exit 1
 end
 
