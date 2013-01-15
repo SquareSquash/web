@@ -47,8 +47,8 @@ gem 'squash_java', require: 'squash/java'
 
 group :assets do
   gem 'sass-rails'
-  gem 'libv8', platform: :mri
-  gem 'therubyracer', platform: :mri
+  gem 'libv8', '~> 3.11.8', platform: :mri
+  gem 'therubyracer', '>= 0.11.1', platform: :mri
   # Version 2.0 of TheRubyRhino breaks asset compilation
   gem 'therubyrhino', '< 2.0', platform: :jruby
   gem 'less-rails'
