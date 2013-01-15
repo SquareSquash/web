@@ -31,6 +31,10 @@ h1 {
 	color: black;
 }
 
+h1 a {
+	text-decoration: none;
+}
+
 p#video { text-align: center; }
 
 ul#menu {
