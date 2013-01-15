@@ -35,6 +35,12 @@ h1 a {
 	text-decoration: none;
 }
 
+h1#cta {
+	margin: 0;
+	text-align: right;
+	padding: 0;
+}
+
 p#video { text-align: center; }
 
 ul#menu {
@@ -45,7 +51,7 @@ ul#menu {
 	-webkit-box-pack: justify;
 	-moz-box-pack: center;
 	box-pack: justify;
-	padding: 5px 15px;
+	padding: 5px 0;
 	width: 100%;
 }
 
@@ -86,7 +92,7 @@ article {
 	column-count: 2;
 	column-gap: 2em;
 	width: 960px;
-	margin: 2em auto;
+	margin: 2em auto 0 auto;
 }
 
 section {
