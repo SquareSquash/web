@@ -41,6 +41,13 @@ h1#cta {
 	padding: 0;
 }
 
+header h3 {
+	font-family: Raleway, sans-serif;
+	font-weight: 400;
+	color: gray;
+	font-size: 24px;
+}
+
 p#video { text-align: center; }
 
 ul#menu {
@@ -131,4 +138,10 @@ section h3 {
 
 section h3:first-child {
 	margin-top: 0;
+}
+
+footer {
+	margin-top: 20px;
+	text-align: center;
+	margin-bottom: 20px;
 }
