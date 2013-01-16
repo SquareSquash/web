@@ -420,6 +420,16 @@ if step < 4
   File.open('/tmp/squash_install_progress', 'w') { |f| f.puts '4' }
 end
 
+if step < 5
+  say "Generating session secret..."
+  secret = SecureRandom.hex
+  contents = File.read('config/initializers/secret_token.rb')
+  File.open('config/initializers/secret_token.rb', 'w') do |f|
+    f.puts contents.sub('_SECRET_', secret)
+  end
+  File.open('/tmp/squash_install_progress', 'w') { |f| f.puts '5' }
+end
+
 say
 say "All done!".green.bold, "You should now be able to run".green,
     "rails server.".green.bold, "Some notes:".green
