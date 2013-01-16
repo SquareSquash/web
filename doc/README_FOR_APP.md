@@ -1,6 +1,8 @@
 Squash: A squarish bug spray
 ============================
 
+**An open-source project from Square**
+
 Squash is a collection of tools that help engineers find and kill bugs in their
 code. Squash consists of the following components:
 
