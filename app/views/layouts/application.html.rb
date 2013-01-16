@@ -140,6 +140,7 @@ module Views
           div(id: 'breadcrumbs-container') { render_breadcrumbs(*breadcrumbs) } if breadcrumbs.present?
 
           body_content
+          footer_portion
 
           div id: 'flashes'
 
@@ -287,6 +288,17 @@ module Views
           end if crumbs.length > 1
 
           li (crumbs.last.kind_of?(String) ? crumbs.last : crumbs.last.name), class: 'active'
+        end
+      end
+
+      def footer_portion
+        footer do
+          p { image_tag 'footer.png' }
+
+          p do
+            text "Hand-coded in San Francisco by Tim Morgan of "
+            a "Square, Inc.", href: 'https://squareup.com'
+          end
         end
       end
 
