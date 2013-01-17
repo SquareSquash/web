@@ -1,7 +1,7 @@
 source :rubygems
 
 # FRAMEWORK
-gem 'rails', git: 'git@github.com:rails/rails.git', branch: '3-2-stable'
+gem 'rails', git: 'git://github.com/rails/rails.git', branch: '3-2-stable'
 # We need to use this branch of Rails because it includes fixes for ActiveRecord
 # and concurrency that we need for our thread-spawning background job paradigm
 # to work
@@ -18,7 +18,7 @@ gem 'url_validation'
 gem 'json_serialize'
 gem 'validates_timeliness'
 gem 'find_or_create_on_scopes'
-gem 'composite_primary_keys', git: 'git@github.com:RISCfuture/composite_primary_keys.git'
+gem 'composite_primary_keys', git: 'git://github.com/RISCfuture/composite_primary_keys.git'
 gem 'activerecord-postgresql-cursors'
 
 # VIEWS
@@ -28,7 +28,7 @@ gem 'kramdown'
 
 # UTILITIES
 gem 'json'
-gem 'git', git: 'git@github.com:RISCfuture/ruby-git.git'
+gem 'git', git: 'git://github.com/RISCfuture/ruby-git.git'
 gem 'user-agent'
 gem 'jruby-openssl', platform: :jruby
 
