@@ -1,10 +1,11 @@
 Squash: A squarish bug spray
 ============================
 
-**An open-source project from Square**
+**An open-source project from [Square](http://github.com/square)**.
 
 Squash is a collection of tools that help engineers find and kill bugs in their
-code. Squash consists of the following components:
+code by automatically collecting, collating and analyzing run time exceptions.
+Squash consists of the following components:
 
 * **Client libraries:** Client libraries for different systems (Ruby, Ruby on
   Rails, Cocoa with Objective-C, etc.) catch and record errors when they occur,
@@ -17,6 +18,8 @@ code. Squash consists of the following components:
   notifications from the client libraries and process them.
 
 This project is the front-end and the API.
+
+Pull requests are more than welcome, please check out [CONTRIBUTING](https://github.com/SquareSquash/web/blob/master/CONTRIBUTING.md) for details.
 
 How to Install
 --------------
@@ -89,8 +92,8 @@ altered.
 **Why do you use threads to accomplish background tasks instead of fibers or
 Resque workers?** Squash was originally built for Square, which runs all its
 services on JRuby. Using threads is very efficient in JRuby, and avoids the
-overhead of having to deploy both a website and workers. (It was hard enough
-just getting the website alone up on production.)
+overhead of having to deploy both a website and workers. This should make 
+deployment to a production environment much easier.
 
 If you are running Squash in a non-thread-safe (or multithreading-unfriendly)
 environment, it should be easy to convert to a Resque-based environment. All
@@ -144,7 +147,7 @@ multiple private methods.
 In addition to the usual helpers (in `app/helpers`), there are view mixins under
 `app/views/additions` that simplify view coding.
 
-Embedded code snippets are all rendered using the {ProjectsController#context}
+Embedded code snippets are all rendered using the `ProjectsController#context`
 action. This action loads the appropriate file and revision from the Git
 repository and returns a snippet plus the name of the SyntaxHighlighter brush to
 use. The brush is determined from the file name/extension; the mapping can be
@@ -168,7 +171,7 @@ JavaScript files are organized into four possible locations:
   alongside, the `.html.rb` view file. For example, if
   `app/views/projects/new.html.rb` needed a bit of JS glue code, it would be
   placed in `app/views/projects/new.js`. This code is placed in a `<SCRIPT>` tag
-  at the end of the view by the {Views::Layouts::Application#inline_javascript}
+  at the end of the view by the `Views::Layouts::Application#inline_javascript`
   method.
 
 CSS files are similarly organized:
@@ -185,7 +188,7 @@ CSS files are similarly organized:
 
 ### Controllers
 
-For information about requests and responses, see {ApplicationController}.
+For information about requests and responses, see `ApplicationController`.
 
 ### Models
 
@@ -197,7 +200,7 @@ data integrity even in situations where Rails fails, or outside of the Rails
 stack. See the various migrations to learn more about the triggers, rules, and
 constraints being used.
 
-Observers are used for more high-level triggers, such as creating {Event Events}
+Observers are used for more high-level triggers, such as creating `Event Events`
 at the appropriate times, or sending emails. See the classes in
 `app/models/observers` for more.
 
@@ -216,11 +219,11 @@ workers.
 Workers are found in the `lib/workers` directory. Along with OccurrencesWorker,
 which stores and categorizes Occurrences, there are other workers for managing
 Deploys and other minor tasks. These workers are run asynchronously using
-{Multithread}.
+`Multithread`.
 
 ### Mailers
 
-Notification mails are sent by the {NotificationMailer}. It and any other
+Notification mails are sent by the `NotificationMailer`. It and any other
 mailers live in `app/mailers`.
 
 `NotificationMailer` conditionally delivers emails. An email will only be
@@ -235,13 +238,13 @@ delivered if all of the following conditions are met:
 ### Authentication and Authorization
 
 Authentication is done using either password verification or LDAP; see
-{AuthenticationHelpers} and related controller mixins, as well as the
+`AuthenticationHelpers` and related controller mixins, as well as the
 model mixins under `app/models/additions` for more information.
 
 There are four permissions levels that a User can have, specific to an
 individual Project:
 
-**Non-members** do not have a {Membership} record with a Project. They can view
+**Non-members** do not have a `Membership` record with a Project. They can view
 Bugs and Occurrences, view the Project's API key, view the list of other
 Project members, watch Bugs, and comment on Bugs.
 
@@ -262,11 +265,11 @@ Recording and Categorizing Occurrences
 
 The client library identifiers used throughout the website determine how a Bug
 reported from that library is presented in the view. The
-{OccurrencesController::INDEX_FIELDS} constant maps a client library identifier
+`OccurrencesController::INDEX_FIELDS` constant maps a client library identifier
 to the relevant summary fields to display in the list view.
 
 Each occurrence is transmitted with the name of the client library; the
-{Occurrence} records this to the `client` field. The {Bug}'s `client` field is
+`Occurrence} records this to the `client` field. The {Bug`'s `client` field is
 set from the first Occurrence's; in general, one should expect that all
 Occurrences of a Bug share the same client value.
 
@@ -287,7 +290,7 @@ expanded to include the new client.
 For information about the background worker that converts incoming exception
 information into Occurrence and Bug records (including doing "best guess" commit
 blaming, determining which Occurrences share the same root Bug, etc.), see the
-documentation for the {OccurrencesWorker} module. See also **Static Analysis**
+documentation for the `OccurrencesWorker` module. See also **Static Analysis**
 below.
 
 ### Deploys and Releases
@@ -296,7 +299,7 @@ Squash can handle both _deployed_ projects (hosted projects for which typically
 only one version is live at a time) and _released_ projects (distributed apps
 for which many versions may exist "in the wild").
 
-If you are developing a released project, you must associate your {Deploy}
+If you are developing a released project, you must associate your `Deploy`
 objects with a unique version identifier (such as a build number). You must also
 send the correct build identifier with every occurrence report. See the client
 library and API controller documentation for more information.
@@ -323,7 +326,7 @@ When an Occurrence is grouped into a Bug, its message is stripped of any
 non-relevant or situational information. (Note that since the message is not
 used as a dimension in grouping Occurrences, two Occurrences of the same Bug
 could have completely different messages. A Bug gets its message from its first
-Occurrence.) This is done by the {Blamer}.
+Occurrence.) This is done by the `Blamer`.
 
 For most messages, this is done using simple regex subsitution. Squash can also
 normalize an exception's message using a list of known message templates. Such
@@ -353,16 +356,16 @@ more usable format.
 
 Currently, the supported conversions are:
 
-* symbolication of iOS exceptions (see {Symbolication}),
-* deobfuscation of Java exceptions (see {ObfuscationMap}),
-* and source-mapping of JavaScript exceptions (see {SourceMap}).
+* symbolication of iOS exceptions (see `Symbolication`),
+* deobfuscation of Java exceptions (see `ObfuscationMap`),
+* and source-mapping of JavaScript exceptions (see `SourceMap`).
 
 Client libraries are responsible for delivering the raw stack trace data to
 Squash when an exception occurs, and for delivering lookup tables to Squash upon
-each new release. {Api::V1Controller} has endpoints for these purposes in
+each new release. `Api::V1Controller` has endpoints for these purposes in
 various languages.
 
-Unconverted stack traces are stored in a particular format; see {Occurrence} for
+Unconverted stack traces are stored in a particular format; see `Occurrence` for
 more information. When a new exception with a stack trace in this format is
 received, Squash immediately attempts to convert it using an existing matching
 lookup table. If no such table is found, the stack trace is left unconverted. It
@@ -371,8 +374,8 @@ Squash automatically finds and converts any matching stack traces.
 
 Because every new Occurrence must be assigned a Bug (including unconverted
 Occurrences), it is possible that the "blamed" `file` and `line` fields of the
-Bug could themselves be unconverted. The {Bug} class has provisions to support
-this; see in particular {Bug#displayable_file?}.
+Bug could themselves be unconverted. The `Bug` class has provisions to support
+this; see in particular `Bug#displayable_file?`.
 
 Specs
 -----
