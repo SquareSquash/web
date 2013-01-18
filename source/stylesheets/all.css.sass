@@ -1,0 +1,146 @@
+// @import "fonts/_sqmarket"
+@import "font-awesome.min"
+@import "compass/utilities/general/clearfix"
+
+$yellow: #fdbf65
+
+body
+  font-family: Raleway, sans-serif
+  font-weight: 400
+  font-size: 14px
+  padding: 0
+  margin: 0
+  min-width: 1100px
+
+a,
+a:link,
+a:visited,
+a:hover,
+a:active
+  color: $yellow
+
+strong
+  font-weight: 700
+
+header
+  width: 640px
+  margin: 2em auto
+
+h2
+  font-family: Dosis, sans-serif
+  font-weight: 300
+  color: gray
+  font-size: 36px
+  margin: 0
+
+h1
+  font-family: Dosis, sans-serif
+  font-weight: 600
+  margin-top: 0
+  font-size: 60px
+  color: black
+  a
+    text-decoration: none
+
+header h3
+  font-family: Raleway, sans-serif
+  font-weight: 400
+  color: gray
+  font-size: 24px
+
+p#video
+  text-align: center
+
+#menu-container
+  width: 100%
+  background-color: black
+  z-index: 100
+
+  &.fixed
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    margin: 0
+    box-shadow: 0 10px 10px white
+
+ul#menu
+  width: 1100px
+  margin: 0 auto
+  display: block // cs
+  text-align: center
+  padding: 5px 0
+
+  > li
+    display: inline-block
+    font-family: Dosis, sans-serif
+    font-weight: 600
+    text-transform: uppercase
+    font-size: 18px
+    color: $yellow
+    padding: 0 10px
+    vertical-align: middle
+    list-style-type: none
+
+    &:first-child
+      padding-left: 0
+
+    &:last-child
+      padding-right: 0
+
+    a
+      color: #fdbf65
+      text-decoration: none
+
+    i
+      margin-right: 0.5em
+
+
+article
+  width: 960px
+  margin: 2em auto 0 auto
+  +clearfix
+
+section
+  float: left
+  margin: 0 0 20px 0
+  line-height: 195%
+  width: 466px
+  +clearfix
+
+  &:nth-child(odd)
+    margin-right: 28px
+
+  img
+    float: left
+    margin-left: 5px
+    margin-right: 1em
+    margin-bottom: 0
+    max-width: 250px
+    border: 2px solid white
+    box-shadow: rgba(0, 0, 0, 0.5) 0 0 5px
+  h3
+    font-family: Dosis, sans-serif
+    font-weight: 600
+    color: gray
+    font-size: 24px
+    font-weight: bold
+    border-top: 2px solid #ddd
+    padding-top: 7px
+    &:first-child
+      margin-top: 0
+  p
+    position: relative
+    top: -8px
+
+  &#cta
+    clear: both
+    float: right
+    margin: 0
+    padding: 0
+    line-height: inherit
+
+footer
+  margin-top: 20px
+  text-align: center
+  margin-bottom: 20px

@@ -1,0 +1,122 @@
+<header>
+  <h2>
+    Say goodbye to bugs.
+  </h2>
+  <h1>
+    Say hello to <a href="https://github.com/SquareSquash/web">Squash</a>.
+  </h1>
+
+  <iframe
+    width="640"
+    height="480"
+    src="http://www.youtube.com/embed/160_JLZvn-4?rel=0"
+    frameborder="0"
+    allowfullscreen
+    id="video"></iframe>
+  <h3>
+    Squash is an exception reporting and bug analysis tool from <a href="https://squareup.com">Square</a>.
+  </h3>
+</header>
+
+<nav id="menu-container">
+  <ul id="menu">
+    <li>
+      <a href="#emails">
+        <i class="icon-envelope"></i> Fewer Emails
+      </a>
+    </li>
+    <li>
+      <a href="#data"><i class="icon-list"></i>Better Data</a>
+    </li>
+    <li>
+      <a href="#analysis"><i class="icon-lightbulb"></i>Smart Code Analysis</a>
+    </li>
+    <li>
+      <a href="#symbolication"><i class="icon-magic"></i>Symbolication</a>
+    </li>
+    <li>
+      <a href="#visualization"><i class="icon-bar-chart"></i>Data Visualization</a>
+    </li>
+    <li>
+      <a href="#collaboration"><i class="icon-comments-alt"></i>Collaboration</a>
+    </li>
+  </ul>
+</nav>
+
+<article>
+  <section id="emails">
+    <h3>Fewer Emails</h3>
+    <img src="images/fewer-emails.png" />
+    <p>Rather than emailing the entire company when there’s a bug, <strong>Squash only sends an email to the engineer at fault.</strong> When people receive an email from Squash, they pay attention to it, because it’s usually something they’re prepared to address. <strong>If the engineer sits on the email, eventually it escalates.</strong> You can configure how you’d like unaddressed bugs to escalate.</p>
+  </section>
+
+  <section id="analysis">
+    <h3>Smart Code Analysis</h3>
+    <img src="images/smart-code-analysis.png" />
+    <p><strong>Squash uses git blame to figure out who can fix the bug.</strong> Squash analyzes the stack trace of every exception, and determines which line in the backtrace is the source of the bug. It then uses git to figure out who might have caused the bug, or at least someone who’s familiar with the code. Squash shows you where in the code the problem was, so you can quickly get to fixing it.</p>
+  </section>
+
+  <section id="data">
+    <h3>Better Data</h3>
+    <img src="images/better-data.png" />
+    <p>View more information about bugs when they occur. <strong>Dig inside the values of environment variables, instance variables, request parameters, and more</strong> using the Value Inspector. Did this bug happen when the user was on 3G? Were they low on memory?</p>
+  </section>
+
+  <section id="visualization">
+    <h3>Data Visualization</h3>
+    <img src="images/data-visualization.png" />
+    <p>Squash lets you analyze information about a bug to determine its root cause. You can view <strong>occurrence histograms displayed against deploy times</strong> to determine if a deploy changed the frequency of occurrence, or <strong>analyze occurrences dimensionally</strong> to determine if, for example, a combination of operating system or web browser is the source of most of the occurrences.</p>
+  </section>
+
+  <section id="symbolication">
+    <h3>Symbolication</h3>
+    <img src="images/symbolication.png" />
+    <p>Squash <strong>symbolicates iOS crashes</strong>, <strong>un-minifies JavaScript code</strong>, and <strong>de-obfuscates Java code</strong>, allowing it to use its first-class static analysis capabilities on any project.</p>
+  </section>
+
+  <section id="collaboration">
+    <h3>Collaboration</h3>
+    <img src="images/collaboration.png" />
+    <p>Squash includes a <strong>full-featured commenting system</strong>, <strong>ticket-management system</strong> similar to JIRA, and a <strong>news feed</strong> letting you collaborate on, and track the progress of, fixing a bug. Squash also has <strong>PagerDuty and JIRA integration</strong> allowing you to triage in emergencies and track longer term problems.</p>
+  </section>
+
+  <section id="cta">
+    <h1>
+      <a href="https://github.com/SquareSquash/web">Start using Squash.</a>
+    </h1>
+    <p>
+      See <a href="https://github.com/square">other Square open-source projects.</a>
+    </p>
+  </section>
+</article>
+
+<footer>
+  <a href="https://squareup.com"><img src="images/jewel.png"></img></a>
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+  $(document).ready(function() {
+    var menu = $('#menu-container');
+    var menuPosition = menu.offset().top;
+    $(window).scroll(function() {
+      if ($(window).scrollTop() > menuPosition && !menu.hasClass('fixed'))
+        menu.addClass('fixed');
+      else if ($(window).scrollTop() < menuPosition && menu.hasClass('fixed'))
+        menu.removeClass('fixed');
+    });
+  });
+</script>
+
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-37683630-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
