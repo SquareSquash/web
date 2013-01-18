@@ -17,7 +17,7 @@ gem 'email_validation'
 gem 'url_validation'
 gem 'json_serialize'
 gem 'validates_timeliness'
-gem 'find_or_create_on_scopes'
+gem 'find_or_create_on_scopes', '>= 1.2.1'
 gem 'composite_primary_keys', git: 'git://github.com/RISCfuture/composite_primary_keys.git'
 gem 'activerecord-postgresql-cursors'
 

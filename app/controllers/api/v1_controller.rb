@@ -101,12 +101,11 @@ class Api::V1Controller < ActionController::Base
   def symbolication
     require_params :symbolications
 
-    symbolication = Symbolication.new
     params['symbolications'].each do |attrs|
-      symbolication.uuid = attrs['uuid']
-      symbolication.send :write_attribute, :symbols, attrs['symbols']
-      symbolication.send :write_attribute, :lines, attrs['lines']
-      symbolication.save!
+      Symbolication.where(uuid: attrs['uuid']).create_or_update do |symbolication|
+        symbolication.send :write_attribute, :symbols, attrs['symbols']
+        symbolication.send :write_attribute, :lines, attrs['lines']
+      end
     end
 
     head :created

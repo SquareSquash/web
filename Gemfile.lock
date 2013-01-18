@@ -107,7 +107,7 @@ GEM
       json
       json-schema (>= 1.0.1)
       kramdown
-    find_or_create_on_scopes (1.2.0)
+    find_or_create_on_scopes (1.2.1)
       activerecord (>= 3.1)
     font-awesome-rails (3.0.1.0)
       railties (>= 3.1)
@@ -247,7 +247,7 @@ DEPENDENCIES
   factory_girl_rails
   fakeweb
   fdoc
-  find_or_create_on_scopes
+  find_or_create_on_scopes (>= 1.2.1)
   font-awesome-rails
   git!
   has_metadata_column!
