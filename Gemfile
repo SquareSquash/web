@@ -30,7 +30,6 @@ gem 'kramdown'
 gem 'json'
 gem 'git', git: 'git://github.com/RISCfuture/ruby-git.git'
 gem 'user-agent'
-gem 'jruby-openssl', platform: :jruby
 
 # AUTH
 gem 'net-ldap', require: 'net/ldap'
