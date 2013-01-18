@@ -262,7 +262,7 @@ end
       end
 
       def configuration
-        form_for(@project, html: {class: 'labeled whitewashed'}) do |f|
+        form_for(@project, html: {class: 'labeled'}) do |f|
           fieldset do
             h5 "Application and library paths"
 
