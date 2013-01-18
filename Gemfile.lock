@@ -200,9 +200,7 @@ GEM
     squash_javascript (1.0.0)
       json
       railties (>= 3.1)
-      squash_uploader
     squash_rails (1.0.0)
-      squash_ruby
     squash_ruby (1.0.0)
       json
     squash_uploader (1.0.0)
