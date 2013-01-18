@@ -67,5 +67,12 @@ Squash::Application.routes.draw do
   get 'search/suggestions' => 'search#suggestions'
   get 'search' => 'search#search'
 
+  match 'api/1.0/notify', :constraints => {:method => 'OPTIONS'},
+    :to => lambda { |env| [200, {
+      'Access-Control-Allow-Origin' => '*',
+      'Access-Control-Request-Method' => '*',
+      'Access-Control-Allow-Headers' => 'Content-Type'
+    }, []] }
+
   root to: 'projects#index'
 end
