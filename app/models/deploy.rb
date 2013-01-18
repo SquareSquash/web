@@ -64,8 +64,10 @@ class Deploy < ActiveRecord::Base
   has_many :bugs, inverse_of: :deploy, dependent: :nullify
   has_one :obfuscation_map, inverse_of: :deploy, dependent: :destroy
 
-  attr_accessible :revision, :deployed_at, :hostname, :build, as: :worker
-  attr_readonly :environment, :revision, :build, :hostname, :deployed_at
+  attr_accessible :revision, :deployed_at, :hostname, :build, :version,
+                  as: :worker
+  attr_readonly :environment, :revision, :build, :hostname, :deployed_at,
+                :version
 
   validates :environment,
             presence: true
