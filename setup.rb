@@ -270,6 +270,15 @@ if step < 1
                }
            }.to_yaml)
   end
+  unless https
+    say "Updating config/environments/production.rb..."
+    prod_config = File.read('config/environments/production.rb')
+    prod_config.sub! 'config.force_ssl = true', 'config.force_ssl = false'
+    prod_config.sub! 'require "rack/ssl"', '#require "rack/ssl"'
+    File.open('config/environments/production.rb', 'w') do |f|
+      f.puts prod_config
+    end
+  end
 
   url = query("What URL will production Squash be available at?", "http#{'s' if https}://#{hostname}")
   say "Updating config/environments/production/javascript_dogfood.yml..."
