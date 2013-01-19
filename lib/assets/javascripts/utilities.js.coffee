@@ -120,7 +120,7 @@ root.isLeapYear = (year) ->
 #
 root.shellEscape = (str) ->
   if str == '' then return "''"
-  str.replace(/([^A-Za-z0-9_\-.,:\/@\n])/, "\\\\\\1").replace(/\n/, "'\n'")
+  str.replace(/([^A-Za-z0-9_\-.,:\/@\n])/, "\\$1").replace(/\n/, "'\n'")
 
 # Converts an array of strings into a sentence with an Oxford comma.
 #
