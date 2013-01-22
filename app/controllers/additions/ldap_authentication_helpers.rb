@@ -42,7 +42,7 @@ module LdapAuthenticationHelpers
       ldap.auth Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password
       if ldap.bind
         if (entry = locate_ldap_user(ldap, username))
-          ldap.auth entry[:dn], password
+          ldap.auth entry.dn, password
           unless ldap.bind
             logger.tagged('AuthenticationHelpers') { logger.info "Denying login to #{username}: LDAP authentication failed." }
             return false

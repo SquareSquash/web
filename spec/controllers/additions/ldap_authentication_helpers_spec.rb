@@ -39,6 +39,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
             sn:        'Bar',
             dn:        "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username},#{Squash::Configuration.authentication.ldap.tree_base}"
         }
+        entry.stub(:dn).and_return(entry[:dn])
 
         @ldap.should_receive(:search).once do |hsh|
           hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username}"
@@ -65,6 +66,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
             sn:        'Bar',
             dn:        "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username},#{Squash::Configuration.authentication.ldap.tree_base}"
         }
+        entry.stub(:dn).and_return(entry[:dn])
 
         @ldap.should_receive(:search).once do |hsh|
           hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username}"
@@ -112,6 +114,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
               sn:        'Bar',
               dn:        "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username},#{Squash::Configuration.authentication.ldap.tree_base}"
           }
+          entry.stub(:dn).and_return(entry[:dn])
 
           @ldap.should_receive(:search).once do |hsh|
             hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username}"
@@ -157,6 +160,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
             sn:        'User',
             dn:        "#{Squash::Configuration.authentication.ldap.search_key}=newuser,#{Squash::Configuration.authentication.ldap.tree_base}"
         }
+        entry.stub(:dn).and_return(entry[:dn])
 
         @ldap.should_receive(:search).once do |hsh|
           hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=newuser"
