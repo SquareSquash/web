@@ -79,7 +79,7 @@ module Views
               accordion.accordion_item('ruby', "Pure Ruby") { pure_ruby }
               accordion.accordion_item('ios', "Objective-C + iOS") { objc_ios }
               accordion.accordion_item('javascript', "JavaScript") { javascript_client }
-              accordion.accordion_item('java', "Java (Generic)") { javascript_client }
+              accordion.accordion_item('java', "Java (Generic)") { java }
             end
           end
         end
