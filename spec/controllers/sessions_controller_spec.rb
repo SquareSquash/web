@@ -30,10 +30,10 @@ describe SessionsController do
       before :each do
         @ldap.stub!(:bind).and_return(true)
         @ldap.stub! :encryption
-        @ldap.stub!(:search).and_yield(
-            :givenname => %w(Sancho),
-            :sn        => %w(Sample)
-        )
+
+        entry = {:givenname => %w(Sancho), :sn => %w(Sample)}
+        entry.stub!(:dn).and_return('some dn')
+        @ldap.stub!(:search).and_yield(entry)
       end
 
       it "should log in a valid username and password" do
