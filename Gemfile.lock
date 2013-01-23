@@ -1,9 +1,9 @@
 GIT
   remote: git://github.com/RISCfuture/composite_primary_keys.git
-  revision: c947ca9d255a9e5854072b3567c4368d5891cacb
+  revision: 4f624f3a431b5ad3fa2d80e58b118896c356dffe
   specs:
-    composite_primary_keys (5.0.7)
-      activerecord (~> 3.2.0)
+    composite_primary_keys (5.0.12)
+      activerecord (~> 3.2.0, >= 3.2.9)
 
 GIT
   remote: git://github.com/RISCfuture/has_metadata_column.git

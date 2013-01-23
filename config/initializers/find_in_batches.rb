@@ -12,9 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Reimplementation of find_in_batches that fixes bugs and works with composite_primary_keys
+module CompositePrimaryKeys::ActiveRecord::Batches
 
-module ActiveRecord::Batches
+  # Reimplementation of find_in_batches that fixes bugs and works with
+  # composite_primary_keys.
+
   def find_in_batches(options = {})
     relation = self
 
