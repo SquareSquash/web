@@ -118,7 +118,11 @@ end
 def prompt_or_quit(*args) exit unless prompt(*args) end
 
 def run(*command)
-  say "Running".cyan, *command.map { |s| s.cyan.bold }, "...".cyan
+  args = ["Running".cyan]
+  args += command.map { |s| s.cyan.bold }
+  args << "...".cyan
+  say *args
+
   stdout, stderr, status = Open3.capture3(*command)
   unless status.success?
     say "Command exited unsuccessfully:".red.bold, status.inspect.red
@@ -134,7 +138,11 @@ def run(*command)
 end
 
 def run_ignore(*command)
-  say "Running".cyan, *command.map { |s| s.cyan.bold }, "... (failure OK)".cyan
+  args = ["Running".cyan]
+  args += command.map { |s| s.cyan.bold }
+  args <<  "... (failure OK)".cyan
+  say *args
+
   system *command
 end
 
@@ -170,6 +178,19 @@ def choose(question, choices, default=nil)
   return output
 end
 
+if RUBY_VERSION < '1.9.2'
+  say "You need Ruby 1.9.2 or newer to use Squash.".red.bold
+  say "Please re-run this script under a newer version of Ruby.".magenta
+  exit 1
+end
+
+if RUBY_PLATFORM == 'java'
+  say "This setup script must be run on MRI 1.9.2 or newer.".red.bold
+  say "You can run Squash itself on JRuby, but this script must be run on MRI."
+  say "See http://jira.codehaus.org/browse/JRUBY-6409 for the reason why."
+  exit 1
+end
+
 say "Welcome! Let's set up your Squash installation.".bold
 puts "I'll ask you some questions to help configure Squash for your needs.",
      "Remember read the README.md file to familiarize yourself with the Squash",
@@ -200,19 +221,6 @@ if step == 0 && !`git status --porcelain`.empty?
 end
 
 say "Checking for required software..."
-
-if RUBY_VERSION < '1.9.2'
-  say "You need Ruby 1.9.2 or newer to use Squash.".red.bold
-  say "Please re-run this script under a newer version of Ruby.".magenta
-  exit 1
-end
-
-if RUBY_PLATFORM == 'java'
-  say "This setup script must be run on MRI 1.9.2 or newer.".red.bold
-  say "You can run Squash itself on JRuby, but this script must be run on MRI."
-  say "See http://jira.codehaus.org/browse/JRUBY-6409 for the reason why."
-  exit 1
-end
 
 require 'open3'
 require 'yaml'
