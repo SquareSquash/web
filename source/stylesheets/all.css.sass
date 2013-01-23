@@ -1,13 +1,13 @@
-// @import "fonts/_sqmarket"
+@import "fonts/_sqmarket"
 @import "font-awesome.min"
 @import "compass/utilities/general/clearfix"
 
 $yellow: #fdbf65
 
 body
-  font-family: Raleway, sans-serif
-  font-weight: 400
+  font-family: SQMarket-Regular, Helvetica, sans-serif
   font-size: 14px
+  font-weight: normal
   padding: 0
   margin: 0
   min-width: 1100px
@@ -20,22 +20,23 @@ a:active
   color: $yellow
 
 strong
-  font-weight: 700
+  font-weight: normal
+  font-family: SQMarket-Medium
 
 header
   width: 640px
   margin: 2em auto
 
 h2
-  font-family: Dosis, sans-serif
-  font-weight: 300
+  font-family: SQMarket-MediumItalic, Helvetica, sans-serif
+  font-weight: normal
   color: gray
   font-size: 36px
   margin: 0
 
 h1
-  font-family: Dosis, sans-serif
-  font-weight: 600
+  font-family: SQMarket-MediumItalic, Helvetica, sans-serif
+  font-weight: normal
   margin-top: 0
   font-size: 60px
   color: black
@@ -43,8 +44,8 @@ h1
     text-decoration: none
 
 header h3
-  font-family: Raleway, sans-serif
-  font-weight: 400
+  font-family: SQMarket-Regular, Helvetica, sans-serif
+  font-weight: normal
   color: gray
   font-size: 24px
 
@@ -73,10 +74,9 @@ ul#menu
 
   > li
     display: inline-block
-    font-family: Dosis, sans-serif
-    font-weight: 600
+    font-family: SQMarket-Light, Helvetica, sans-serif
     text-transform: uppercase
-    font-size: 18px
+    font-size: 14px
     color: $yellow
     padding: 0 10px
     vertical-align: middle
@@ -100,6 +100,7 @@ article
   width: 960px
   margin: 2em auto 0 auto
   +clearfix
+  font-family: SQMarket-Light, Helvetica, sans-serif
 
 section
   float: left
@@ -120,11 +121,10 @@ section
     border: 2px solid white
     box-shadow: rgba(0, 0, 0, 0.5) 0 0 5px
   h3
-    font-family: Dosis, sans-serif
-    font-weight: 600
+    font-family: SQMarket-MediumItalic, Helvetica, sans-serif
     color: gray
     font-size: 24px
-    font-weight: bold
+    font-weight: normal
     border-top: 2px solid #ddd
     padding-top: 7px
     &:first-child
@@ -139,6 +139,9 @@ section
     margin: 0
     padding: 0
     line-height: inherit
+
+    h1
+      font-size: 48px
 
 footer
   margin-top: 20px
