@@ -87,8 +87,8 @@ class Project::MembershipController < ApplicationController
     respond_with @membership, location: edit_project_my_membership_url(@project)
   end
 
-  # Removes membership from a Project. A Project owner cannot leave his Project
-  # without first reassigning ownership.
+  # Removes membership from a Project. A Project owner cannot leave his/her
+  # Project without first reassigning ownership.
   #
   # Routes
   # ------

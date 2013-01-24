@@ -127,7 +127,7 @@ class ProjectsController < ApplicationController
   end
 
   # Displays a page where the user can see information about how to install
-  # Squash into his project, and how to configure his project for Squash
+  # Squash into his/her project, and how to configure his/her project for Squash
   # support.
   #
   # Routes

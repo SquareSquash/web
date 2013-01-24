@@ -36,7 +36,7 @@ describe Email do
       email.should be_valid
     end
 
-    it "should not allow a user to assume redirect ownership of his primary email" do
+    it "should not allow a user to assume redirect ownership of his/hera primary email" do
       user  = FactoryGirl.create(:user)
       email = FactoryGirl.build(:email, email: user.email, user: user)
       email.should_not be_valid

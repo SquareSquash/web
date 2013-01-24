@@ -416,7 +416,7 @@ class Bug < ActiveRecord::Base
     redirected_email ||= Email.redirected.by_email(email).first
     # if one exists
     if redirected_email
-      # recurse again with the redirected user's primary email, in case someone has taken over HIS emails
+      # recurse again with the redirected user's primary email, in case someone has taken over HIS/HER emails
       return find_responsible_user(redirected_email.user.email, history)
     else
       # this email has not been assumed by anyone else; return it

@@ -82,7 +82,7 @@ describe Project::MembershipController do
       response.should redirect_to(login_url(next: request.fullpath))
     end
 
-    it "should not allow the owner to delete his project" do
+    it "should not allow the owner to delete his/her project" do
       login_as @membership.project.owner
       delete :destroy, project_id: @membership.project.to_param
       response.should redirect_to(account_url)
