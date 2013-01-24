@@ -18,7 +18,7 @@ if Rails.env.development?
   # bring sexy back (sexy == tables)
   module YARD::Templates::Helpers::HtmlHelper
     def html_markup_markdown(text)
-      markup_class(:markdown).new(text, :gh_blockcode, :fenced_code, :autolink, :tables).to_html
+      markup_class(:markdown).new(text, :gh_blockcode, :fenced_code, :autolink, :tables, :no_intraemphasis).to_html
     end
   end
 
@@ -29,7 +29,7 @@ if Rails.env.development?
     doc.options << '-o' << 'doc/app'
     doc.options << '--title' << "Squash Documentation"
 
-    doc.files = %w( app/**/*.rb lib/**/*.rb doc/README_FOR_APP.md )
+    doc.files = %w( app/**/*.rb lib/**/*.rb - doc/*.md )
   end
 end
 
