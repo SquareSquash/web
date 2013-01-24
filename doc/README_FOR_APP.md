@@ -50,7 +50,7 @@ Squash requires the following:
 
 * Ruby 1.9.2 or newer (JRuby with `--1.9` is supported)
 * Multithreading support (see the next section)
-* PostgreSQL 8.4 or newer
+* PostgreSQL 9.0 or newer
 * The Bundler gem
 * Git 1.7 or newer
 
