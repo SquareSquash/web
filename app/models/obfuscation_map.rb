@@ -43,8 +43,8 @@ require 'base64'
 # Properties
 # ----------
 #
-# |             |                                                                    |
-# |:------------|:-------------------------------------------------------------------|
+# |             |                                                                      |
+# |:------------|:---------------------------------------------------------------------|
 # | `namespace` | A serialized `Squash::Java::Namespace` object with obfuscation data. |
 
 class ObfuscationMap < ActiveRecord::Base

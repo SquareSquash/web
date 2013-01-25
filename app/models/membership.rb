@@ -38,6 +38,7 @@
 # Metadata
 # ========
 #
+# |                          |                                                                                                                  |
 # |:-------------------------|:-----------------------------------------------------------------------------------------------------------------|
 # | `send_assignment_emails` | If `true`, emails will be sent when the User is assigned to a Bug in this Project.                               |
 # | `send_comment_emails`    | If `true`, emails will be sent when a User comments on a Bug in this Project that this User is participating in. |

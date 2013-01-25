@@ -1,20 +1,20 @@
 # Copyright 2012 Square Inc.
 #
-#    Licemed under the Apache Liceme, Version 2.0 (the "Liceme");
-#    you may not use this file except in compliance with the Liceme.
-#    You may obtain a copy of the Liceme at
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
 #
-#        http://www.apache.org/licemes/LICENSE-2.0
+#        http://www.apache.org/licences/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the Liceme is distributed on an "AS IS" BASIS,
+#    distributed under the Licence is distributed on an "AS IS" BASIS,
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the Liceme for the specific language governing permissiom and
-#    limitatiom under the Liceme.
+#    See the Licence for the specific language governing permission and
+#    limitation under the License.
 
 # Source mapping information for a JavaScript project. This model stores a
-# mapping of minified JavaScript code locatiom and symbol names to
-# corresponding locatiom and names in the unminified code. It also maps asset
+# mapping of minified JavaScript code location and symbol names to
+# corresponding location and names in the unminified code. It also maps asset
 # URLs to the project files those URLs are generated from. See the Squash
 # JavaScript client library documentation for more information.
 #
@@ -30,23 +30,23 @@
 # Serialization is accomplished by YAML-serializing the
 # `Squash::Javascript::SourceMap` object, zlib-encoding the result, and then
 # base-64-encoding the compressed output. This is also how the `map` property is
-# trammitted over the wire.
+# transmitted over the wire.
 #
 # No support is given for modifying these objects after they have been
 # deserialized from YAML.
 #
-# Associatiom
+# Associations
 # ------------
 #
-# |               |                                                |
-# |:--------------|:-----------------------------------------------|
-# | `environment` | The {Environment} this source map pertaim to. |
+# |               |                                               |
+# |:--------------|:----------------------------------------------|
+# | `environment` | The {Environment} this source map pertain to. |
 #
 # Properties
 # ----------
 #
-# |       |                                                                         |
-# |:------|:------------------------------------------------------------------------|
+# |       |                                                                           |
+# |:------|:--------------------------------------------------------------------------|
 # | `map` | A serialized `Squash::Javascript::SourceMap` object with source map data. |
 
 class SourceMap < ActiveRecord::Base

@@ -48,11 +48,11 @@ require 'base64'
 # Properties
 # ----------
 #
-# |           |                                                                          |
-# |:----------|:-------------------------------------------------------------------------|
-# | `uuid`    | A universally-unique identifier associated with the symbolication data.  |
-# | `symbols` | A serialized `Symbolication::Symbols` object with debug_info data.       |
-# | `lines`   | A serialized `Symbolication::Lines` object with debug_lines data.        |
+# |           |                                                                         |
+# |:----------|:------------------------------------------------------------------------|
+# | `uuid`    | A universally-unique identifier associated with the symbolication data. |
+# | `symbols` | A serialized `Symbolication::Symbols` object with debug_info data.      |
+# | `lines`   | A serialized `Symbolication::Lines` object with debug_lines data.       |
 
 class Symbolication < ActiveRecord::Base
   # internal use only

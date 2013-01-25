@@ -28,12 +28,12 @@ require 'zlib'
 # Response Codes
 # --------------
 #
-# |          |                                     |
-# |:---------|:------------------------------------|
-# | 200, 201 | No errors.                          |
-# | 422      | Invalid arguments.                  |
-# | 403      | Invalid API key.                    |
-# | 404      | Unknown environment, deploy, etc.   |
+# |          |                                   |
+# |:---------|:----------------------------------|
+# | 200, 201 | No errors.                        |
+# | 422      | Invalid arguments.                |
+# | 403      | Invalid API key.                  |
+# | 404      | Unknown environment, deploy, etc. |
 
 class Api::V1Controller < ActionController::Base
   include Squash::Ruby::ControllerMethods

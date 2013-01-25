@@ -37,7 +37,7 @@ The API has the following endpoints:
 |:--------------|:-------------------------------------------------------------------------------------------------------------------------|
 | `api_key`     | The project's API key. Typically this is configured by the API user.                                                     |
 | `environment` | The environment name (e.g., "production"). Also configured by the API user.                                              |
-| `client`      | A constant string identifying this client.	 																		   |
+| `client`      | A constant string identifying this client.                                                                               |
 | `backtraces`  | An array of backtraces of every relevant thread or fiber at the time of the crash (see Backtrace Format below for more). |
 | `class_name`  | The name of the exception class.                                                                                         |
 | `message`     | The exception message.                                                                                                   |

@@ -47,10 +47,10 @@ require 'digest/sha2'
 # Metadata
 # ========
 #
-# |              |                              |
-# |:-------------|:-----------------------------|
-# | `first_name` | The user's first name.       |
-# | `last_name`  | The user's last name.        |
+# |              |                        |
+# |:-------------|:-----------------------|
+# | `first_name` | The user's first name. |
+# | `last_name`  | The user's last name.  |
 
 class User < ActiveRecord::Base
   # @private

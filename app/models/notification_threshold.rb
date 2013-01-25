@@ -31,6 +31,8 @@
 # Properties
 # ==========
 #
+# |                   |                                                                   |
+# |:------------------|:------------------------------------------------------------------|
 # | `threshold`       | The number of times the Bug must occur within the period.         |
 # | `period`          | The amount of time, in seconds, the threshold is calculated over. |
 # | `last_tripped_at` | The last time this threshold was exceeded.                        |

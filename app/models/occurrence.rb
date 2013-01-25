@@ -269,10 +269,10 @@
 # Server Applications
 # -------------------
 #
-# |            |                                                   |
-# |:-----------|:--------------------------------------------------|
-# | `root`     | The path to the project root.                     |
-# | `hostname` | The computer's hostname.                          |
+# |            |                               |
+# |:-----------|:------------------------------|
+# | `root`     | The path to the project root. |
+# | `hostname` | The computer's hostname.      |
 #
 # Client Applications
 # -------------------
