@@ -205,13 +205,25 @@ describe Occurrence do
     end
   end
 
-  describe "#redirect_to" do
+  describe "#redirect_to!" do
     it "should truncate the occurrence and set the redirect target" do
       o1 = FactoryGirl.create(:rails_occurrence)
       o2 = FactoryGirl.create(:rails_occurrence, bug: o1.bug)
       o1.redirect_to! o2
       o1.redirect_target.should eql(o2)
       o1.should be_truncated
+      o1.bug.should_not be_irrelevant
+    end
+
+    it "should mark the bug as irrelevant if it's the last occurrence to be redirected" do
+      b1 = FactoryGirl.create(:bug)
+      b2 = FactoryGirl.create(:bug, environment: b1.environment)
+      o1 = FactoryGirl.create(:rails_occurrence, bug: b1)
+      o2 = FactoryGirl.create(:rails_occurrence, bug: b2)
+
+      o1.redirect_to! o2
+      o1.redirect_target.should eql(o2)
+      b1.reload.should be_irrelevant
     end
   end
 

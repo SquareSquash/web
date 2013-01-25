@@ -638,12 +638,21 @@ class Occurrence < ActiveRecord::Base
   # description of redirection. Also truncates the Occurrence and saves the
   # record.
   #
+  # If this is the last remaining Occurrence under a Bug to be redirected, the
+  # Bug is marked as irrelevant. This removes from the list Bugs with
+  # unsymbolicated Occurrences once the Symbolication is uploaded.
+  #
   # @param [Occurrence] occurrence The Occurrence to redirect this Occurrence
   #   to.
 
   def redirect_to!(occurrence)
     update_column :redirect_target_id, occurrence.id
     truncate!
+
+    # if all occurrences for this bug redirect, mark the bug as unimportant
+    if bug.occurrences.where(redirect_target_id: nil).none?
+      bug.update_attribute :irrelevant, true
+    end
   end
 
   # Symbolicates this Occurrence's backtrace. Does nothing if there is no linked
