@@ -788,7 +788,7 @@ class Occurrence < ActiveRecord::Base
     (bt = backtraces).each do |bt|
       bt['backtrace'].each do |elem|
         next unless elem['type'] == 'obfuscated'
-        klass = map.namespace.obfuscated_type(elem['class'])
+        klass = map.namespace.obfuscated_type(elem['class_name'])
         next unless klass && klass.path
         meth = map.namespace.obfuscated_method(klass, elem['symbol'])
         elem.replace(

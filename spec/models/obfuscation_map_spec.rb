@@ -43,7 +43,7 @@ describe ObfuscationMap do
                                                                      "file"   => "B.java",
                                                                      "line"   => 15,
                                                                      "symbol" => "int b(int)",
-                                                                     "class"  => "com.A.B"}]}])
+                                                                     "class_name"  => "com.A.B"}]}])
       occurrence.should_not be_deobfuscated
 
       namespace = Squash::Java::Namespace.new
@@ -86,7 +86,7 @@ describe ObfuscationMap do
                                                                      "file"   => "B.java",
                                                                      "line"   => 5,
                                                                      "symbol" => "int b(int)",
-                                                                     "class"  => "com.A.B"}]}])
+                                                                     "class_name"  => "com.A.B"}]}])
 
       namespace = Squash::Java::Namespace.new
       namespace.add_package_alias 'com.foo', 'A'

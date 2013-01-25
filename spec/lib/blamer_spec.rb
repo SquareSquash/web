@@ -296,7 +296,7 @@ describe Blamer do
                                                                      "file"   => "A.java",
                                                                      "line"   => 15,
                                                                      "symbol" => "b",
-                                                                     "class"  => "A"}]}],
+                                                                     "class_name"  => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')
@@ -313,7 +313,7 @@ describe Blamer do
                                                                      "file"   => "A.java",
                                                                      "line"   => -15,
                                                                      "symbol" => "b",
-                                                                     "class"  => "A"}]}],
+                                                                     "class_name"  => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')

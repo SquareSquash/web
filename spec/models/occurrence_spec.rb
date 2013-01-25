@@ -685,7 +685,7 @@ describe Occurrence do
                                        "file"   => "B.java",
                                        "line"   => 15,
                                        "symbol" => "int a(java.lang.String)",
-                                       "class"  => "com.A.B"}]}]
+                                       "class_name"  => "com.A.B"}]}]
       @occurrence.deobfuscate!
 
       @occurrence.changes.should be_empty
@@ -711,12 +711,12 @@ describe Occurrence do
                                        "file"   => "B.java",
                                        "line"   => 15,
                                        "symbol" => "int b(java.lang.String)",
-                                       "class"  => "com.A.B"},
+                                       "class_name"  => "com.A.B"},
                                       {"type"   => "obfuscated",
                                        "file"   => "ActivityThread.java",
                                        "line"   => 15,
                                        "symbol" => "int a(java.lang.String)",
-                                       "class"  => "com.squareup.ActivityThread"}]}]
+                                       "class_name"  => "com.squareup.ActivityThread"}]}]
       @occurrence.deobfuscate!
 
       @occurrence.changes.should be_empty
@@ -730,7 +730,7 @@ describe Occurrence do
                                                 "file"   => "ActivityThread.java",
                                                 "line"   => 15,
                                                 "symbol" => "int a(java.lang.String)",
-                                                "class"  => "com.squareup.ActivityThread"}]}])
+                                                "class_name"  => "com.squareup.ActivityThread"}]}])
     end
 
     it "should use a custom obfuscation map" do
@@ -754,7 +754,7 @@ describe Occurrence do
                                        "file"   => "B.java",
                                        "line"   => 15,
                                        "symbol" => "int a(java.lang.String)",
-                                       "class"  => "com.A.B"}]}]
+                                       "class_name"  => "com.A.B"}]}]
       @occurrence.deobfuscate! om2
 
       @occurrence.changes.should be_empty
@@ -812,7 +812,7 @@ describe Occurrence do
                                                          "file"   => "A.java",
                                                          "line"   => 15,
                                                          "symbol" => "b",
-                                                         "class"  => "A"},
+                                                         "class_name"  => "A"},
                                                         {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                          "line"   => 644,
                                                          "symbol" => "connect"},
