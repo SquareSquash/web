@@ -1,7 +1,9 @@
 <%= @comment.user.name %> has commented on this bug:
 
 <%= @bug.class_name %>
-<% if @bug.displayable_file? %>
+<% if @bug.special_file? %>
+in <%= @bug.file %>
+<% else %>
 in <%= @bug.file %>:<%= @bug.line %>
 <% end %>
 

@@ -938,24 +938,6 @@ describe Bug do
     end
   end
 
-  describe "#displayable_file?" do
-    it "should return true for a normal bug" do
-      FactoryGirl.build(:bug).should be_displayable_file
-    end
-
-    it "should return false for an unsymbolicated iOS bug" do
-      FactoryGirl.build(:bug, special_file: true, file: '_RETURN_ADDRESS_').should_not be_displayable_file
-    end
-
-    it "should return false for an un-sourcemapped JS bug" do
-      FactoryGirl.build(:bug, special_file: true, file: '_JS_ASSET_').should_not be_displayable_file
-    end
-
-    it "should return true for an obfuscated Java bug" do
-      FactoryGirl.build(:bug, special_file: true, file: 'FileName.java').should be_displayable_file
-    end
-  end
-
   context "[duplicates]" do
     before(:all) { @env = FactoryGirl.create(:environment) }
 

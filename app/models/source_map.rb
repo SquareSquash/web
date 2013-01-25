@@ -84,14 +84,18 @@ class SourceMap < ActiveRecord::Base
   # @param [String] route The URL of the minified JavaScript file.
   # @param [Fixnum] line The line of code.
   # @param [Fixnum] column The character number within the line.
-  # @return [Array, nil] If found, an array consisting of the source file path,
+  # @return [Hash, nil] If found, a hash consisting of the source file path,
   #   line number, and method name.
 
   def resolve(route, line, column)
     if (mapping = map.resolve(route, line, column))
-      return [mapping.source_file, mapping.source_line, mapping.symbol]
+      {
+          'file'   => mapping.source_file,
+          'line'   => mapping.source_line,
+          'symbol' => mapping.symbol
+      }
     else
-      return nil
+      nil
     end
   end
 

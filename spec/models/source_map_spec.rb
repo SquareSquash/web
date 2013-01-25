@@ -33,10 +33,16 @@ describe SourceMap do
       occurrence = FactoryGirl.create(:rails_occurrence,
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc',
                                       bug:        bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 5, 'foo'],
-                                          ['_JS_ASSET_', 'http://test.host/example/asset.js', 3, 144, 'eval', nil]
-                                      ]]])
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" =>
+                                                        [{"file" => "lib/better_caller/extensions.rb", "line" => 5, "symbol" => "foo"},
+                                                         {"type"    => "minified",
+                                                          "url"     => "http://test.host/example/asset.js",
+                                                          "line"    => 3,
+                                                          "column"  => 144,
+                                                          "symbol"  => "eval",
+                                                          "context" => nil}]}])
       occurrence.should_not be_sourcemapped
 
       map = Squash::Javascript::SourceMap.new
@@ -69,10 +75,16 @@ describe SourceMap do
       occurrence = FactoryGirl.create(:rails_occurrence,
                                       revision:   bug1.blamed_revision,
                                       bug:        bug1,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 5, 'foo'],
-                                          ['_JS_ASSET_', 'http://test.host/example/asset.js', 3, 144, 'eval', nil]
-                                      ]]])
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" =>
+                                                        [{"file" => "lib/better_caller/extensions.rb", "line" => 5, "symbol" => "foo"},
+                                                         {"type"    => "minified",
+                                                          "url"     => "http://test.host/example/asset.js",
+                                                          "line"    => 3,
+                                                          "column"  => 144,
+                                                          "symbol"  => "eval",
+                                                          "context" => nil}]}])
       occurrence.should_not be_sourcemapped
 
       map = Squash::Javascript::SourceMap.new

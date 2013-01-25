@@ -31,10 +31,10 @@ atom_feed(root_url: project_environment_bug_url(@project, @environment, @bug, an
         html.p occurrence.message
         html.h2 "Backtrace"
 
-        occurrence.backtraces.each do |(name, faulted, backtrace)|
-          html.h3 "#{name}#{' (raised)' if faulted}"
+        occurrence.backtraces.each do |bt|
+          html.h3 "#{bt['name']}#{' (raised)' if bt['faulted']}"
           html.ul do
-            backtrace.each { |line| html.li format_backtrace_element(*line) }
+            bt['backtrace'].each { |line| html.li format_backtrace_element(*line) }
           end
         end
       end

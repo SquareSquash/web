@@ -37,8 +37,73 @@
 # ------------------------------------------
 #
 # Each Occurrence has multiple backtraces, one for each thread or other unit of
-# execution (client specific). They are stored as nested arrays in the following
-# format:
+# execution (client specific). These backtraces can appear in one of two
+# formats:
+#
+# ### Current format
+#
+# The current backtrace format is an array of hashes. Each hash has the
+# following keys:
+#
+# | Key         | Required | Description                                                               |
+# |:------------|:---------|:--------------------------------------------------------------------------|
+# | `name`      | yes      | A name for the thread or fiber.                                           |
+# | `faulted`   | yes      | If `true`, this is the thread or fiber in which the exception was raised. |
+# | `backtrace` | yes      | The stack trace for this thread or fiber.                                 |
+# | `registers` | no       | The value of the registers for this thread (hash).                        |
+#
+# The `backtrace` value is an array of hashes, one per line of the backtrace,
+# ordered from outermost stack element to innermost. Each hash can have the
+# following keys (all are required):
+#
+# |          |                                                     |
+# |:---------|:----------------------------------------------------|
+# | `file`   | The file name.                                      |
+# | `line`   | The line number in the file.                        |
+# | `symbol` | The name of the method containing that line number. |
+#
+# #### Special backtraces
+#
+# For certain special stack trace lines, a `type` field will be present
+# indicating the type of special stack trace line this is. If the `type` field
+# is present, other fields will appear alongside it.
+#
+# For unsymbolicated backtrace lines, the `type` field will be **address** and
+# the only other field will be named "address" and will be the integer stack
+# trace return address. Unsymbolicated backtrace lines can be symbolicated by
+# calling {#symbolicate}, assuming an appropriate {Symbolication} is available.
+#
+# For un-sourcemapped JavaScript lines, the `type` field will be **minified**
+# and the other fields will be:
+#
+# |           |                                                                    |
+# |:----------|:-------------------------------------------------------------------|
+# | `url`     | The URL of the minified JavaScript asset.                          |
+# | `line`    | The line number in the minified file.                              |
+# | `column`  | The column number in the minified file.                            |
+# | `symbol`  | The minified method or function name.                              |
+# | `context` | An array of strings containing the lines of code around the error. |
+#
+# Some elements will be `nil` depending on browser support. Un-sourcemapped
+# lines can be source-mapped by calling {#sourcemap}, assuming an appropriate
+# {SourceMap} is available.
+#
+# For obfuscated Java backtrace lines, the `type` field will be **obfuscated**
+# and the other fields will be (all are required):
+#
+# |          |                                                         |
+# |:---------|:--------------------------------------------------------|
+# | `file`   | The obfuscated file name without path (e.g., "A.java"). |
+# | `line`   | The line number within that file.                       |
+# | `symbol` | The method name (can be obfuscated).                    |
+# | `class`  | The class name (can be obfuscated).                     |
+#
+# Obfuscated backtrace lines can be de-obfuscated by calling {#deobfuscate},
+# assuming an appropriate {ObfuscationMap} is available.
+#
+# ### Legacy format
+#
+# Older client libraries may report backtraces in this format:
 #
 # ```` ruby
 # [
@@ -66,7 +131,7 @@
 # For certain special cases, this array will consist of other than three
 # elements. These special cases are:
 #
-# ### Unsymbolicated backtrace lines
+# #### Unsymbolicated backtrace lines
 #
 # If a line in the backtrace is not yet symbolicated, it is stored in a different
 # format. Each unsymbolicated line of a backtrace becomes a _two_-element array.
@@ -76,7 +141,7 @@
 # Unsymbolicated backtrace lines can be symbolicated by calling {#symbolicate},
 # assuming an appropriate {Symbolication} is available.
 #
-# ### Un-sourcemapped JavaScript files
+# #### Un-sourcemapped JavaScript files
 #
 # If a line in a backtrace corresponds to a JavaScript asset that has not yet
 # been mapped to an un-minified source file, it is stored as a six-element
@@ -93,7 +158,7 @@
 # lines can be source-mapped by calling {#sourcemap}, assuming an appropriate
 # {SourceMap} is available.
 #
-# ### Obfuscated Java files
+# #### Obfuscated Java files
 #
 # Java backtraces do not contain the full file path, and the class name can be
 # obfuscated using yGuard. If a line in a backtrace comes from a Java stack
@@ -433,12 +498,11 @@ class Occurrence < ActiveRecord::Base
     end
   end
 
-  # @return [Array<String, Fixnum, String>] The backtrace in `backtrace` that is
-  #   at fault.
+  # @return [Array<Hash>] The backtrace in `backtrace` that is at fault.
 
   def faulted_backtrace
-    bt = backtraces.detect { |(_, faulted, _)| faulted }
-    bt ? bt[2] : []
+    bt = backtraces.detect { |b| b['faulted'] }
+    bt ? bt['backtrace'] : []
   end
 
   # @return [true, false] Whether or not this exception was nested under one or
@@ -596,10 +660,10 @@ class Occurrence < ActiveRecord::Base
     return if truncated?
     return if symbolicated?
 
-    (bt = backtraces).each do |(_, _, backtrace)|
-      backtrace.each do |elem|
-        next unless elem.size == 2 && elem.first == '_RETURN_ADDRESS_'
-        symbolicated = symb.symbolicate(elem.last)
+    (bt = backtraces).each do |bt|
+      bt['backtrace'].each do |elem|
+        next unless elem['type'] == 'address'
+        symbolicated = symb.symbolicate(elem['address'])
         elem.replace(symbolicated) if symbolicated
       end
     end
@@ -627,9 +691,9 @@ class Occurrence < ActiveRecord::Base
 
   def symbolicated?
     return true if truncated?
-    !(backtraces.detect do |(_, _, backtrace)|
-      backtrace.detect { |elem| elem.size != 3 && elem.first == '_RETURN_ADDRESS_' }
-    end)
+    backtraces.all? do |bt|
+      bt['backtrace'].none? { |elem| elem['type'] == 'address' }
+    end
   end
 
   # @overload sourcemap(source_map, ...)
@@ -652,11 +716,11 @@ class Occurrence < ActiveRecord::Base
     sourcemaps = bug.environment.source_maps.where(revision: revision) if sourcemaps.empty?
     return if sourcemaps.empty?
 
-    (bt = backtraces).each do |(_, _, backtrace)|
-      backtrace.each do |elem|
-        next unless elem.size == 6 && elem.first == '_JS_ASSET_'
+    (bt = backtraces).each do |bt|
+      bt['backtrace'].each do |elem|
+        next unless elem['type'] == 'minified'
         symbolicated = nil
-        sourcemaps.each { |map| symbolicated ||= map.resolve(elem[1], elem[2], elem[3]) }
+        sourcemaps.each { |map| symbolicated ||= map.resolve(elem['url'], elem['line'], elem['column']) }
         elem.replace(symbolicated) if symbolicated
       end
     end
@@ -681,9 +745,9 @@ class Occurrence < ActiveRecord::Base
 
   def sourcemapped?
     return true if truncated?
-    !(backtraces.detect do |(_, _, backtrace)|
-      backtrace.detect { |elem| elem.size != 3 && elem.first == '_JS_ASSET_' }
-    end)
+    backtraces.all? do |bt|
+      bt['backtrace'].none? { |elem| elem['type'] == 'minified' }
+    end
   end
 
   # De-obfuscates this Occurrence's backtrace. Does nothing if the linked Deploy
@@ -700,13 +764,17 @@ class Occurrence < ActiveRecord::Base
     return if truncated?
     return if deobfuscated?
 
-    (bt = backtraces).each do |(_, _, backtrace)|
-      backtrace.each do |elem|
-        next unless elem.size == 5 && elem.first == '_JAVA_'
-        klass = map.namespace.obfuscated_type(elem[4])
+    (bt = backtraces).each do |bt|
+      bt['backtrace'].each do |elem|
+        next unless elem['type'] == 'obfuscated'
+        klass = map.namespace.obfuscated_type(elem['class'])
         next unless klass && klass.path
-        meth = map.namespace.obfuscated_method(klass, elem[3])
-        elem.replace([klass.path, elem[2], meth.try(:full_name) || elem[3]])
+        meth = map.namespace.obfuscated_method(klass, elem['symbol'])
+        elem.replace(
+            'file'   => klass.path,
+            'line'   => elem['line'],
+            'symbol' => meth.try(:full_name) || elem['symbol']
+        )
       end
     end
     self.backtraces = bt # refresh the actual JSON
@@ -733,9 +801,9 @@ class Occurrence < ActiveRecord::Base
 
   def deobfuscated?
     return true if truncated?
-    !(backtraces.detect do |(_, _, backtrace)|
-      backtrace.detect { |elem| elem.size != 3 && elem.first == '_JAVA_' }
-    end)
+    backtraces.all? do |bt|
+      bt['backtrace'].none? { |elem| elem['type'] == 'obfuscated' }
+    end
   end
 
   # Recalculates the blame for this Occurrence and re-determines which Bug it
@@ -764,5 +832,59 @@ class Occurrence < ActiveRecord::Base
     options[:except] << :id
     options[:except] << :bug_id
     super options
+  end
+
+  # @private
+  def backtraces
+    bt = attribute('backtraces')
+    return bt if bt.first.kind_of?(Hash)
+    @new_trace ||= bt.map do |(name, faulted, trace)|
+      {
+          'name'      => name,
+          'faulted'   => faulted,
+          'backtrace' => convert_legacy_backtrace_format(trace)
+      }
+    end
+  end
+
+  private
+
+  def convert_legacy_backtrace_format(backtrace)
+    backtrace.map do |bt_line|
+      if bt_line.length == 3
+        {
+            'file'   => bt_line[0],
+            'line'   => bt_line[1],
+            'symbol' => bt_line[2]
+        }
+      else
+        case bt_line.first
+          when '_RETURN_ADDRESS_'
+            {
+                'type'    => 'address',
+                'address' => bt_line[1]
+            }
+          when '_JS_ASSET_'
+            {
+                'type'    => 'minified',
+                'url'     => bt_line[1],
+                'line'    => bt_line[2],
+                'column'  => bt_line[3],
+                'symbol'  => bt_line[4],
+                'context' => bt_line[5]
+            }
+          when '_JAVA_'
+            {
+                'type'   => 'obfuscated',
+                'file'   => bt_line[1],
+                'line'   => bt_line[2],
+                'symbol' => bt_line[3],
+                'class'  => bt_line[4]
+            }
+          else
+            raise "Unknown special legacy backtrace format #{bt_line.first}"
+        end
+      end
+    end
   end
 end

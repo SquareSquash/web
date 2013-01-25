@@ -9,8 +9,10 @@ Revision:      <%= @bug.revision %>
 Fix Commit:    <%= @bug.resolution_revision %>
 
 <%= @bug.class_name %>
-<% if @bug.displayable_file? %>
-    in <%= @bug.file %>:<%= @bug.line %>
+<% if @bug.special_file? %>
+in <%= @bug.file %>
+<% else %>
+in <%= @bug.file %>:<%= @bug.line %>
 <% end %>
 
 <%= @bug.message_template %>

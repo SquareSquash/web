@@ -22,14 +22,10 @@ atom_feed(root_url: project_environment_bugs_url(@project, @environment)) do |fe
                url:       project_environment_bug_url(@project, @environment, bug),
                id:        "project:#{@project.slug},environment:#{@environment.name},bug:#{bug.number}") do |entry|
       entry.title(
-          if @bug.displayable_file?
-            "#{bug.class_name} in #{bug.file}:#{bug.line}"
+          if @bug.special_file?
+            "#{bug.class_name} in #{bug.file}"
           else
-            case @bug.file
-              when '_RETURN_ADDRESS_' then "#{bug.class_name} in unsymbolicated code"
-              when '_JS_ASSET_' then "#{bug.class_name} in minified JavaScript code"
-              else "#{bug.class_name} in compiled code"
-            end
+            "#{bug.class_name} in #{bug.file}:#{bug.line}"
           end
       )
       #entry.summary bug.message_template
@@ -39,7 +35,11 @@ atom_feed(root_url: project_environment_bugs_url(@project, @environment)) do |fe
           html.span bug.message_template
         end
         html.p do
-          html.span "#{bug.file}, line #{bug.line}" unless @bug.displayable_file?
+          if bug.special_file?
+            html.span "#{bug.file}"
+          else
+            html.span "#{bug.file}, line #{bug.line}"
+          end
           html.em "(revision #{bug.revision})"
         end
       end

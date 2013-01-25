@@ -21,9 +21,4 @@ root = exports ? this
 #
 root.formatBugFile = (bug) ->
   parts = bug.file.split('/')
-  if bug.displayable_file
-    parts[parts.length  - 1]
-  else
-    if bug.file == '_RETURN_ADDRESS_' then "(unsymbolicated code)"
-    else if bug.file == '_JS_ASSET_' then "(minified JavaScript code)"
-    else "(unknown)"
+  parts[parts.length  - 1]

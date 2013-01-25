@@ -59,7 +59,10 @@ describe Occurrence do
       symb = FactoryGirl.create(:symbolication, symbols: symbols)
       FactoryGirl.create(:rails_occurrence,
                          symbolication: symb,
-                         backtraces:    [['1', true, [['_RETURN_ADDRESS_', 5]]]]).
+                         backtraces:    [{"name"      => "1",
+                                          "faulted"   => true,
+                                          "backtrace" => [{"type"    => "address",
+                                                           "address" => 5}]}]).
           should be_symbolicated
     end
 
@@ -160,15 +163,19 @@ describe Occurrence do
 
   describe "#faulted_backtrace" do
     it "should return the at-fault backtrace" do
-      bt1 = [['foo.rb', 123, 'bar']]
-      bt2 = [['bar.rb', 321, 'foo']]
-      FactoryGirl.build(:occurrence, backtraces: [["1", false, bt1], ['2', true, bt2]]).faulted_backtrace.should eql(bt2)
+      bt1 = [{'file' => 'foo.rb', 'line' => 123, 'symbol' => 'bar'}]
+      bt2 = [{'file' => 'bar.rb', 'line' => 321, 'symbol' => 'foo'}]
+      FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
+                                                  {'name' => '2', 'faulted' => true, 'backtrace' => bt2}]).
+          faulted_backtrace.should eql(bt2)
     end
 
     it "should return an empty array if there is no at-fault backtrace" do
-      bt1 = [['foo.rb', 123, 'bar']]
-      bt2 = [['bar.rb', 321, 'foo']]
-      FactoryGirl.build(:occurrence, backtraces: [["1", false, bt1], ['2', false, bt2]]).faulted_backtrace.should eql([])
+      bt1 = [{'file' => 'foo.rb', 'line' => 123, 'symbol' => 'bar'}]
+      bt2 = [{'file' => 'bar.rb', 'line' => 321, 'symbol' => 'foo'}]
+      FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
+                                                  {'name' => '2', 'faulted' => false, 'backtrace' => bt2}]).
+          faulted_backtrace.should eql([])
     end
   end
 
@@ -227,19 +234,41 @@ describe Occurrence do
     end
 
     it "should do nothing if the occurrence is already symbolicated" do
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['_RETURN_ADDRESS_', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" => [{"file"   => "/usr/bin/gist",
+                                                  "line"   => 313,
+                                                  "symbol" => "<main>"},
+                                                 {"file"   => "/usr/bin/gist",
+                                                  "line"   => 171,
+                                                  "symbol" => "execute"},
+                                                 {"file"   => "/usr/bin/gist",
+                                                  "line"   => 197,
+                                                  "symbol" => "write"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 626,
+                                                  "symbol" => "start"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 637,
+                                                  "symbol" => "do_start"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "connect"},
+                                                 {"file"   => "_RETURN_ADDRESS_",
+                                                  "line"   => 87,
+                                                  "symbol" => "timeout"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                  "line"   => 44,
+                                                  "symbol" => "timeout"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "block in connect"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "open"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "initialize"}]}]
       -> { @occurrence.symbolicate! }.should_not change(@occurrence, :backtraces)
     end
 
@@ -250,21 +279,34 @@ describe Occurrence do
       symb = FactoryGirl.create(:symbolication, symbols: symbols)
 
       @occurrence.symbolication = symb
-      @occurrence.backtraces    = [["Thread 0", true, [
-          ['_RETURN_ADDRESS_', 1],
-          ['_RETURN_ADDRESS_', 2],
-          ['_RETURN_ADDRESS_', 12],
-          ['_RETURN_ADDRESS_', 10, 'timeout']
-      ]]]
+      @occurrence.backtraces    = [{"name"      => "Thread 0",
+                                    "faulted"   => true,
+                                    "backtrace" => [{"type"    => "address",
+                                                     "address" => 1},
+                                                    {"type"    => "address",
+                                                     "address" => 2},
+                                                    {"type"    => "address",
+                                                     "address" => 12},
+                                                    {"file"   => "_RETURN_ADDRESS_",
+                                                     "line"   => 10,
+                                                     "symbol" => "timeout"}]}]
       @occurrence.symbolicate!
 
       @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([["Thread 0", true, [
-          ['foo.rb', 15, 'bar'],
-          ['foo.rb', 15, 'bar'],
-          ['foo2.rb', 5, 'bar2'],
-          ['_RETURN_ADDRESS_', 10, 'timeout']
-      ]]])
+      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+                                          "faulted"   => true,
+                                          "backtrace" => [{"file"   => "foo.rb",
+                                                           "line"   => 15,
+                                                           "symbol" => "bar"},
+                                                          {"file"   => "foo.rb",
+                                                           "line"   => 15,
+                                                           "symbol" => "bar"},
+                                                          {"file"   => "foo2.rb",
+                                                           "line"   => 5,
+                                                           "symbol" => "bar2"},
+                                                          {"file"   => "_RETURN_ADDRESS_",
+                                                           "line"   => 10,
+                                                           "symbol" => "timeout"}]}])
     end
 
 
@@ -280,55 +322,111 @@ describe Occurrence do
       symb2 = FactoryGirl.create(:symbolication, symbols: symbols2)
 
       @occurrence.symbolication = symb1
-      @occurrence.backtraces    = [["Thread 0", true, [
-          ['_RETURN_ADDRESS_', 1],
-          ['_RETURN_ADDRESS_', 2],
-          ['_RETURN_ADDRESS_', 12],
-          ['_RETURN_ADDRESS_', 10, 'timeout']
-      ]]]
+      @occurrence.backtraces    = [{"name"      => "Thread 0",
+                                    "faulted"   => true,
+                                    "backtrace" => [{"type"    => "address",
+                                                     "address" => 1},
+                                                    {"type"    => "address",
+                                                     "address" => 2},
+                                                    {"type"    => "address",
+                                                     "address" => 12},
+                                                    {"file"   => "_RETURN_ADDRESS_",
+                                                     "line"   => 10,
+                                                     "symbol" => "timeout"}]}]
       @occurrence.symbolicate! symb2
 
       @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([["Thread 0", true, [
-          ['foo3.rb', 15, 'bar3'],
-          ['foo3.rb', 15, 'bar3'],
-          ['foo4.rb', 5, 'bar4'],
-          ['_RETURN_ADDRESS_', 10, 'timeout']
-      ]]])
+      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+                                          "faulted"   => true,
+                                          "backtrace" => [{"file"   => "foo3.rb",
+                                                           "line"   => 15,
+                                                           "symbol" => "bar3"},
+                                                          {"file"   => "foo3.rb",
+                                                           "line"   => 15,
+                                                           "symbol" => "bar3"},
+                                                          {"file"   => "foo4.rb",
+                                                           "line"   => 5,
+                                                           "symbol" => "bar4"},
+                                                          {"file"   => "_RETURN_ADDRESS_",
+                                                           "line"   => 10,
+                                                           "symbol" => "timeout"}]}])
     end
   end
 
   describe "#symbolicated?" do
     it "should return true if all lines are symbolicated" do
-      FactoryGirl.build(:occurrence, backtraces: [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['_RETURN_ADDRESS_', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]).should be_symbolicated
+      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+                                                   "faulted"   => true,
+                                                   "backtrace" => [{"file"   => "/usr/bin/gist",
+                                                                    "line"   => 313,
+                                                                    "symbol" => "<main>"},
+                                                                   {"file"   => "/usr/bin/gist",
+                                                                    "line"   => 171,
+                                                                    "symbol" => "execute"},
+                                                                   {"file"   => "/usr/bin/gist",
+                                                                    "line"   => 197,
+                                                                    "symbol" => "write"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 626,
+                                                                    "symbol" => "start"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 637,
+                                                                    "symbol" => "do_start"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "connect"},
+                                                                   {"file"   => "_RETURN_ADDRESS_",
+                                                                    "line"   => 87,
+                                                                    "symbol" => "timeout"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                                    "line"   => 44,
+                                                                    "symbol" => "timeout"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "block in connect"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "open"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "initialize"}]}]).should be_symbolicated
     end
 
     it "should return false if any line is unsymbolicated" do
-      FactoryGirl.build(:occurrence, backtraces: [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['_RETURN_ADDRESS_', 4632],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]).should_not be_symbolicated
+      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+                                                   "faulted"   => true,
+                                                   "backtrace" => [{"file"   => "/usr/bin/gist",
+                                                                    "line"   => 313,
+                                                                    "symbol" => "<main>"},
+                                                                   {"file"   => "/usr/bin/gist",
+                                                                    "line"   => 171,
+                                                                    "symbol" => "execute"},
+                                                                   {"file"   => "/usr/bin/gist",
+                                                                    "line"   => 197,
+                                                                    "symbol" => "write"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 626,
+                                                                    "symbol" => "start"},
+                                                                   {"type"    => "address",
+                                                                    "address" => 4632},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "connect"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                                    "line"   => 87,
+                                                                    "symbol" => "timeout"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                                    "line"   => 44,
+                                                                    "symbol" => "timeout"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "block in connect"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "open"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "initialize"}]}]).should_not be_symbolicated
     end
   end
 
@@ -350,19 +448,41 @@ describe Occurrence do
     end
 
     it "should do nothing if the occurrence is already sourcemapped" do
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['_JAVA_', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" => [{"file"   => "/usr/bin/gist",
+                                                  "line"   => 313,
+                                                  "symbol" => "<main>"},
+                                                 {"file"   => "/usr/bin/gist",
+                                                  "line"   => 171,
+                                                  "symbol" => "execute"},
+                                                 {"file"   => "/usr/bin/gist",
+                                                  "line"   => 197,
+                                                  "symbol" => "write"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 626,
+                                                  "symbol" => "start"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 637,
+                                                  "symbol" => "do_start"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "connect"},
+                                                 {"file"   => "_JAVA_",
+                                                  "line"   => 87,
+                                                  "symbol" => "timeout"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                  "line"   => 44,
+                                                  "symbol" => "timeout"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "block in connect"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "open"},
+                                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                  "line"   => 644,
+                                                  "symbol" => "initialize"}]}]
       -> { @occurrence.sourcemap! }.should_not change(@occurrence, :backtraces)
     end
 
@@ -371,15 +491,22 @@ describe Occurrence do
       map << Squash::Javascript::SourceMap::Mapping.new('http://test.host/example/asset.js', 3, 140, 'app/assets/javascripts/source.js', 25, 1, 'foobar')
       FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map
 
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['_JS_ASSET_', 'http://test.host/example/asset.js', 3, 140, 'foo', nil]
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" => [{"type"    => "minified",
+                                                  "url"     => "http://test.host/example/asset.js",
+                                                  "line"    => 3,
+                                                  "column"  => 140,
+                                                  "symbol"  => "foo",
+                                                  "context" => nil}]}]
       @occurrence.sourcemap!
 
       @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([["Thread 0", true, [
-          ['app/assets/javascripts/source.js', 25, 'foobar']
-      ]]])
+      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+                                          "faulted"   => true,
+                                          "backtrace" => [{"file"   => "app/assets/javascripts/source.js",
+                                                           "line"   => 25,
+                                                           "symbol" => "foobar"}]}])
     end
 
 
@@ -392,49 +519,96 @@ describe Occurrence do
       sm1 = FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map1
       sm2 = FactoryGirl.create :source_map, map: map2
 
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['_JS_ASSET_', 'http://test.host/example/asset.js', 3, 140, 'foo', nil]
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" => [{"type"    => "minified",
+                                                  "url"     => "http://test.host/example/asset.js",
+                                                  "line"    => 3,
+                                                  "column"  => 140,
+                                                  "symbol"  => "foo",
+                                                  "context" => nil}]}]
       @occurrence.sourcemap! sm2
 
       @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([["Thread 0", true, [
-          ['app/assets/javascripts/source2.js', 2, 'foobar2']
-      ]]])
+      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+                                          "faulted"   => true,
+                                          "backtrace" => [{"file"   => "app/assets/javascripts/source2.js",
+                                                           "line"   => 2,
+                                                           "symbol" => "foobar2"}]}])
     end
   end
 
   describe "#sourcemapped?" do
     it "should return true if all lines are source-mapped" do
-      FactoryGirl.build(:occurrence, backtraces: [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['_RETURN_ADDRESS_', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]).should be_sourcemapped
+      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+                                                   "faulted"   => true,
+                                                   "backtrace" => [{"file"   => "/usr/bin/gist",
+                                                                    "line"   => 313,
+                                                                    "symbol" => "<main>"},
+                                                                   {"file"   => "/usr/bin/gist",
+                                                                    "line"   => 171,
+                                                                    "symbol" => "execute"},
+                                                                   {"file"   => "/usr/bin/gist",
+                                                                    "line"   => 197,
+                                                                    "symbol" => "write"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 626,
+                                                                    "symbol" => "start"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 637,
+                                                                    "symbol" => "do_start"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "connect"},
+                                                                   {"file"   => "_RETURN_ADDRESS_",
+                                                                    "line"   => 87,
+                                                                    "symbol" => "timeout"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                                    "line"   => 44,
+                                                                    "symbol" => "timeout"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "block in connect"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "open"},
+                                                                   {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                                    "line"   => 644,
+                                                                    "symbol" => "initialize"}]}]).should be_sourcemapped
     end
 
     it "should return false if any line is not source-mapped" do
-      FactoryGirl.build(:occurrence, backtraces: [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['_JS_ASSET_', 'http://test.host/my.js', 20, 5, 'myfunction', nil],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]).should_not be_sourcemapped
+      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+                                                   "faulted"   => true,
+                                                   "backtrace" =>
+                                                       [{"file" => "/usr/bin/gist", "line" => 313, "symbol" => "<main>"},
+                                                        {"file" => "/usr/bin/gist", "line" => 171, "symbol" => "execute"},
+                                                        {"file" => "/usr/bin/gist", "line" => 197, "symbol" => "write"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 626,
+                                                         "symbol" => "start"},
+                                                        {"type"    => "minified",
+                                                         "url"     => "http://test.host/my.js",
+                                                         "line"    => 20,
+                                                         "column"  => 5,
+                                                         "symbol"  => "myfunction",
+                                                         "context" => nil},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "connect"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                         "line"   => 87,
+                                                         "symbol" => "timeout"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                         "line"   => 44,
+                                                         "symbol" => "timeout"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "block in connect"},
+                                                        {"file" => "/usr/lib/ruby/1.9.1/net/http.rb", "line" => 644, "symbol" => "open"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "initialize"}]}]).should_not be_sourcemapped
     end
   end
 
@@ -456,19 +630,32 @@ describe Occurrence do
     end
 
     it "should do nothing if the occurrence is already de-obfuscated" do
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['_JAVA_', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" =>
+                                     [{"file" => "/usr/bin/gist", "line" => 313, "symbol" => "<main>"},
+                                      {"file" => "/usr/bin/gist", "line" => 171, "symbol" => "execute"},
+                                      {"file" => "/usr/bin/gist", "line" => 197, "symbol" => "write"},
+                                      {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                       "line"   => 626,
+                                       "symbol" => "start"},
+                                      {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                       "line"   => 637,
+                                       "symbol" => "do_start"},
+                                      {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                       "line"   => 644,
+                                       "symbol" => "connect"},
+                                      {"file" => "_JAVA_", "line" => 87, "symbol" => "timeout"},
+                                      {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                       "line"   => 44,
+                                       "symbol" => "timeout"},
+                                      {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                       "line"   => 644,
+                                       "symbol" => "block in connect"},
+                                      {"file" => "/usr/lib/ruby/1.9.1/net/http.rb", "line" => 644, "symbol" => "open"},
+                                      {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                       "line"   => 644,
+                                       "symbol" => "initialize"}]}]
       -> { @occurrence.deobfuscate! }.should_not change(@occurrence, :backtraces)
     end
 
@@ -479,15 +666,23 @@ describe Occurrence do
       namespace.add_method_alias 'com.foo.Bar', 'int baz(java.lang.String)', 'a'
       FactoryGirl.create :obfuscation_map, namespace: namespace, deploy: @occurrence.bug.deploy
 
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['_JAVA_', 'B.java', 15, 'int a(java.lang.String)', 'com.A.B']
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" =>
+                                     [{"type"   => "obfuscated",
+                                       "file"   => "B.java",
+                                       "line"   => 15,
+                                       "symbol" => "int a(java.lang.String)",
+                                       "class"  => "com.A.B"}]}]
       @occurrence.deobfuscate!
 
       @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([["Thread 0", true, [
-          ['src/foo/Bar.java', 15, 'int baz(java.lang.String)']
-      ]]])
+      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+                                          "faulted"   => true,
+                                          "backtrace" =>
+                                              [{"file"   => "src/foo/Bar.java",
+                                                "line"   => 15,
+                                                "symbol" => "int baz(java.lang.String)"}]}])
     end
 
     it "should leave un-obfuscated names intact" do
@@ -497,17 +692,33 @@ describe Occurrence do
       namespace.add_method_alias 'com.foo.Bar', 'int baz(java.lang.String)', 'a'
       FactoryGirl.create :obfuscation_map, namespace: namespace, deploy: @occurrence.bug.deploy
 
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['_JAVA_', 'B.java', 15, 'int b(java.lang.String)', 'com.A.B'],
-          ['_JAVA_', 'ActivityThread.java', 15, 'int a(java.lang.String)', 'com.squareup.ActivityThread']
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" =>
+                                     [{"type"   => "obfuscated",
+                                       "file"   => "B.java",
+                                       "line"   => 15,
+                                       "symbol" => "int b(java.lang.String)",
+                                       "class"  => "com.A.B"},
+                                      {"type"   => "obfuscated",
+                                       "file"   => "ActivityThread.java",
+                                       "line"   => 15,
+                                       "symbol" => "int a(java.lang.String)",
+                                       "class"  => "com.squareup.ActivityThread"}]}]
       @occurrence.deobfuscate!
 
       @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([["Thread 0", true, [
-          ['src/foo/Bar.java', 15, 'int b(java.lang.String)'],
-          ['_JAVA_', 'ActivityThread.java', 15, 'int a(java.lang.String)', 'com.squareup.ActivityThread']
-      ]]])
+      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+                                          "faulted"   => true,
+                                          "backtrace" =>
+                                              [{"file"   => "src/foo/Bar.java",
+                                                "line"   => 15,
+                                                "symbol" => "int b(java.lang.String)"},
+                                               {"type"   => "obfuscated",
+                                                "file"   => "ActivityThread.java",
+                                                "line"   => 15,
+                                                "symbol" => "int a(java.lang.String)",
+                                                "class"  => "com.squareup.ActivityThread"}]}])
     end
 
     it "should use a custom obfuscation map" do
@@ -524,49 +735,89 @@ describe Occurrence do
       om1 = FactoryGirl.create(:obfuscation_map, namespace: namespace1, deploy: @occurrence.bug.deploy)
       om2 = FactoryGirl.create(:obfuscation_map, namespace: namespace2, deploy: @occurrence.bug.deploy)
 
-      @occurrence.backtraces = [["Thread 0", true, [
-          ['_JAVA_', 'B.java', 15, 'int a(java.lang.String)', 'com.A.B']
-      ]]]
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" =>
+                                     [{"type"   => "obfuscated",
+                                       "file"   => "B.java",
+                                       "line"   => 15,
+                                       "symbol" => "int a(java.lang.String)",
+                                       "class"  => "com.A.B"}]}]
       @occurrence.deobfuscate! om2
 
       @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([["Thread 0", true, [
-          ['src/foo/BarTwo.java', 15, 'int baz2(java.lang.String)']
-      ]]])
+      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+                                          "faulted"   => true,
+                                          "backtrace" =>
+                                              [{"file"   => "src/foo/BarTwo.java",
+                                                "line"   => 15,
+                                                "symbol" => "int baz2(java.lang.String)"}]}])
     end
   end
 
   describe "#deobfuscated?" do
     it "should return true if all lines are deobfuscated" do
-      FactoryGirl.build(:occurrence, backtraces: [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['_JAVA_', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]).should be_deobfuscated
+      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+                                                   "faulted"   => true,
+                                                   "backtrace" =>
+                                                       [{"file" => "/usr/bin/gist", "line" => 313, "symbol" => "<main>"},
+                                                        {"file" => "/usr/bin/gist", "line" => 171, "symbol" => "execute"},
+                                                        {"file" => "/usr/bin/gist", "line" => 197, "symbol" => "write"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 626,
+                                                         "symbol" => "start"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 637,
+                                                         "symbol" => "do_start"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "connect"},
+                                                        {"file" => "_JAVA_", "line" => 87, "symbol" => "timeout"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                         "line"   => 44,
+                                                         "symbol" => "timeout"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "block in connect"},
+                                                        {"file" => "/usr/lib/ruby/1.9.1/net/http.rb", "line" => 644, "symbol" => "open"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "initialize"}]}]).
+          should be_deobfuscated
     end
 
     it "should return false if any line is deobfuscated" do
-      FactoryGirl.build(:occurrence, backtraces: [["Thread 0", true, [
-          ['/usr/bin/gist', 313, '<main>'],
-          ['/usr/bin/gist', 171, 'execute'],
-          ['/usr/bin/gist', 197, 'write'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-          ['_JAVA_', 'A.java', 15, 'b', 'A'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 87, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-          ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-      ]]]).should_not be_deobfuscated
+      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+                                                   "faulted"   => true,
+                                                   "backtrace" =>
+                                                       [{"file" => "/usr/bin/gist", "line" => 313, "symbol" => "<main>"},
+                                                        {"file" => "/usr/bin/gist", "line" => 171, "symbol" => "execute"},
+                                                        {"file" => "/usr/bin/gist", "line" => 197, "symbol" => "write"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 626,
+                                                         "symbol" => "start"},
+                                                        {"type"   => "obfuscated",
+                                                         "file"   => "A.java",
+                                                         "line"   => 15,
+                                                         "symbol" => "b",
+                                                         "class"  => "A"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "connect"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                         "line"   => 87,
+                                                         "symbol" => "timeout"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                                         "line"   => 44,
+                                                         "symbol" => "timeout"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "block in connect"},
+                                                        {"file" => "/usr/lib/ruby/1.9.1/net/http.rb", "line" => 644, "symbol" => "open"},
+                                                        {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                                         "line"   => 644,
+                                                         "symbol" => "initialize"}]}]).
+          should_not be_deobfuscated
     end
   end
 

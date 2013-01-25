@@ -24,19 +24,41 @@ FactoryGirl.define do
     client 'rails'
 
     message 'No HTTP_REFERRER was set in the request to this action, so redirect_to :back could not be called successfully. If this is a test, make sure to specify request.env["HTTP_REFERRER"].'
-    backtraces [["Thread 0", true, [
-        ['/usr/bin/gist', 313, '<main>'],
-        ['/usr/bin/gist', 171, 'execute'],
-        ['/usr/bin/gist', 197, 'write'],
-        ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
-        ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
-        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
-        ['/usr/lib/ruby/1.9.1/timeout.rb', 87, 'timeout'],
-        ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
-        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
-        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
-        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
-    ]]]
+    backtraces [{"name"      => "Thread 0",
+                 "faulted"   => true,
+                 "backtrace" => [{"file"   => "/usr/bin/gist",
+                                  "line"   => 313,
+                                  "symbol" => "<main>"},
+                                 {"file"   => "/usr/bin/gist",
+                                  "line"   => 171,
+                                  "symbol" => "execute"},
+                                 {"file"   => "/usr/bin/gist",
+                                  "line"   => 197,
+                                  "symbol" => "write"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                  "line"   => 626,
+                                  "symbol" => "start"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                  "line"   => 637,
+                                  "symbol" => "do_start"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                  "line"   => 644,
+                                  "symbol" => "connect"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                  "line"   => 87,
+                                  "symbol" => "timeout"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/timeout.rb",
+                                  "line"   => 44,
+                                  "symbol" => "timeout"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                  "line"   => 644,
+                                  "symbol" => "block in connect"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                  "line"   => 644,
+                                  "symbol" => "open"},
+                                 {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
+                                  "line"   => 644,
+                                  "symbol" => "initialize"}]}]
     revision 'adf85a0c645e8b262ed7cdb347ff0b32a2f860dc'
 
     request_method 'POST'
@@ -93,5 +115,21 @@ FactoryGirl.define do
       "RUBY_VERSION"         => "ree-1.8.7-2011.12",
       "_"                    => "/Users/tim/.rvm/rubies/ree-1.8.7-2011.12/bin/irb"
     )
+  end
+
+  factory :legacy_occurrence, parent: :rails_occurrence do
+    [["Thread 0", true, [
+        ['/usr/bin/gist', 313, '<main>'],
+        ['/usr/bin/gist', 171, 'execute'],
+        ['/usr/bin/gist', 197, 'write'],
+        ['/usr/lib/ruby/1.9.1/net/http.rb', 626, 'start'],
+        ['/usr/lib/ruby/1.9.1/net/http.rb', 637, 'do_start'],
+        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'connect'],
+        ['/usr/lib/ruby/1.9.1/timeout.rb', 87, 'timeout'],
+        ['/usr/lib/ruby/1.9.1/timeout.rb', 44, 'timeout'],
+        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'block in connect'],
+        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'open'],
+        ['/usr/lib/ruby/1.9.1/net/http.rb', 644, 'initialize']
+    ]]]
   end
 end

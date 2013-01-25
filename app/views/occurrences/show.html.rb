@@ -134,68 +134,67 @@ module Views
         end
 
         ul(class: 'pills backtrace-tabs') do
-          backtraces.each_with_index do |(name, faulted, _), index|
-            li(class: (faulted ? 'active' : nil)) { a name, href: "#backtrace-#{identifier}-#{index}", rel: 'tab', class: (faulted ? 'faulted' : nil) }
+          backtraces.each_with_index do |bt, index|
+            li(class: (bt['faulted'] ? 'active' : nil)) { a bt['name'], href: "#backtrace-#{identifier}-#{index}", rel: 'tab', class: (bt['faulted'] ? 'faulted' : nil) }
           end
         end
 
         div(class: 'tab-content') do
-          backtraces.each_with_index do |(_, faulted, backtrace), index|
-            div(id: "backtrace-#{identifier}-#{index}", class: (faulted ? 'active' : nil)) do
-              p("This thread raised or crashed.", class: 'alert info') if faulted
+          backtraces.each_with_index do |bt, index|
+            div(id: "backtrace-#{identifier}-#{index}", class: (bt['faulted'] ? 'active' : nil)) do
+              p("This thread raised or crashed.", class: 'alert info') if bt['faulted']
               ul(class: 'backtrace') do
-                backtrace.each_with_index do |element, lindex|
-                  if element.size == 3
+                bt['backtrace'].each_with_index do |element, lindex|
+                  if element['type'].nil?
                     # NORMAL BACKTRACE ELEMENT
-                    file, line, method = *element
-                    if @project.path_type(file) == :library
-                      li format_backtrace_element(file, line, method), class: 'lib long-words'
+                    if @project.path_type(element['file']) == :library
+                      li format_backtrace_element(element['file'], element['line'], element['method']), class: 'lib long-words'
                     else
-                      li(class: (@project.path_type(file) == :filtered ? 'filtered' : nil)) do
-                        p { a format_backtrace_element(file, line, method), href: "#backtrace-#{identifier}-#{index}-info-#{lindex}", class: 'backtrace-link long-words' }
+                      li(class: (@project.path_type(element['file']) == :filtered ? 'filtered' : nil)) do
+                        p { a format_backtrace_element(element['file'], element['line'], element['method']), href: "#backtrace-#{identifier}-#{index}-info-#{lindex}", class: 'backtrace-link long-words' }
                         div(id: "backtrace-#{identifier}-#{index}-info-#{lindex}", style: 'display: none') do
                           blockquote do
-                            text! editor_link 'textmate', @project, file, line; br
-                            text! editor_link 'sublime', @project, file, line; br
-                            text! editor_link 'vim', @project, file, line; br
-                            text! editor_link 'emacs', @project, file, line
+                            text! editor_link 'textmate', @project, element['file'], element['line']; br
+                            text! editor_link 'sublime', @project, element['file'], element['line']; br
+                            text! editor_link 'vim', @project, element['file'], element['line']; br
+                            text! editor_link 'emacs', @project, element['file'], element['line']
                           end
-                          pre class: 'context', :'data-project' => @project.to_param, :'data-revision' => @occurrence.revision, :'data-file' => file, :'data-line' => line
+                          pre class: 'context', :'data-project' => @project.to_param, :'data-revision' => @occurrence.revision, :'data-file' => element['file'], :'data-line' => element['line']
                         end
                       end
                     end
                   else
                     # NON-NORMAL BACKTRACE ELEMENT
-                    case element.first
-                      when '_RETURN_ADDRESS_'
-                        li "0x#{element.last.to_s(16).rjust(8, '0').upcase}", class: 'lib long-words'
-                      when '_JS_ASSET_'
-                        line_portion = if element[2] && element[3] then "#{element[2]}:#{element[3]}"
-                                       elsif element[2] then element[2].to_s
+                    case element['type']
+                      when 'address'
+                        li "0x#{element['address'].to_s(16).rjust(8, '0').upcase}", class: 'lib long-words'
+                      when 'minified'
+                        line_portion = if element['line'] && element['column'] then "#{element['line']}:#{element['column']}"
+                                       elsif element['line'] then element['line'].to_s
                                        else nil end
-                        li_text = element[1]
+                        li_text = element['url']
                         li_text << " : " << line_portion if line_portion
-                        li_text << " (in #{element[4]})" if element[4]
-                        if element[5] # context
+                        li_text << " (in #{element['symbol']})" if element['symbol']
+                        if element['context']
                           li do
                             p { a li_text, href: "#backtrace-#{identifier}-#{index}-info-#{lindex}", class: 'backtrace-link long-words' }
                             div(id: "backtrace-#{identifier}-#{index}-info-#{lindex}", style: 'display: none') do
                               pre_class = "brush: js; toolbar: false; unindent: false"
-                              line_count = element[5].size
-                              if element[2] # line number
-                                first_line = element[2] - line_count/2
+                              line_count = element['context'].size
+                              if element['line']
+                                first_line = element['line'] - line_count/2
                                 pre_class << "; ruler: true; first-line: " << first_line.to_s << "; highlight: " << (first_line + line_count/2).to_s
                               else
                                 pre_class << "; ruler: false; highlight: " << line_count/2 + 1
                               end
-                              pre element[5].join("\n"), class: pre_class
+                              pre element['context'].join("\n"), class: pre_class
                             end
                           end
                         else
                           li li_text, class: 'long-words'
                         end
-                      when '_JAVA_'
-                        li format_backtrace_element(element[1], element[2], element[3]), class: 'lib long-words'
+                      when 'obfuscated'
+                        li format_backtrace_element(element['file'], element['line'], element['symbol']), class: 'lib long-words'
                     end
                   end
                 end

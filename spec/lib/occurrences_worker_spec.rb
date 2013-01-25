@@ -36,9 +36,15 @@ describe OccurrencesWorker do
     # this is a valid stack trace in the context of the repo, and will produce
     # valid blamed commits.
     @valid_trace = [
-        ["lib/better_caller/extensions.rb", 11, 'set_better_backtrace'],
-        ["lib/better_caller/extensions.rb", 4, 'set_better_backtrace'],
-        ["lib/better_caller/extensions.rb", 2, nil]
+        {"file"   => "lib/better_caller/extensions.rb",
+         "line"   => 11,
+         "symbol" => "set_better_backtrace"},
+        {"file"   => "lib/better_caller/extensions.rb",
+         "line"   => 4,
+         "symbol" => "set_better_backtrace"},
+        {"file"   => "lib/better_caller/extensions.rb",
+         "line"   => 2,
+         "symbol" => nil}
     ]
   end
 
@@ -89,10 +95,10 @@ describe OccurrencesWorker do
         occ.client.should eql('rails')
         occ.revision.should eql(@commit.sha)
         occ.message.should eql("Well crap")
-        occ.faulted_backtrace.zip(@exception.backtrace).each do |(file, line, method), bt_line|
+        occ.faulted_backtrace.zip(@exception.backtrace).each do |(element), bt_line|
           next if bt_line.include?('.java') # we test the java portions of the backtrace elsewhere
-          bt_line.include?("#{file}:#{line}").should be_true
-          bt_line.end_with?(":in `#{method}'").should(be_true) if method
+          bt_line.include?("#{element['file']}:#{element['line']}").should be_true
+          bt_line.end_with?(":in `#{element['method']}'").should(be_true) if element['method']
         end
 
         occ.bug.environment.name.should eql('production')
@@ -156,7 +162,7 @@ describe OccurrencesWorker do
 
     context "[blame]" do
       it "should set the bug's blamed_revision when there's blame to be had" do
-        occ = OccurrencesWorker.new(@params.merge('backtraces' => [["Thread 0", true, @valid_trace]])).perform
+        occ = OccurrencesWorker.new(@params.merge('backtraces' => [{'name' => "Thread 0", 'faulted' => true, 'backtrace' => @valid_trace}])).perform
         occ.bug.blamed_revision.should eql('30e7c2ff8758f4f19bfbc0a57e26c19ab69d1d44')
       end
 
@@ -170,7 +176,7 @@ describe OccurrencesWorker do
       it "should match an existing bug by file, line, class name, and commit when there's blame to be had" do
         env = @project.environments.where(name: 'production').find_or_create!
         bug = FactoryGirl.create(:bug, environment: env, file: 'lib/better_caller/extensions.rb', line: 11, class_name: 'ArgumentError', blamed_revision: '30e7c2ff8758f4f19bfbc0a57e26c19ab69d1d44')
-        occ = OccurrencesWorker.new(@params.merge('backtraces' => [["Thread 0", true, @valid_trace]])).perform
+        occ = OccurrencesWorker.new(@params.merge('backtraces' => [{'name' => "Thread 0", 'faulted' => true, 'backtrace' => @valid_trace}])).perform
         occ.bug.should eql(bug)
       end
 

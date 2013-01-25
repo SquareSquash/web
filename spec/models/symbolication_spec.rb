@@ -34,9 +34,11 @@ describe Symbolication do
                                       revision:         '2dc20c984283bede1f45863b8f3b4dd9b5b554cc',
                                       symbolication_id: SecureRandom.uuid,
                                       bug:              bug,
-                                      backtraces:       [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 5, 'foo'],
-                                          ['_RETURN_ADDRESS_', 1]]]])
+                                      backtraces:       [{"name"      => "Thread 0",
+                                                          "faulted"   => true,
+                                                          "backtrace" =>
+                                                              [{"file" => "lib/better_caller/extensions.rb", "line" => 5, "symbol" => "foo"},
+                                                               {"type" => "address", "address" => 1}]}])
       occurrence.should_not be_symbolicated
 
       symbols = Squash::Symbolicator::Symbols.new
@@ -56,7 +58,7 @@ describe Symbolication do
       env = FactoryGirl.create(:environment, project: project)
 
       bug1 = FactoryGirl.create(:bug,
-                                file:            '_RETURN_ADDRESS_',
+                                file:            '0x00000042',
                                 line:            3,
                                 blamed_revision: '30e7c2ff8758f4f19bfbc0a57e26c19ab69d1d44',
                                 environment:     env)
@@ -70,8 +72,9 @@ describe Symbolication do
                                       bug:              bug1,
                                       symbolication_id: SecureRandom.uuid,
                                       revision:         bug1.blamed_revision,
-                                      backtraces:       [["Thread 0", true, [
-                                          ['_RETURN_ADDRESS_', 3]]]])
+                                      backtraces:       [{"name"      => "Thread 0",
+                                                          "faulted"   => true,
+                                                          "backtrace" => [{"type" => "address", "address" => 3}]}])
 
       symbols = Squash::Symbolicator::Symbols.new
       symbols.add 1, 5, 'lib/better_caller/extensions.rb', 5, 'bar'
@@ -98,15 +101,26 @@ describe Symbolication do
     end
 
     it "should symbolicate an address using lines" do
-      @symbolication.symbolicate(12).should eql(['foo.rb', 12, nil])
+      @symbolication.symbolicate(12).should eql(
+                                                'file' => 'foo.rb',
+                                                'line' => 12
+                                            )
     end
 
     it "should symbolicate an address using symbols" do
-      @symbolication.symbolicate(16).should eql(['foo2.rb', 15, 'baz'])
+      @symbolication.symbolicate(16).should eql(
+                                                'file'   => 'foo2.rb',
+                                                'line'   => 15,
+                                                'symbol' => 'baz'
+                                            )
     end
 
     it "should symbolicate an address using lines and symbols" do
-      @symbolication.symbolicate(5).should eql(['foo.rb', 7, 'bar'])
+      @symbolication.symbolicate(5).should eql(
+                                               'file'   => 'foo.rb',
+                                               'line'   => 7,
+                                               'symbol' => 'bar'
+                                           )
     end
 
     it "should return nil for unsymbolicatable addresses" do

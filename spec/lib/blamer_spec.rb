@@ -30,9 +30,11 @@ describe Blamer do
   it "should raise an error if it can't find a commit" do
     @occurrence = FactoryGirl.build(:rails_occurrence,
                                     bug:        @shell_bug,
-                                    backtraces: [["Thread 0", true, [
-                                        ['lib/better_caller/extensions.rb', 2, 'foo']
-                                    ]]],
+                                    backtraces: [{"name"      => "Thread 0",
+                                                  "faulted"   => true,
+                                                  "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                   "line"   => 2,
+                                                                   "symbol" => "foo"}]}],
                                     revision:   'abcdef')
     -> { Blamer.new(@occurrence).find_or_create_bug! }.should raise_error('Need a resolvable commit')
   end
@@ -42,9 +44,11 @@ describe Blamer do
     @bug.update_attribute :duplicate_of, original
     @occurrence = FactoryGirl.build(:rails_occurrence,
                                     bug:        @shell_bug,
-                                    backtraces: [["Thread 0", true, [
-                                        ['lib/better_caller/extensions.rb', 2, 'foo']
-                                    ]]],
+                                    backtraces: [{"name"      => "Thread 0",
+                                                  "faulted"   => true,
+                                                  "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                   "line"   => 2,
+                                                                   "symbol" => "foo"}]}],
                                     revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
     bug         = Blamer.new(@occurrence).find_or_create_bug!
     bug.should eql(original)
@@ -54,9 +58,11 @@ describe Blamer do
     it "should match an existing bug in the same environment" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 2, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 2,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
@@ -66,9 +72,11 @@ describe Blamer do
       @bug.update_attribute :fixed, true
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 2, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 2,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
@@ -77,9 +85,11 @@ describe Blamer do
     it "should create a new bug if no existing bug could be found" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 3, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 3,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
@@ -91,9 +101,11 @@ describe Blamer do
       @shell_bug.environment = FactoryGirl.create(:environment, project: @project)
       @occurrence            = FactoryGirl.build(:rails_occurrence,
                                                  bug:        @shell_bug,
-                                                 backtraces: [["Thread 0", true, [
-                                                     ['lib/better_caller/extensions.rb', 2, 'foo']
-                                                 ]]],
+                                                 backtraces: [{"name"      => "Thread 0",
+                                                               "faulted"   => true,
+                                                               "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                                "line"   => 2,
+                                                                                "symbol" => "foo"}]}],
                                                  revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug                    = Blamer.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
@@ -104,9 +116,11 @@ describe Blamer do
       @shell_bug.class_name = 'SomeOtherError'
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 2, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 2,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
@@ -125,9 +139,11 @@ describe Blamer do
       @shell_bug.deploy = @bug.deploy
       @occurrence       = FactoryGirl.build(:rails_occurrence,
                                             bug:        @shell_bug,
-                                            backtraces: [["Thread 0", true, [
-                                                ['lib/better_caller/extensions.rb', 2, 'foo']
-                                            ]]],
+                                            backtraces: [{"name"      => "Thread 0",
+                                                          "faulted"   => true,
+                                                          "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                           "line"   => 2,
+                                                                           "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug               = Blamer.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
@@ -139,9 +155,11 @@ describe Blamer do
       @shell_bug.deploy = @bug.deploy
       @occurrence       = FactoryGirl.build(:rails_occurrence,
                                             bug:        @shell_bug,
-                                            backtraces: [["Thread 0", true, [
-                                                ['lib/better_caller/extensions.rb', 2, 'foo']
-                                            ]]],
+                                            backtraces: [{"name"      => "Thread 0",
+                                                          "faulted"   => true,
+                                                          "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                           "line"   => 2,
+                                                                           "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug               = Blamer.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
@@ -151,9 +169,11 @@ describe Blamer do
       @shell_bug.deploy = FactoryGirl.create(:deploy, environment: @env, revision: '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       @occurrence       = FactoryGirl.build(:rails_occurrence,
                                             bug:        @shell_bug,
-                                            backtraces: [["Thread 0", true, [
-                                                ['lib/better_caller/extensions.rb', 2, 'foo']
-                                            ]]],
+                                            backtraces: [{"name"      => "Thread 0",
+                                                          "faulted"   => true,
+                                                          "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                           "line"   => 2,
+                                                                           "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug               = Blamer.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
@@ -165,9 +185,11 @@ describe Blamer do
       @bug.update_attribute :fixed, true
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 2, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 2,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
@@ -179,13 +201,23 @@ describe Blamer do
     it "should set the bug's file and line using git-blame" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['/library/file', 10, 'foo'],
-                                          ['ext/better_caller.c', 50, 'foo'],
-                                          ['ext/better_caller.c', 46, 'foo'],
-                                          ['ext/better_caller.c', 31, 'foo'],
-                                          ['ext/better_caller.c', 27, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "/library/file",
+                                                                     "line"   => 10,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "ext/better_caller.c",
+                                                                     "line"   => 50,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "ext/better_caller.c",
+                                                                     "line"   => 46,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "ext/better_caller.c",
+                                                                     "line"   => 31,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "ext/better_caller.c",
+                                                                     "line"   => 27,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('ext/better_caller.c')
@@ -196,11 +228,17 @@ describe Blamer do
     it "should use the topmost file if the backtrace is all library files" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['/library/file', 27, 'foo'],
-                                          ['/library/file2', 11, 'foo'],
-                                          ['/library/file3', 5, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "/library/file",
+                                                                     "line"   => 27,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "/library/file2",
+                                                                     "line"   => 11,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "/library/file3",
+                                                                     "line"   => 5,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('/library/file')
@@ -212,11 +250,17 @@ describe Blamer do
     it "should use the topmost project file if none of the project files have associated commits" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['/library/file', 27, 'foo'],
-                                          ['fake/project/file', 11, 'foo'],
-                                          ['/library/file2', 5, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "/library/file",
+                                                                     "line"   => 27,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "fake/project/file",
+                                                                     "line"   => 11,
+                                                                     "symbol" => "foo"},
+                                                                    {"file"   => "/library/file2",
+                                                                     "line"   => 5,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('fake/project/file')
@@ -228,14 +272,17 @@ describe Blamer do
     it "should set special_file for unsymbolicated bugs" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['_RETURN_ADDRESS_', 27],
-                                          ['_RETURN_ADDRESS_', 11],
-                                          ['_RETURN_ADDRESS_', 5]
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"type"    => "address",
+                                                                     "address" => 27},
+                                                                    {"type"    => "address",
+                                                                     "address" => 11},
+                                                                    {"type"    => "address",
+                                                                     "address" => 5}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
-      bug.file.should eql('_RETURN_ADDRESS_')
+      bug.file.should eql('0x0000001B')
       bug.line.should eql(1)
       bug.special_file?.should be_true
     end
@@ -243,9 +290,13 @@ describe Blamer do
     it "should set special_file but use the backtrace elements for an obfuscated Java bug" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['_JAVA_', 'A.java', 15, 'b', 'A']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"type"   => "obfuscated",
+                                                                     "file"   => "A.java",
+                                                                     "line"   => 15,
+                                                                     "symbol" => "b",
+                                                                     "class"  => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')
@@ -256,9 +307,13 @@ describe Blamer do
     it "should abs Java line numbers, which can apparently be negative" do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['_JAVA_', 'A.java', -15, 'b', 'A']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"type"   => "obfuscated",
+                                                                     "file"   => "A.java",
+                                                                     "line"   => -15,
+                                                                     "symbol" => "b",
+                                                                     "class"  => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')
@@ -271,9 +326,11 @@ describe Blamer do
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
                                       message:    "Undefined 123 for #<Object:0x007fedfa0aa920>",
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 3, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 3,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.message_template.should eql('Undefined [NUMBER] for #<Object:[ADDRESS]>')
@@ -284,9 +341,11 @@ describe Blamer do
       @occurrence           = FactoryGirl.build(:rails_occurrence,
                                                 bug:        @shell_bug,
                                                 message:    "Cannot drop index 'foo_index': needed in a foreign key",
-                                                backtraces: [["Thread 0", true, [
-                                                    ['lib/better_caller/extensions.rb', 3, 'foo']
-                                                ]]],
+                                                backtraces: [{"name"      => "Thread 0",
+                                                              "faulted"   => true,
+                                                              "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                               "line"   => 3,
+                                                                               "symbol" => "foo"}]}],
                                                 revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug                   = Blamer.new(@occurrence).find_or_create_bug!
       bug.message_template.should eql("Cannot drop index '[STRING]': needed in a foreign key")
@@ -299,9 +358,11 @@ describe Blamer do
       @bug.update_attribute :fixed_at, Time.now
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 2, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 2,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
       blamer = Blamer.new(@occurrence)
@@ -316,9 +377,11 @@ describe Blamer do
       @bug.update_attributes({fixed: true, fix_deployed: true}, as: :admin)
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 2, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 2,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
       blamer = Blamer.new(@occurrence)
@@ -333,9 +396,11 @@ describe Blamer do
       @bug.update_attribute :fixed_at, 40.days.ago
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 2, 'foo']
-                                      ]]],
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 2,
+                                                                     "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
       blamer = Blamer.new(@occurrence)
@@ -352,9 +417,11 @@ describe Blamer do
       @shell_bug.deploy = deploy
       @occurrence       = FactoryGirl.build(:rails_occurrence,
                                             bug:        @shell_bug,
-                                            backtraces: [["Thread 0", true, [
-                                                ['lib/better_caller/extensions.rb', 2, 'foo']
-                                            ]]],
+                                            backtraces: [{"name"      => "Thread 0",
+                                                          "faulted"   => true,
+                                                          "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                           "line"   => 2,
+                                                                           "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
       blamer = Blamer.new(@occurrence)

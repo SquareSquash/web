@@ -47,17 +47,17 @@ class PagerDutyAcknowledger
     if @bug.fixed?
       I18n.t 'workers.pagerduty.acknowledge.description.fixed',
              class_name: @bug.class_name,
-             file_name:  @bug.displayable_file? ? File.basename(@bug.file) : t('workers.pagerduty.not_applicable'),
+             file_name:  File.basename(@bug.file),
              locale:     @bug.environment.project.locale
     elsif @bug.irrelevant?
       I18n.t 'workers.pagerduty.acknowledge.description.irrelevant',
              class_name: @bug.class_name,
-             file_name:  @bug.displayable_file? ? File.basename(@bug.file) : t('workers.pagerduty.not_applicable'),
+             file_name:  File.basename(@bug.file),
              locale:     @bug.environment.project.locale
     else
       I18n.t 'workers.pagerduty.acknowledge.description.assigned',
              class_name: @bug.class_name,
-             file_name:  @bug.displayable_file? ? File.basename(@bug.file) : t('workers.pagerduty.not_applicable'),
+             file_name:  File.basename(@bug.file),
              user:       @bug.assigned_user.name,
              locale:     @bug.environment.project.locale
     end

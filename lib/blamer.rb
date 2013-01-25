@@ -214,9 +214,9 @@ class Blamer
 
   def blamed_revision(occurrence_commit)
     # first, strip irrelevant lines from the backtrace.
-    backtrace = occurrence.faulted_backtrace.select { |elem| elem.size == 3 }
-    backtrace.select! { |(file, _, _)| project.path_type(file) == :project }
-    backtrace.reject! { |(_, line, _)| line.nil? }
+    backtrace = occurrence.faulted_backtrace.select { |elem| elem['type'].nil? }
+    backtrace.select! { |elem| project.path_type(elem['file']) == :project }
+    backtrace.reject! { |elem| elem['line'].nil? }
 
     if backtrace.empty? # no project files in the trace; just use the top library file
       file, line = file_and_line_for_bt_element(occurrence.faulted_backtrace.first)
@@ -224,24 +224,24 @@ class Blamer
     end
 
     # collect the blamed commits for each line
-    backtrace.map! do |(file, line, _)|
-      commit = project.repo.blame(file,
+    backtrace.map! do |elem|
+      commit = project.repo.blame(elem['file'],
                                   revision:               occurrence_commit,
                                   detect_interfile_moves: true,
                                   detect_intrafile_moves: true,
-                                  start:                  line,
-                                  end:                    line)[line] rescue nil
-      [file, line, commit]
+                                  start:                  elem['line'],
+                                  end:                    elem['line'])[elem['line']] rescue nil
+      [elem, commit]
     end
 
     top_element = backtrace.first
-    backtrace.reject! { |(_, _, commit)| commit.nil? }
+    backtrace.reject! { |(_, commit)| commit.nil? }
     if backtrace.empty? # no file has an associated commit; just use the top file
-      file, line = file_and_line_for_bt_element(top_element)
+      file, line = file_and_line_for_bt_element(top_element.first)
       return file, line, nil
     end
 
-    earliest_commit = backtrace.sort_by { |(_, _, commit)| commit.committer.date }.first.last
+    earliest_commit = backtrace.sort_by { |(_, commit)| commit.committer.date }.first.last
 
     # now, for each line, assign a score consisting of different weighted factors
     # indicating how likely it is that that line is to blame
@@ -249,19 +249,27 @@ class Blamer
       line << score_backtrace_line(index, backtrace.length, line.last.committer.date, occurrence_commit.date, earliest_commit.date)
     end
 
-    file, line, commit, _ = backtrace.sort_by(&:last).last
+    element, commit, _ = backtrace.sort_by(&:last).last
+    file, line = file_and_line_for_bt_element(element)
     return file, line, commit
   end
 
   def file_and_line_for_bt_element(element)
-    if element.size == 3
-      return element[0], element[1]
-    elsif element.size == 5 && element.first == '_JAVA_' # special-case java backtraces because they're almost real backtraces
-      @special = true
-      return element[1], element[2].abs
-    else # special file, do the best we can
-      @special = true #TODO not the best way of doing this
-      return element[0], 1
+    case element['type']
+      when nil
+        [element['file'], element['line']]
+      when 'obfuscated'
+        @special = true
+        [element['file'], element['line'].abs]
+      when 'minified'
+        @special = true
+        [element['url'], element['line']]
+      when 'address'
+        @special = true #TODO not the best way of doing this
+        return "0x#{element['address'].to_s(16).rjust(8, '0').upcase}", 1
+      else
+        @special = true
+        return '(unknown)', 1
     end
   end
 

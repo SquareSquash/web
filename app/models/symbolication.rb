@@ -112,22 +112,32 @@ class Symbolication < ActiveRecord::Base
   # method declaration.
   #
   # @param [Fixnum] address A stack return address (decimal number).
-  # @return [Array<String, Fixnum, String>, nil] The file path, line number, and
-  #   method name containing that address, or `nil` if that address could not be
-  #   symbolicated.
+  # @return [Hash, nil] The file path, line number, and method name containing
+  #   that address, or `nil` if that address could not be symbolicated.
 
   def symbolicate(address)
     line   = lines.for(address) if lines
     symbol = symbols.for(address)
 
     if line && symbol
-      return [line.file, line.line, symbol.ios_method]
+      {
+          'file'   => line.file,
+          'line'   => line.line,
+          'symbol' => symbol.ios_method
+      }
     elsif line
-      return [line.file, line.line, nil]
+      {
+          'file' => line.file,
+          'line' => line.line
+      }
     elsif symbol
-      return [symbol.file, symbol.line, symbol.ios_method]
+      {
+          'file'   => symbol.file,
+          'line'   => symbol.line,
+          'symbol' => symbol.ios_method
+      }
     else
-      return nil
+      nil
     end
   end
 

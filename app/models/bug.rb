@@ -92,7 +92,7 @@
 # | `fixed_at`             | When the bug was marked as fixed (set automatically).                                                |
 # | `notify_on_occurrence` | An array of User IDs to email whenever a new Occurrence is added.                                    |
 # | `notify_on_deploy`     | An array of User IDs to email when the Bug's resolution commit has been deployed.                    |
-# | `special_file`         | If `true`, the `file` property has a special value (e.g., "_RETURN_ADDRESS_"), as does `line`.       |
+# | `special_file`         | If `true`, the `file` property has a special value (e.g., a function address), as does `line`.       |
 # | `jira_issue`           | The key of a linked JIRA issue, such as "PROJ-123".                                                  |
 # | `jira_status_id`       | The ID value of the status field of the JIRA issue that should automatically resolve this Bug.       |
 
@@ -314,33 +314,6 @@ class Bug < ActiveRecord::Base
     special_file? || environment.project.path_type(file) == :library
   end
 
-  # Returns whether the `file` and `line` can be displayed as is to the user.
-  # Bugs with `special_file` set to true are not displayable, unless it's a Java
-  # file. Examples: If this is a normal bug caused by the Ruby client, the file
-  # and line can be displayed as-is. If this is an unsymbolicated iOS bug, then
-  # the value of `file` is "_RETURN_ADDRESS_", which doesn't make sense to
-  # display. But, if this is an obfuscated Java bug, the value of `file` is the
-  # name of the file (not the full path). So while we can't get Git context for
-  # it (hence {#library_file?} would return `true`), it's still human-readable,
-  # and so this method returns `true.`
-  #
-  # Hopefully this handy table will help:
-  #
-  # | `file`           | `special_file` | `displayable?` |
-  # |:-----------------|:---------------|:---------------|
-  # | file/path.rb     | false          | true           |
-  # | _RETURN_ADDRESS_ | true           | false          |
-  # | _JS_ASSET_       | true           | false          |
-  # | FileName.java    | true           | true           |
-  #
-  # @return [true, false] Whether the value of `file` and `line` are suitable
-  #   for display to the end user without alteration.
-
-  def displayable_file?
-    !special_file? || file.ends_with?('.java')
-  end
-  alias displayable_file displayable_file? # for the JSON
-
   # @private
   def to_param() number end
 
@@ -377,7 +350,7 @@ class Bug < ActiveRecord::Base
         :searchable_text << :notify_on_occurrence << :notify_on_deploy
 
     options[:methods] = Array.wrap(options[:methods])
-    options[:methods] << :status << :displayable_file
+    options[:methods] << :status
 
     super options
   end

@@ -34,9 +34,16 @@ describe ObfuscationMap do
       occurrence = FactoryGirl.create(:rails_occurrence,
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc',
                                       bug:        bug,
-                                      backtraces: [["Thread 0", true, [
-                                          ['lib/better_caller/extensions.rb', 5, 'foo'],
-                                          ['_JAVA_', 'B.java', 15, 'int b(int)', 'com.A.B']]]])
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 5,
+                                                                     "symbol" => "foo"},
+                                                                    {"type"   => "obfuscated",
+                                                                     "file"   => "B.java",
+                                                                     "line"   => 15,
+                                                                     "symbol" => "int b(int)",
+                                                                     "class"  => "com.A.B"}]}])
       occurrence.should_not be_deobfuscated
 
       namespace = Squash::Java::Namespace.new
@@ -73,8 +80,13 @@ describe ObfuscationMap do
       occurrence = FactoryGirl.create(:rails_occurrence,
                                       bug:        bug1,
                                       revision:   bug1.blamed_revision,
-                                      backtraces: [["Thread 0", true, [
-                                          ['_JAVA_', 'B.java', 5, 'int b(int)', 'com.A.B']]]])
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"type"   => "obfuscated",
+                                                                     "file"   => "B.java",
+                                                                     "line"   => 5,
+                                                                     "symbol" => "int b(int)",
+                                                                     "class"  => "com.A.B"}]}])
 
       namespace = Squash::Java::Namespace.new
       namespace.add_package_alias 'com.foo', 'A'

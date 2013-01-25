@@ -6,7 +6,9 @@ Occurrence: <%= project_environment_bug_occurrence_url @bug.environment.project,
 THE BUG
 
 <%= @bug.class_name %>
-<% if @bug.displayable_file? %>
+<% if @bug.special_file? %>
+in <%= @bug.file %>
+<% else %>
 in <%= @bug.file %>:<%= @bug.line %>
 <% end %>
 

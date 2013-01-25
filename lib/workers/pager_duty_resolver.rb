@@ -29,7 +29,7 @@ class PagerDutyResolver < PagerDutyAcknowledger
   def description
     I18n.t 'workers.pagerduty.resolve.description',
            class_name: @bug.class_name,
-           file_name:  @bug.displayable_file? ? File.basename(@bug.file) : t('workers.pagerduty.not_applicable'),
+           file_name:  File.basename(@bug.file),
            locale:     @bug.environment.project.locale
   end
 end

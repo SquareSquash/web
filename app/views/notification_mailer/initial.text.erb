@@ -7,7 +7,9 @@ Environment: <%= @bug.environment.name %>
 Revision:    <%= @bug.revision %>
 
 <%= @bug.class_name %>
-<% if @bug.displayable_file? %>
+<% if @bug.special_file? %>
+in <%= @bug.file %>
+<% else %>
 in <%= @bug.file %>:<%= @bug.line %>
 <% end %>
 

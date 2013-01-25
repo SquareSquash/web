@@ -93,10 +93,10 @@ module Views
         bug_location
 
         if @bug.special_file?
-          case @bug.file
-            when '_RETURN_ADDRESS_'
+          case @bug.file #TODO don't guess, record this information
+            when /^0x/
               p "This bug has not been symbolicated. If you would like meaningful backtraces, please upload a symbolication file using your language’s client library.", class: 'alert info'
-            when '_JS_ASSET_'
+            when /^https?:\/\//
               p "No JavaScript source map was found for this bug. If you would like meaningful backtraces, please upload a source map using the Squash JavaScript client library.", class: 'alert info'
             when /\.java$/
               p "No Java renamelog was found for this bug. If you would like more meaningful backtraces, please upload a renamelog.xml file using the Squash Java deobfuscator.", class: 'alert info'
@@ -108,14 +108,10 @@ module Views
 
       def bug_location
         p(id: 'location') do
-          if @bug.displayable_file?
-            text "#{@bug.file}, line #{number_with_delimiter @bug.line} "
+          if @bug.special_file?
+            text "#{@bug.file} "
           else
-            case @bug.file
-              when '_RETURN_ADDRESS_' then text("(unsymbolicated code) ")
-              when '_JS_ASSET_' then text("(minified JavaScript code) ")
-              else "(unknown) "
-            end
+            text "#{@bug.file}, line #{number_with_delimiter @bug.line} "
           end
           span(class: 'aux') do
             text "(revision "

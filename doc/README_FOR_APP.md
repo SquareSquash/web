@@ -372,7 +372,7 @@ Squash automatically finds and converts any matching stack traces.
 Because every new Occurrence must be assigned a Bug (including unconverted
 Occurrences), it is possible that the "blamed" `file` and `line` fields of the
 Bug could themselves be unconverted. The {Bug} class has provisions to support
-this; see in particular {Bug#displayable_file?}.
+this; see in particular `bugs.special_file`.
 
 Specs
 -----
