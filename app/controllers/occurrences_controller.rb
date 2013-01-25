@@ -38,6 +38,7 @@ class OccurrencesController < ApplicationController
       'ruby'    => [:host],
       'rails'   => [:host, :controller, :action],
       'ios'     => [:device_type, :operating_system, :version],
+      'cocoa'   => [:device_type, :operating_system, :os_version, :version],
       'java'    => [:host],
       'jetty'   => [:host, :path],
       'android' => [:device_type, :operating_system, :version]
