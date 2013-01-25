@@ -77,7 +77,8 @@ module Views
             accordion('configure-clients') do |accordion|
               accordion.accordion_item('ruby-on-rails', "Ruby on Rails") { ruby_on_rails }
               accordion.accordion_item('ruby', "Pure Ruby") { pure_ruby }
-              accordion.accordion_item('ios', "Objective-C + iOS") { objc_ios }
+              accordion.accordion_item('ios', "Cocoa + Objective-C (iOS)") { cocoa_ios }
+              accordion.accordion_item('osx', "Cocoa + Objective-C (Mac OS X)") { cocoa_osx }
               accordion.accordion_item('javascript', "JavaScript") { javascript_client }
               accordion.accordion_item('java', "Java (Generic)") { java }
             end
@@ -147,22 +148,39 @@ end
         end
       end
 
-      def objc_ios
+      def cocoa_ios
         p do
           text "Download and compile the "
-          a "Squash iOS client library", href: 'https://github.com/SquareSquash/ios'
-          text ", and add the compiled library and Squash::Ruby.h files to your project. Add the library to your Link Binary With Libraries build phase, "
-          code "#import"
-          text " the header file, then configure Squash like so:"
+          a "Squash Cocoa client library", href: 'https://github.com/SquareSquash/cocoa'
+          text ", and add the compiled library and SquashCocoa.h files to your project. Add the library to your Link Binary With Libraries build phase, "
+          code '#import "SquashCocoa.h"'
+          text ", then configure Squash like so:"
         end
+
+        cocoa_common
+      end
+
+      def cocoa_osx
+        p do
+          text "Download and compile the "
+          a "Squash Cocoa client framework", href: 'https://github.com/SquareSquash/cocoa'
+          text ", and add the compiled framework to your project. Add the framework to your Link Binary With Libraries build phase, "
+          code '#import <SquashCocoa/SquashCocoa.h>'
+          text ", then configure Squash like so:"
+        end
+
+        cocoa_common
+      end
+
+      def cocoa_common
         pre <<-OBJC, class: 'brush: obj-c; light: true'
 - (BOOL) application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [Squash::Ruby sharedClient].APIHost = @"#{request.protocol + request.host_with_port}";
-    [Squash::Ruby sharedClient].APIKey = @"#{@project.api_key}";
-    [Squash::Ruby sharedClient].environment = @"production";
-    [Squash::Ruby sharedClient].revision = @"GIT_REVISION_OF_RELEASED_PRODUCT";
-    [[Squash::Ruby sharedClient] reportErrors];
-    [[Squash::Ruby sharedClient] hook];
+    [SquashCocoa sharedClient].APIHost = @"#{request.protocol + request.host_with_port}";
+    [SquashCocoa sharedClient].APIKey = @"#{@project.api_key}";
+    [SquashCocoa sharedClient].environment = @"production";
+    [SquashCocoa sharedClient].revision = @"GIT_REVISION_OF_RELEASED_PRODUCT";
+    [[SquashCocoa sharedClient] reportErrors];
+    [[SquashCocoa sharedClient] hook];
     return YES;
 }
         OBJC
@@ -178,12 +196,10 @@ end
         p do
           text "To notify Squash of releases (public or internal), use the "
           code "squash_release"
-          text " binary installed by the same gem. Add a Run Script phase to your project's Archive scheme that executes the binary. An example (for a 'production' release):"
-
-          pre <<-SH, class: 'brush: shell, light: true'
-/path/to/squash_release #{@project.api_key} production
-          SH
+          text " binary installed by the same gem. Add a Run Script phase to your project's Archive scheme that executes the binary."
         end
+
+        p "More information is available in the README for SquashCocoa."
       end
 
       def javascript_client
