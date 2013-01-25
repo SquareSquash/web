@@ -22,6 +22,8 @@ module Views
   module Occurrences
     # @private
     class Show < Views::Layouts::Application
+      include BacktraceRendering
+
       needs :project, :environment, :bug, :occurrence
 
       protected
@@ -115,93 +117,6 @@ module Views
 
       def backtrace_tab
         render_backtraces @occurrence.backtraces, 'root'
-      end
-
-      def render_backtraces(backtraces, identifier)
-        p(style: 'text-align: right') do
-          input type: 'checkbox', class: 'show-library-files', id: 'show-library-files', checked: 'checked'
-          label "Show library files in backtrace", for: 'show-library-files', style: 'display: inline'
-        end
-
-        if !@occurrence.symbolicated? && !@occurrence.symbolication
-          p "Portions of the backtrace have not yet been symbolicated. If you would like a meaningful backtrace, please upload a symbolication file using your language’s client library.", class: 'alert info'
-        end
-        if !@occurrence.sourcemapped? #&& !@occurrence.source_map
-          p "Portions of the backtrace have not yet been source-mapped. If you would like a meaningful backtrace, please upload a JavaScript source map using the Squash JavaScript client library.", class: 'alert info'
-        end
-        unless @occurrence.deobfuscated?
-          p "Portions of the backtrace contain obfuscated Java code. If you would like a more meaningful backtrace, please upload a renamelog file using the Squash Java Ruby gem.", class: 'alert info'
-        end
-
-        ul(class: 'pills backtrace-tabs') do
-          backtraces.each_with_index do |bt, index|
-            li(class: (bt['faulted'] ? 'active' : nil)) { a bt['name'], href: "#backtrace-#{identifier}-#{index}", rel: 'tab', class: (bt['faulted'] ? 'faulted' : nil) }
-          end
-        end
-
-        div(class: 'tab-content') do
-          backtraces.each_with_index do |bt, index|
-            div(id: "backtrace-#{identifier}-#{index}", class: (bt['faulted'] ? 'active' : nil)) do
-              p("This thread raised or crashed.", class: 'alert info') if bt['faulted']
-              ul(class: 'backtrace') do
-                bt['backtrace'].each_with_index do |element, lindex|
-                  if element['type'].nil?
-                    # NORMAL BACKTRACE ELEMENT
-                    if @project.path_type(element['file']) == :library
-                      li format_backtrace_element(element['file'], element['line'], element['method']), class: 'lib long-words'
-                    else
-                      li(class: (@project.path_type(element['file']) == :filtered ? 'filtered' : nil)) do
-                        p { a format_backtrace_element(element['file'], element['line'], element['method']), href: "#backtrace-#{identifier}-#{index}-info-#{lindex}", class: 'backtrace-link long-words' }
-                        div(id: "backtrace-#{identifier}-#{index}-info-#{lindex}", style: 'display: none') do
-                          blockquote do
-                            text! editor_link 'textmate', @project, element['file'], element['line']; br
-                            text! editor_link 'sublime', @project, element['file'], element['line']; br
-                            text! editor_link 'vim', @project, element['file'], element['line']; br
-                            text! editor_link 'emacs', @project, element['file'], element['line']
-                          end
-                          pre class: 'context', :'data-project' => @project.to_param, :'data-revision' => @occurrence.revision, :'data-file' => element['file'], :'data-line' => element['line']
-                        end
-                      end
-                    end
-                  else
-                    # NON-NORMAL BACKTRACE ELEMENT
-                    case element['type']
-                      when 'address'
-                        li "0x#{element['address'].to_s(16).rjust(8, '0').upcase}", class: 'lib long-words'
-                      when 'minified'
-                        line_portion = if element['line'] && element['column'] then "#{element['line']}:#{element['column']}"
-                                       elsif element['line'] then element['line'].to_s
-                                       else nil end
-                        li_text = element['url']
-                        li_text << " : " << line_portion if line_portion
-                        li_text << " (in #{element['symbol']})" if element['symbol']
-                        if element['context']
-                          li do
-                            p { a li_text, href: "#backtrace-#{identifier}-#{index}-info-#{lindex}", class: 'backtrace-link long-words' }
-                            div(id: "backtrace-#{identifier}-#{index}-info-#{lindex}", style: 'display: none') do
-                              pre_class = "brush: js; toolbar: false; unindent: false"
-                              line_count = element['context'].size
-                              if element['line']
-                                first_line = element['line'] - line_count/2
-                                pre_class << "; ruler: true; first-line: " << first_line.to_s << "; highlight: " << (first_line + line_count/2).to_s
-                              else
-                                pre_class << "; ruler: false; highlight: " << line_count/2 + 1
-                              end
-                              pre element['context'].join("\n"), class: pre_class
-                            end
-                          end
-                        else
-                          li li_text, class: 'long-words'
-                        end
-                      when 'obfuscated'
-                        li format_backtrace_element(element['file'], element['line'], element['symbol']), class: 'lib long-words'
-                    end
-                  end
-                end
-              end
-            end
-          end
-        end
       end
 
       def parents_tab
