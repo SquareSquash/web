@@ -188,6 +188,18 @@ module Views
             dt "Root"
             dd @occurrence.root
           end
+          if @occurrence.parent_process?
+            dt "Parent Process"
+            dd @occurrence.parent_process
+          end
+          unless @occurrence.process_native.nil?
+            dt "Ran Natively?"
+            dd(@occurrence.process_native? ? "Yes" : "No")
+          end
+          if @occurrence.process_path?
+            dt "Launch Path"
+            dd @occurrence.process_path
+          end
           if @occurrence.arguments
             dt "Launch Arguments"
             dd { kbd @occurrence.arguments }
@@ -207,8 +219,20 @@ module Views
           end
           dt "Type"
           dd @occurrence.device_type
+          if @occurrence.architecture?
+            dt "Architecture"
+            dd @occurrence.architecture
+          end
           dt "Operating System"
-          dd @occurrence.operating_system
+          dd do
+            text @occurrence.operating_system
+            if @occurrence.os_version?
+              text " #{@occurrence.os_version}"
+            end
+            if @occurrence.os_build?
+              text " (#{@occurrence.os_build})"
+            end
+          end
           if @occurrence.physical_memory
             dt "Physical Memory"
             dd number_to_human_size(@occurrence.physical_memory)

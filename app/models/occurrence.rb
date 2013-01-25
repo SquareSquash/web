@@ -264,6 +264,7 @@
 # |:------------|:-------------------------------------------------------------|
 # | `arguments` | The launch arguments, as a string.                           |
 # | `env_vars`  | A hash of the names and values of the environment variables. |
+# | `pid`       | The PID of the process that raised the exception.            |
 #
 # Server Applications
 # -------------------
@@ -272,7 +273,6 @@
 # |:-----------|:--------------------------------------------------|
 # | `root`     | The path to the project root.                     |
 # | `hostname` | The computer's hostname.                          |
-# | `pid`      | The PID of the process that raised the exception. |
 #
 # Client Applications
 # -------------------
@@ -283,9 +283,15 @@
 # | `build`            | The machine version number of the application.                         |
 # | `device_id`        | An ID number unique to the specific device.                            |
 # | `device_type`      | A string identifying the device make and model.                        |
-# | `operating_system` | The version of the operating system the application was running under. |
+# | `operating_system` | The name of the operating system the application was running under.    |
+# | `os_version`       | The human-readable version number of the operating system.             |
+# | `os_build`         | The build number of the operating system.                              |
 # | `physical_memory`  | The amount of memory on the client platform, in bytes.                 |
 # | `symbolication_id` | The UUID for the symbolication data.                                   |
+# | `architecture`     | The processor architecture of the device (e.g., "i386").               |
+# | `parent_process`   | The name of the process that launched this process.                    |
+# | `process_native`   | If `false`, the process was running under an emulator (e.g., Rosetta). |
+# | `process_path`     | The path to the application on disk.                                   |
 #
 # Geolocation Data
 # ----------------
@@ -385,6 +391,10 @@ class Occurrence < ActiveRecord::Base
       # Universal - Host platform
       arguments:              {allow_nil: true},
       env_vars:               {type: Hash, allow_nil: true},
+      pid:                    {type: Fixnum, numericality: {only_integer: true, greater_than: 0}, allow_nil: true},
+      parent_process:         {length: {maximum: 150}, allow_nil: true},
+      process_native:         {type: Boolean, allow_nil: true},
+      process_path:           {length: {maximum: 1024}, allow_nil: true},
 
       # Universal - User identification
       user_id:                {length: {maximum: 256}, allow_nil: true},
@@ -392,7 +402,6 @@ class Occurrence < ActiveRecord::Base
       # Server apps
       root:                   {length: {maximum: 500}, allow_nil: true},
       hostname:               {length: {maximum: 255}, allow_nil: true},
-      pid:                    {type: Fixnum, numericality: {only_integer: true, greater_than: 0}, allow_nil: true},
 
       # Client apps
       version:                {length: {maximum: 50}, allow_nil: true},
@@ -400,7 +409,10 @@ class Occurrence < ActiveRecord::Base
       device_id:              {length: {maximum: 150}, allow_nil: true},
       device_type:            {length: {maximum: 150}, allow_nil: true},
       operating_system:       {length: {maximum: 50}, allow_nil: true},
+      os_build:               {length: {maximum: 50}, allow_nil: true},
+      os_version:             {length: {maximum: 50}, allow_nil: true},
       physical_memory:        {type: Fixnum, numericality: {only_integer: true, greater_than: 0}, allow_nil: true},
+      architecture:           {length: {maximum: 50}, allow_nil: true},
 
       # Geolocation
       lat:                    {type: Float, numericality: {within: -90..90}, allow_nil: true},

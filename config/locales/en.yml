@@ -101,6 +101,7 @@ en:
       occurrence:
         action: Web action
         altitude: geolocated altitude
+        architecture: architecture
         arguments: process arguments
         backtraces: stack traces
         browser_name: Web browser name
@@ -131,15 +132,20 @@ en:
         network_type: network type
         number: number
         occurred_at: time of occurrence
-        operating_system: client operating system
+        operating_system: client OS
+        os_version: OS version
+        os_build: OS build
         orientation: device orientation
         params: params hash
         parent_exceptions: parent exceptions
+        parent_process: parent process name
         path: path
         pid: PID
         physical_memory: device physical memory
         port: port
         power_state: device power state
+        process_native: process running natively
+        process_path: launch path
         query: query string
         request_method: request method
         revision: repository revision
