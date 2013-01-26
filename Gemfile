@@ -1,5 +1,9 @@
 source :rubygems
 
+# SERVER
+gem 'puma'
+gem 'jruby-openssl', platform: :jruby
+
 # FRAMEWORK
 gem 'rails', git: 'git://github.com/rails/rails.git', branch: '3-2-stable'
 # We need to use this branch of Rails because it includes fixes for ActiveRecord
