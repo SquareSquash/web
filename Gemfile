@@ -6,7 +6,7 @@ gem 'puma'
 gem 'jruby-openssl', platform: :jruby
 
 # FRAMEWORK
-gem 'rails', git: 'git://github.com/rails/rails.git', branch: '3-2-stable'
+gem 'rails', git: 'https://github.com/rails/rails.git', branch: '3-2-stable'
 # We need to use this branch of Rails because it includes fixes for ActiveRecord
 # and concurrency that we need for our thread-spawning background job paradigm
 # to work
@@ -16,14 +16,14 @@ gem 'rack-cors', require: 'rack/cors'
 # MODELS
 gem 'pg', platform: :mri
 gem 'activerecord-jdbcpostgresql-adapter', platform: :jruby
-gem 'has_metadata_column', git: 'git://github.com/RISCfuture/has_metadata_column.git'
+gem 'has_metadata_column', git: 'https://github.com/RISCfuture/has_metadata_column.git'
 gem 'slugalicious'
 gem 'email_validation'
 gem 'url_validation'
 gem 'json_serialize'
 gem 'validates_timeliness'
 gem 'find_or_create_on_scopes', '>= 1.2.1'
-gem 'composite_primary_keys', git: 'git://github.com/RISCfuture/composite_primary_keys.git'
+gem 'composite_primary_keys', git: 'https://github.com/RISCfuture/composite_primary_keys.git'
 gem 'activerecord-postgresql-cursors'
 
 # VIEWS
@@ -33,7 +33,7 @@ gem 'kramdown'
 
 # UTILITIES
 gem 'json'
-gem 'git', git: 'git://github.com/RISCfuture/ruby-git.git'
+gem 'git', git: 'https://github.com/RISCfuture/ruby-git.git'
 gem 'user-agent'
 
 # AUTH
