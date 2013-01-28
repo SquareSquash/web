@@ -128,7 +128,7 @@ module Views
                         end
                       end
                     end
-                    form_for([@project, environment], format: 'json') do |f|
+                    form_for([@project, environment], format: 'json', namespace: "env_#{environment.name}") do |f|
                       p do
                         f.check_box :sends_emails
                         text ' '
