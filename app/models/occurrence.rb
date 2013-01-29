@@ -857,9 +857,18 @@ class Occurrence < ActiveRecord::Base
 
   # @private
   def backtraces
-    bt = attribute('backtraces')
-    return bt if bt.first.kind_of?(Hash)
-    @new_trace ||= bt.map do |(name, faulted, trace)|
+    self.class.convert_backtraces(attribute('backtraces'))
+  end
+
+  # Converts a backtrace list in the legacy format into the current backtrace
+  # format.
+  #
+  # @param [Array<Array>] bts An array of backtraces in the legacy format.
+  # @return [Array<Hash>] The backtraces in the current format.
+
+  def self.convert_backtraces(bts)
+    return bts if bts.first.kind_of?(Hash)
+    bts.map do |(name, faulted, trace)|
       {
           'name'      => name,
           'faulted'   => faulted,
@@ -870,7 +879,7 @@ class Occurrence < ActiveRecord::Base
 
   private
 
-  def convert_legacy_backtrace_format(backtrace)
+  def self.convert_legacy_backtrace_format(backtrace)
     backtrace.map do |bt_line|
       if bt_line.length == 3
         {

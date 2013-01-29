@@ -139,7 +139,7 @@ module Views
             end
 
             div(class: 'tab-content', id: 'parents-tab-content') do
-              div(class: 'active', id: "backtraces#{index}") { render_backtraces parent['backtraces'], "parent#{index}" }
+              div(class: 'active', id: "backtraces#{index}") { render_backtraces Occurrence.convert_backtraces(parent['backtraces']), "parent#{index}" }
               div(id: "ivars#{index}") { parameter_table parent['ivars'] }
             end
           end
