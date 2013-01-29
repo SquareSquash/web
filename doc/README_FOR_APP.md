@@ -1,10 +1,11 @@
 Squash: A squarish bug spray
 ============================
 
-**An open-source project from Square**
+**An open-source project from [Square](http://github.com/square)**
 
 Squash is a collection of tools that help engineers find and kill bugs in their
-code. Squash consists of the following components:
+code by automatically collecting, collating and analyzing run time exceptions.
+Squash consists of the following components:
 
 * **Client libraries:** Client libraries for different systems (Ruby, Ruby on
   Rails, Cocoa with Objective-C, etc.) catch and record errors when they occur,
@@ -17,6 +18,9 @@ code. Squash consists of the following components:
   notifications from the client libraries and process them.
 
 This project is the front-end and the API.
+
+Pull requests are more than welcome; please check out {file:CONTRIBUTING} for
+details.
 
 How to Install
 --------------
@@ -89,8 +93,7 @@ altered.
 **Why do you use threads to accomplish background tasks instead of fibers or
 Resque workers?** Squash was originally built for Square, which runs all its
 services on JRuby. Using threads is very efficient in JRuby, and avoids the
-overhead of having to deploy both a website and workers. (It was hard enough
-just getting the website alone up on production.)
+overhead of having to deploy both a website and workers.
 
 If you are running Squash in a non-thread-safe (or multithreading-unfriendly)
 environment, it should be easy to convert to a Resque-based environment. All
