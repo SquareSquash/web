@@ -25,7 +25,12 @@ class root.DynamicSearchField
   # @param [function] handler The handler to execute.
   #
   constructor: (@element, @handler) ->
-    @element.keypress =>
+    @element.keypress (e) =>
+      return false if e.charCode == 13
       @element.stopTime()
       @element.oneTime 1000, 'search-update', =>
         @handler(@element.val())
+    @element.submit (e) ->
+      e.stopPropagation()
+      e.preventDefault()
+      false
