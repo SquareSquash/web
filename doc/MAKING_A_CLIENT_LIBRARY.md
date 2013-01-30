@@ -76,7 +76,7 @@ Own Data Fields" below.
 | `project[api_key]`    | The project's API key. Typically configured by the API user.        |
 | `environment[name]`   | The name of the environment that was deployed (e.g., "production"). |
 | `deploy[revision]`    | The Git SHA1 of the deployed or released revision.                  |
-| `deploy[released_at]` | The time of release or deploy.                                      |
+| `deploy[deployed_at]` | The time of release or deploy, in ISO format.                       |
 
 If your client library is for **deployed, hosted applications**, you must also
 include a `deploy[hostname]` field with the name of the computer where the
