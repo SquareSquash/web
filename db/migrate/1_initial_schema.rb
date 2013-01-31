@@ -355,6 +355,7 @@ class InitialSchema < ActiveRecord::Migration
           resolution_revision CHARACTER(40),
           revision CHARACTER(40) NOT NULL,
           searchable_text TSVECTOR,
+          any_occurrence_crashed BOOLEAN NOT NULL DEFAULT FALSE,
           CHECK (fix_deployed IS TRUE AND fixed IS TRUE OR fix_deployed IS FALSE)
       )
     SQL
@@ -372,6 +373,14 @@ class InitialSchema < ActiveRecord::Migration
           number INTEGER CHECK (number > 0),
           updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
           user_id INTEGER REFERENCES users(id) ON DELETE SET NULL
+      )
+    SQL
+
+    execute <<-SQL
+      CREATE TABLE device_bugs (
+          bug_id INTEGER NOT NULL REFERENCES bugs(id) ON DELETE CASCADE,
+          device_id CHARACTER VARYING(126) NOT NULL,
+          PRIMARY KEY (bug_id, device_id)
       )
     SQL
 
@@ -437,7 +446,8 @@ class InitialSchema < ActiveRecord::Migration
           occurred_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
           redirect_target_id INTEGER,
           revision CHARACTER(40) NOT NULL,
-          symbolication_id uuid
+          symbolication_id uuid,
+          crashed BOOLEAN NOT NULL DEFAULT FALSE
       )
     SQL
 

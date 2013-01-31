@@ -107,4 +107,8 @@ class Deploy < ActiveRecord::Base
     options[:except] << :environment_id
     super options
   end
+
+  def devices_affected
+    DeviceBug.joins(:bug).where(bugs: {deploy_id: id}).count(:device_id, distinct: true)
+  end
 end
