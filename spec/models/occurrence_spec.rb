@@ -159,6 +159,37 @@ describe Occurrence do
         FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
       end
     end unless Squash::Configuration.pagerduty.disabled?
+
+    context "[setting any_occurrence_crashed]" do
+      it "should set any_occurrence_crashed to true if crashed is true" do
+        bug = FactoryGirl.create(:bug)
+        expect {
+          FactoryGirl.create(:rails_occurrence, bug: bug, crashed: true)
+        }.to change{ bug.reload.any_occurrence_crashed }.from(false).to(true)
+      end
+
+      it "should not change any_occurrence_crashed if crashed is false" do
+        bug = FactoryGirl.create(:bug)
+        expect {
+          FactoryGirl.create(:rails_occurrence, bug: bug, crashed: false)
+        }.to_not change{ bug.reload.any_occurrence_crashed }
+      end
+    end
+
+    context "[device bugs]" do
+      it "should create a device bug if the occurrence has a device" do
+        bug = FactoryGirl.create(:bug)
+
+        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
+        occurrence.bug.device_bugs.where(device_id: 'hello').should exist
+        expect {
+          FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
+        }.to_not change{ bug.device_bugs.where(device_id: 'hello').count }
+
+        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'goodbye')
+        occurrence.bug.device_bugs.where(device_id: 'goodbye').should exist
+      end
+    end
   end
 
   describe "#faulted_backtrace" do

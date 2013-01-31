@@ -33,4 +33,31 @@ describe Deploy do
       deploy.save!
     end
   end
+
+  describe "#devices_affected" do
+    it "should return the number of unique devices affected by bugs for a deploy" do
+      deploy = FactoryGirl.create :deploy
+      bug1 = FactoryGirl.create :bug, deploy: deploy
+      bug2 = FactoryGirl.create :bug, deploy: deploy
+
+      deploy.devices_affected.should == 0
+
+      FactoryGirl.create :rails_occurrence, bug: bug1, device_id: 'hello'
+      FactoryGirl.create :rails_occurrence, bug: bug1, device_id: 'hello'
+
+      deploy.devices_affected.should == 1
+
+      FactoryGirl.create :rails_occurrence, bug: bug2, device_id: 'goodbye'
+
+      deploy.devices_affected.should == 2
+
+      FactoryGirl.create :rails_occurrence, bug: bug1, device_id: 'goodbye'
+
+      deploy.devices_affected.should == 2
+
+      FactoryGirl.create :rails_occurrence, bug: bug1, device_id: 'one more'
+
+      deploy.devices_affected.should == 3
+    end
+  end
 end

@@ -64,24 +64,25 @@
 # Properties
 # ==========
 #
-# |                       |                                                                                            |
-# |:----------------------|:-------------------------------------------------------------------------------------------|
-# | `class_name`          | The name of exception class (or error class/number).                                       |
-# | `file`                | The path name of the file determined to be where the Bug is, relative to the project root. |
-# | `line`                | The line number of the above file where the Bug was determined to be.                      |
-# | `revision`            | The revision of the project when the Bug first occurred.                                   |
-# | `blamed_revision`     | The most recent commit that modified the above file and line number.                       |
-# | `resolution_revision` | The commit that fixed this Bug.                                                            |
-# | `number`              | A consecutively incrementing value among other Bugs of the same Project.                   |
-# | `fixed`               | If `true`, this Bug has already been resolved.                                             |
-# | `fix_deployed`        | If `true`, the commit that fixes this Bug has been deployed.                               |
-# | `irrelevant`          | If true, this Bug does not represent an actual programmer error, and will not be fixed.    |
-# | `first_occurrence`    | The time at which this Bug first occurred.                                                 |
-# | `latest_occurrence`   | The time of the most recent occurrence.                                                    |
-# | `occurrences_count`   | The total number of occurrences so far.                                                    |
-# | `comments_count`      | The total number of comments left on the Bug.                                              |
-# | `client`              | The client library that first saw the Bug (Rails, iOS, Android, etc.).                     |
-# | `searchable_text`     | Automatically-managed lexeme vector for text-based search.                                 |
+# |                          |                                                                                            |
+# |:-------------------------|:-------------------------------------------------------------------------------------------|
+# | `class_name`             | The name of exception class (or error class/number).                                       |
+# | `file`                   | The path name of the file determined to be where the Bug is, relative to the project root. |
+# | `line`                   | The line number of the above file where the Bug was determined to be.                      |
+# | `revision`               | The revision of the project when the Bug first occurred.                                   |
+# | `blamed_revision`        | The most recent commit that modified the above file and line number.                       |
+# | `resolution_revision`    | The commit that fixed this Bug.                                                            |
+# | `number`                 | A consecutively incrementing value among other Bugs of the same Project.                   |
+# | `fixed`                  | If `true`, this Bug has already been resolved.                                             |
+# | `fix_deployed`           | If `true`, the commit that fixes this Bug has been deployed.                               |
+# | `irrelevant`             | If `true`, this Bug does not represent an actual programmer error, and will not be fixed.  |
+# | `first_occurrence`       | The time at which this Bug first occurred.                                                 |
+# | `latest_occurrence`      | The time of the most recent occurrence.                                                    |
+# | `occurrences_count`      | The total number of occurrences so far.                                                    |
+# | `comments_count`         | The total number of comments left on the Bug.                                              |
+# | `client`                 | The client library that first saw the Bug (Rails, iOS, Android, etc.).                     |
+# | `searchable_text`        | Automatically-managed lexeme vector for text-based search.                                 |
+# | `any_occurrence_crashed` | `true` if any associated Occurrence crashed.                                               |
 #
 # Metadata
 # ========
@@ -108,7 +109,8 @@ class Bug < ActiveRecord::Base
   has_many :comments, dependent: :delete_all, inverse_of: :bug
   has_many :events, dependent: :delete_all, inverse_of: :bug
   has_many :watches, dependent: :delete_all, inverse_of: :bug
-  has_many :notification_thresholds, dependent: :delete_all, inverse_of: :user
+  has_many :notification_thresholds, dependent: :delete_all, inverse_of: :bug
+  has_many :device_bugs, dependent: :delete_all, inverse_of: :bug
 
   # @return [User, Occurrence, JIRA::Resource::Issue] The User who is currently
   #   modifying this Bug, or the Occurrence that is causing this bug to be
