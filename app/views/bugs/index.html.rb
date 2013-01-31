@@ -40,11 +40,20 @@ module Views
         form(id: 'filter') do
           p do
             text "Show me "
+
             select_tag 'filter[fixed]', options_for_select([%w(unresolved false), %w(resolved true)]), class: 'input-small'
             text " "
             select_tag 'filter[irrelevant]', options_for_select([%w(critical false), %w(irrelevant true)]), class: 'input-small'
-            text " exceptions assigned to "
 
+            if @uses_releases
+              text " exceptions that "
+              select_tag 'filter[any_occurrence_crashed]', options_for_select([['did', 'false'], ['did not', 'true'], ['did or did not', nil]]), class: 'input-small'
+              text " result in a crash, "
+            else
+              text " exceptions"
+            end
+
+            text "assigned to "
             options = {'Sets' => [%w(nobody nobody), %w(somebody somebody), ['all bugs', 'anybody']]}
             options['Individuals'] = @filter_users.map { |fu| [fu.username, fu.id] } unless @filter_users.empty?
             select_tag 'filter[assigned_user_id]',

@@ -56,6 +56,25 @@ describe BugsController do
 
       it_should_behave_like "action that 404s at appropriate times", :get, :index, 'polymorphic_params(@env, true)'
 
+      context '[HTML]' do
+        context "@uses_releases" do
+          before :all do
+            FactoryGirl.create :deploy, environment: @env, build: nil
+          end
+
+          it "should set @uses_releases to true if there is at least one deploy with a build identifier" do
+            FactoryGirl.create :deploy, environment: @env, build: '0123'
+            get :index, polymorphic_params(@env, true)
+            assigns(:uses_releases).should be_true
+          end
+
+          it "should set @uses_releases to false otherwise" do
+            get :index, polymorphic_params(@env, true)
+            assigns(:uses_releases).should be_false
+          end
+        end
+      end
+
       context '[JSON]' do
         it "should load 50 of the most recently occurring bugs by default" do
           get :index, polymorphic_params(@env, true, format: 'json')
@@ -110,6 +129,23 @@ describe BugsController do
           get :index, polymorphic_params(@env, true, format: 'json', filter: {deploy_id: nil})
           JSON.parse(response.body).map { |r| r['number'] }.should include(deployed.number)
           JSON.parse(response.body).map { |r| r['number'] }.should include(undeployed.number)
+        end
+
+        it "should treat crashed=nil as any crashed value" do
+          crashed = FactoryGirl.create(:bug, environment: @env, any_occurrence_crashed: true)
+          uncrashed = FactoryGirl.create(:bug, environment: @env, any_occurrence_crashed: false)
+
+          get :index, polymorphic_params(@env, true, format: 'json', filter: {any_occurrence_crashed: nil})
+          JSON.parse(response.body).map { |r| r['number'] }.should include(crashed.number)
+          JSON.parse(response.body).map { |r| r['number'] }.should include(uncrashed.number)
+
+          get :index, polymorphic_params(@env, true, format: 'json', filter: {any_occurrence_crashed: true})
+          JSON.parse(response.body).map { |r| r['number'] }.should include(crashed.number)
+          JSON.parse(response.body).map { |r| r['number'] }.should_not include(uncrashed.number)
+
+          get :index, polymorphic_params(@env, true, format: 'json', filter: {any_occurrence_crashed: false})
+          JSON.parse(response.body).map { |r| r['number'] }.should_not include(crashed.number)
+          JSON.parse(response.body).map { |r| r['number'] }.should include(uncrashed.number)
         end
 
         it "should treat assigned_user_id=anybody as all exceptions" do

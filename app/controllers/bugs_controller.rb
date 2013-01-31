@@ -38,7 +38,7 @@ class BugsController < ApplicationController
   SORTS.default     = SORTS['latest']
 
   # Valid columns to filter the bug list on.
-  VALID_FILTER_KEYS = %w( fixed irrelevant assigned_user_id deploy_id search )
+  VALID_FILTER_KEYS = %w( fixed irrelevant assigned_user_id deploy_id search any_occurrence_crashed )
 
   # Number of Bugs to return per page.
   PER_PAGE          = 50
@@ -95,7 +95,8 @@ class BugsController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        @filter_users = User.where(id: @environment.bugs.select('assigned_user_id').uniq.limit(PER_PAGE).map(&:assigned_user_id)).order('username ASC')
+        @filter_users  = User.where(id: @environment.bugs.select('assigned_user_id').uniq.limit(PER_PAGE).map(&:assigned_user_id)).order('username ASC')
+        @uses_releases = @environment.deploys.where('build IS NOT NULL').any?
         # index.html.rb
       end
 
@@ -104,6 +105,8 @@ class BugsController < ApplicationController
         filter.each { |k, v| filter[k] = nil if v == '' }
 
         filter.delete('deploy_id') if filter['deploy_id'].nil? # no deploy set means ANY deploy, not NO deploy
+        filter.delete('any_occurrence_crashed') if filter['any_occurrence_crashed'].nil?
+
         # sentinel values
         filter.delete('assigned_user_id') if filter['assigned_user_id'] == 'somebody'
         filter.delete('assigned_user_id') if filter['assigned_user_id'] == 'anybody'
