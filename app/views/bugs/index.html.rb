@@ -64,7 +64,7 @@ module Views
 
             if @uses_releases
               text " exceptions that "
-              select_tag 'filter[any_occurrence_crashed]', options_for_select([['did', 'false'], ['did not', 'true'], ['did or did not', nil]]), class: 'input-small'
+              select_tag 'filter[any_occurrence_crashed]', options_for_select([['did or did not', nil], ['did', 'true'], ['did not', 'false']]), class: 'input-small'
               text " result in a crash, "
             else
               text " exceptions"

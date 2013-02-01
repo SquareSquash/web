@@ -316,7 +316,7 @@ module Views
             plural ||= singular.pluralize
             div(class: 'shown') do
               strong number_with_delimiter(number)
-              span(number == 1 ? singular : plural)
+              span(' ' + (number == 1 ? singular : plural))
             end
           end
         end
