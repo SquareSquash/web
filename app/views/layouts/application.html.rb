@@ -98,6 +98,19 @@ module Views
       #   the current page.
       def breadcrumbs() [] end
 
+      # Override this method to populate a set of at-a-glance numerical stats
+      # that will appear alongside the breadcrumbs. This method should returrn
+      # an array of arrays. The values of each inner array should be
+      #
+      # 1. the number to display,
+      # 2. a description of what the number represents, in singular, and
+      # 3. optionally, the plural form of #2.
+      #
+      # @return [Array<Array>] The stats to display alongside the breadcrumbs.
+      def breadcrumbs_stats()
+        []
+      end
+
       ### HELPERS
 
       # Like link_to, but makes a button. This much simpler version does not
@@ -137,7 +150,13 @@ module Views
             navbar_small
             navbar_large
           end
-          div(id: 'breadcrumbs-container') { render_breadcrumbs(*breadcrumbs) } if breadcrumbs.present?
+          div(id: 'breadcrumbs-container') do
+            div(class: 'container') do
+              render_breadcrumbs(*breadcrumbs)
+              stats = breadcrumbs_stats
+              render_breadcrumbs_stats(stats) unless stats.empty?
+            end
+          end if breadcrumbs.present?
 
           body_content
           footer_portion
@@ -266,7 +285,7 @@ module Views
       end
 
       def render_breadcrumbs(*crumbs)
-        ul(class: 'container breadcrumb') do
+        ul(class: 'breadcrumb') do
           0.upto(crumbs.length - 2) do |i|
             li do
               if crumbs[i].kind_of?(String)
@@ -288,6 +307,18 @@ module Views
           end if crumbs.length > 1
 
           li (crumbs.last.kind_of?(String) ? crumbs.last : crumbs.last.name), class: 'active'
+        end
+      end
+
+      def render_breadcrumbs_stats(stats)
+        div(id: 'breadcrumbs-stats') do
+          stats.each do |(number, singular, plural)|
+            plural ||= singular.pluralize
+            div(class: 'shown') do
+              strong number_with_delimiter(number)
+              span(number == 1 ? singular : plural)
+            end
+          end
         end
       end
 

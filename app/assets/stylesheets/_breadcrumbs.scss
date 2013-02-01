@@ -1,9 +1,19 @@
 @import "vars";
 
+#breadcrumbs-container .container {
+  display: -webkit-box;
+  display: -moz-box;
+  display: box;
+}
+
 ul.breadcrumb {
   background-color: white;
   padding: 0 20px;
   line-height: $nav-height;
+
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
 
   li {
     display: inline;
@@ -18,5 +28,31 @@ ul.breadcrumb {
       color: $gray4;
       padding: 0 5px;
     }
+  }
+}
+
+div#breadcrumbs-stats {
+  display: -webkit-box;
+  display: -moz-box;
+  display: box;
+
+  div {
+    margin: 13px 5px;
+    background-color: $gray5;
+    padding: 4px 10px;
+    border-radius: $radius-size;
+
+    strong {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    span {
+      font-size: 14px;
+      display: none;
+    }
+
+    &.shown span { display: inline; }
   }
 }

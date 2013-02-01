@@ -34,6 +34,23 @@ module Views
 
       def breadcrumbs() [@project, @environment] end
 
+      def breadcrumbs_stats()
+        return super unless @uses_releases
+        [
+            [@environment.bugs_count,
+             "unresolved, unassigned bug"],
+            [@environment.bugs.where(fixed: false, irrelevant: false, any_occurrence_crashed: true).count,
+             "bug with at least one occurrence that resulted in a crash",
+             "bugs with at least one occurrence that resulted in a crash"],
+            [Occurrence.joins(:bug).where(bugs: {fixed: false, irrelevant: false}, crashed: true).count,
+             "crash associated with an unresolved bug",
+             "crashes associated with an unresolved bug"],
+            [DeviceBug.joins(:bug).where(bugs: {fixed: false, irrelevant: false, environment_id: @environment.id}).count,
+             "device that crashed because of an unresolved bug",
+             "devices that crashed because of an unresolved bug"]
+        ]
+      end
+
       private
 
       def filter
