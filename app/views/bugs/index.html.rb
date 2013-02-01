@@ -20,7 +20,7 @@ module Views
   module Bugs
     # @private
     class Index < Views::Layouts::Application
-      needs :project, :environment, :filter_users
+      needs :project, :environment, :filter_users, :uses_releases
 
       protected
 
