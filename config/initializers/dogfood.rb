@@ -17,6 +17,11 @@
 
 Squash::Ruby.configure Squash::Configuration.dogfood
 
+Squash::Configuration.authentication.strategy == 'password'
+Squash::Configuration.authentication['password'] = {
+  salt: ENV['SQUASH_AUTHENTICATION_PASSWORD_SALT']
+}
+
 # Auto-configure development dogfood
 
 unless defined?(IRB)
