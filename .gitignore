@@ -3,3 +3,4 @@
 node_modules
 doc/fdoc-html
 tmp/cache/*
+*.swp

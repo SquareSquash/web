@@ -1,2 +1,4 @@
----
+--- 
 strategy: password
+password: 
+  salt: EnxPEC6+hjY41LUTY2h20g==
