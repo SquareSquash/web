@@ -20,7 +20,7 @@ module Views
   module Bugs
     # @private
     class Index < Views::Layouts::Application
-      needs :project, :environment, :filter_users, :uses_releases
+      needs :project, :environment, :filter_users
 
       protected
 
@@ -35,7 +35,7 @@ module Views
       def breadcrumbs() [@project, @environment] end
 
       def breadcrumbs_stats()
-        return super unless @uses_releases
+        return super unless @project.uses_releases?
         [
             [@environment.bugs_count,
              "unresolved, unassigned bug"],
@@ -62,7 +62,7 @@ module Views
             text " "
             select_tag 'filter[irrelevant]', options_for_select([%w(critical false), %w(irrelevant true)]), class: 'input-small'
 
-            if @uses_releases
+            if @project.uses_releases?
               text " exceptions that "
               select_tag 'filter[any_occurrence_crashed]', options_for_select([['did or did not', nil], ['did', 'true'], ['did not', 'false']]), class: 'input-small'
               text " result in a crash, "

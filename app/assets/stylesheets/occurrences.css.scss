@@ -84,7 +84,7 @@ table.parameter { @include table; }
     overflow-y: auto;
     padding-bottom: 30px;
 
-    input[type=checkbox] { margin-top: 5px; }
+    input[type=checkbox], input[type=radio] { margin-top: 5px; }
     table { width: auto; }
   }
 }

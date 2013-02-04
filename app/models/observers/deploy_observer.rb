@@ -12,18 +12,22 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-FactoryGirl.define do
-  factory :deploy do
-    association :environment
-    revision '2dc20c984283bede1f45863b8f3b4dd9b5b554cc'
-    deployed_at { Time.now }
+# This observer on the {Deploy} model:
+#
+# * sets a Project's `uses_releases` attribute if the Deploy has release
+#   information.
+
+class DeployObserver < ActiveRecord::Observer
+  # @private
+  def after_create(deploy)
+    update_project_release_setting deploy
   end
 
-  factory :release, class: 'Deploy' do
-    association :environment
-    revision '2dc20c984283bede1f45863b8f3b4dd9b5b554cc'
-    version '1.2.3'
-    sequence :build, &:to_s
-    deployed_at { Time.now }
+  private
+
+  def update_project_release_setting(deploy)
+    return unless deploy.release?
+    return if deploy.environment.project.uses_releases_override?
+    deploy.environment.project.update_attribute :uses_releases, true
   end
 end

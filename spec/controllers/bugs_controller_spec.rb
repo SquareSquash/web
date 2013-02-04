@@ -56,25 +56,6 @@ describe BugsController do
 
       it_should_behave_like "action that 404s at appropriate times", :get, :index, 'polymorphic_params(@env, true)'
 
-      context '[HTML]' do
-        context "@uses_releases" do
-          before :all do
-            FactoryGirl.create :deploy, environment: @env, build: nil
-          end
-
-          it "should set @uses_releases to true if there is at least one deploy with a build identifier" do
-            FactoryGirl.create :deploy, environment: @env, build: '0123'
-            get :index, polymorphic_params(@env, true)
-            assigns(:uses_releases).should be_true
-          end
-
-          it "should set @uses_releases to false otherwise" do
-            get :index, polymorphic_params(@env, true)
-            assigns(:uses_releases).should be_false
-          end
-        end
-      end
-
       context '[JSON]' do
         it "should load 50 of the most recently occurring bugs by default" do
           get :index, polymorphic_params(@env, true, format: 'json')

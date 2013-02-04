@@ -176,6 +176,7 @@ en:
         sender: sender
         sends_emails_outside_team: notify unknown email addresses
         trusted_email_domain: trusted domain for unknown email addresses
+        uses_releases: is a released and distributed application
         whitelist_paths_string: whitelisted paths
         whitelist_paths_string: whitelisted paths
       user:

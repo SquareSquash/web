@@ -96,7 +96,6 @@ class BugsController < ApplicationController
     respond_to do |format|
       format.html do
         @filter_users  = User.where(id: @environment.bugs.select('assigned_user_id').uniq.limit(PER_PAGE).map(&:assigned_user_id)).order('username ASC')
-        @uses_releases = @environment.deploys.where('build IS NOT NULL').any?
         # index.html.rb
       end
 

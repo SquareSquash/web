@@ -32,6 +32,41 @@ describe Deploy do
 
       deploy.save!
     end
+
+    context "[uses_releases]" do
+      before(:all) { @env = FactoryGirl.create(:environment) }
+
+      it "should set it to true if a release is created" do
+        @env.project.update_attribute :uses_releases, false
+        FactoryGirl.create :release, environment: @env
+        @env.project(true).uses_releases?.should be_true
+      end
+
+      it "should not set it to false if there is a subsequent deploy" do
+        @env.project(true).update_attribute :uses_releases, true
+        FactoryGirl.create :deploy, environment: @env
+        @env.project.uses_releases?.should be_true
+      end
+
+      it "should not set it to true if the override is set" do
+        @env.project.uses_releases = false
+        @env.project.uses_releases_override = true
+        FactoryGirl.create :release, environment: @env
+        @env.project(true).uses_releases?.should be_false
+      end
+    end
+  end
+
+  describe "#release?" do
+    before(:all) { @env = FactoryGirl.create(:environment) }
+
+    it "should return true for a release" do
+      FactoryGirl.create(:release, environment: @env).should be_release
+    end
+
+    it "should return false for a deploy" do
+      FactoryGirl.create(:deploy, environment: @env).should_not be_release
+    end
   end
 
   describe "#devices_affected" do

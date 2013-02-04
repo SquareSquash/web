@@ -280,6 +280,22 @@ end
       def configuration
         form_for(@project, html: {class: 'labeled'}) do |f|
           fieldset do
+            h5 "General settings"
+
+            f.label(:uses_releases, value: false, class: 'radio-label') do
+              f.radio_button :uses_releases, false
+              text " this product is deployed to a server"
+            end
+            f.label(:uses_releases, value: true, class: 'radio-label') do
+              f.radio_button :uses_releases, true
+              text " this product is distributed to client platforms"
+            end
+            # need the spaces before the radio button text because Rails helpers
+            # add spurious spaces sometimes (not always), and the text needs to
+            # line up
+          end
+
+          fieldset do
             h5 "Application and library paths"
 
             f.label :filter_paths_string
