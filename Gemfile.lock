@@ -130,6 +130,7 @@ GEM
     json_serialize (2.2.1)
       activerecord (>= 3.0)
       activesupport (>= 3.0)
+    kgio (2.8.0)
     kramdown (0.14.1)
     less (2.2.2)
       commonjs (~> 0.2.6)
@@ -160,6 +161,7 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
+    raindrops (0.10.0)
     rake (10.0.3)
     rdoc (3.12)
       json (~> 1.4)
@@ -222,6 +224,10 @@ GEM
     uglifier (1.3.0)
       execjs (>= 0.3.0)
       multi_json (~> 1.0, >= 1.0.2)
+    unicorn (4.5.0)
+      kgio (~> 2.6)
+      rack
+      raindrops (~> 0.7)
     url_validation (1.0.0)
       activerecord
       activesupport
@@ -275,6 +281,7 @@ DEPENDENCIES
   therubyracer (>= 0.11.1)
   therubyrhino (< 2.0)
   uglifier
+  unicorn
   url_validation
   user-agent
   validates_timeliness
