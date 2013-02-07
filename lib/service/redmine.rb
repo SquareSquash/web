@@ -16,7 +16,7 @@ module Service
 
     end
 
-    Her::API.setup :url => Squash::Configuration.redmine.api_host, :ssl => {:verify => false} do |connection|
+    Her::API.setup :url => Squash::Configuration.redmine.api_host do |connection|
       #connection.response :logger  # uncomment this if you need to debug your response
       connection.use ApiKeyAuthentication if Squash::Configuration.redmine.authentication.strategy == "api_key"
       connection.use Faraday::Request::UrlEncoded
