@@ -1,0 +1,6 @@
+---
+disabled: true
+authentication:
+  strategy: api_key
+  key: "the_key"
+api_host: "https://redmine.your.com/redmin/url"

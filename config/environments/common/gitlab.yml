@@ -1,0 +1,6 @@
+---
+disabled: true
+authentication:
+  strategy: api_key
+  key: "YOUR_API_KEY"
+api_host: "http://ur_gitlab/api/version3/project_id/1"
