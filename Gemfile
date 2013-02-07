@@ -36,6 +36,10 @@ gem 'net-ldap', require: 'net/ldap'
 
 # INTEGRATION
 gem 'jira-ruby', require: 'jira'
+gem 'faraday'
+gem 'faraday_middleware'
+gem 'her'
+
 
 # DOGFOOD
 gem 'squash_ruby', require: 'squash/ruby'
