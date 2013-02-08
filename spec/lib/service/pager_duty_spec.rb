@@ -43,6 +43,22 @@ describe Service::PagerDuty do
         resp.attributes.should eql('status' => 'success', 'message' => 'You did it!')
         resp.status.should eql('success')
       end
+
+      it "should use an HTTP proxy if configured" do
+        Squash::Configuration.pagerduty[:http_proxy] = Configoro::Hash.new('host' => 'myhost', 'port' => 123)
+        http = Net::HTTP
+        proxy = Net::HTTP::Proxy(nil, nil, nil, nil)
+        Net::HTTP.should_receive(:Proxy).once.with('myhost', 123).and_return(http)
+        Net::HTTP.should_receive(:Proxy).once.with(nil, nil, nil, nil).and_return(proxy)
+
+        resp = @pagerduty.send(method, 'abc123')
+        resp.http_status.should eql(200)
+        resp.should be_success
+        resp.attributes.should eql('status' => 'success', 'message' => 'You did it!')
+        resp.status.should eql('success')
+
+        Squash::Configuration.pagerduty.delete :http_proxy
+      end
     end
   end
 
