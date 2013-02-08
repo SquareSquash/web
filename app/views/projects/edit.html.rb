@@ -373,7 +373,16 @@ end
           fieldset do
             h5 "PagerDuty integration"
 
-            p "Squash can create a PagerDuty incident for a bug once it’s reached its critical threshold (see above). When the bug is assigned, the incident will automatically be acknowledged. The incident will also be resolved automatically when the bug is resolved."
+            p "Squash can create a PagerDuty incident for new bugs. When the bug is assigned, the incident will automatically be acknowledged. The incident will also be resolved automatically when the bug is resolved."
+
+            f.label(:always_notify_pagerduty, value: false, class: 'radio-label') do
+              f.radio_button :always_notify_pagerduty, false
+              text " notify PagerDuty when a bug exceeds the critical threshold (see above)"
+            end
+            f.label(:always_notify_pagerduty, value: true, class: 'radio-label') do
+              f.radio_button :always_notify_pagerduty, true
+              text " always notify PagerDuty"
+            end
 
             f.label :pagerduty_service_key
             f.text_field :pagerduty_service_key

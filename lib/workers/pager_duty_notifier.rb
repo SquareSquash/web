@@ -51,7 +51,8 @@ class PagerDutyNotifier
         @occurrence.bug.environment.notifies_pagerduty? &&
         @occurrence.bug.environment.project.pagerduty_enabled? &&
         @occurrence.bug.environment.project.pagerduty_service_key &&
-        @occurrence.bug.occurrences_count > @occurrence.bug.environment.project.critical_threshold
+        (@occurrence.bug.occurrences_count > @occurrence.bug.environment.project.critical_threshold ||
+            @occurrence.bug.environment.project.always_notify_pagerduty?)
 
   end
 

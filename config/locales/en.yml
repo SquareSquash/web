@@ -162,6 +162,7 @@ en:
         window_height: window height
       project:
         all_mailing_list: all exceptions mailing list
+        always_notify_pagerduty: always notify pagerduty
         api_key: API key
         commit_url_format: commit URL format
         critical_mailing_list: critical exceptions mailing list

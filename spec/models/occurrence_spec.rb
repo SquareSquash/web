@@ -114,6 +114,16 @@ describe Occurrence do
         FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
       end
 
+      it "should send an incident if always_notify_pagerduty is set" do
+        @project.update_attribute :always_notify_pagerduty, true
+        Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+            /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+            @bug.pagerduty_incident_key,
+            an_instance_of(Hash)
+        )
+        FactoryGirl.create :rails_occurrence, bug: @bug
+      end
+
       it "should send an incident to PagerDuty once the critical threshold is breached" do
         FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
         Service::PagerDuty.any_instance.should_receive(:trigger).once.with(

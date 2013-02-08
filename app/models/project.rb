@@ -82,10 +82,11 @@ require 'securerandom'
 # Integrations
 # ------------
 #
-# |                         |                                                                                                                                             |
-# |:------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
-# | `pagerduty_enabled`     | If `true`, new Occurrences are sent to PagerDuty. Note that PagerDuty "acknowledge" and "resolve" events are sent regardless of this value. |
-# | `pagerduty_service_key` | The service key assigned to this project by PagerDuty.                                                                                      |
+# |                           |                                                                                                                                             |
+# |:--------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------|
+# | `pagerduty_enabled`       | If `true`, new Occurrences are sent to PagerDuty. Note that PagerDuty "acknowledge" and "resolve" events are sent regardless of this value. |
+# | `pagerduty_service_key`   | The service key assigned to this project by PagerDuty.                                                                                      |
+# | `always_notify_pagerduty` | If `true`, all new Bugs are sent to PagerDuty. If `false`, only those Bugs that exceed the critical threshold are sent.                     |
 
 class Project < ActiveRecord::Base
   # The directory where repositories are checked out.
@@ -110,15 +111,16 @@ class Project < ActiveRecord::Base
                   :commit_url_format, :critical_mailing_list, :all_mailing_list,
                   :critical_threshold, :sender, :locale,
                   :sends_emails_outside_team, :trusted_email_domain,
-                  :pagerduty_enabled, :pagerduty_service_key, :uses_releases,
-                  as: :admin
+                  :pagerduty_enabled, :pagerduty_service_key,
+                  :always_notify_pagerduty, :uses_releases, as: :admin
   attr_accessible :name, :repository_url, :default_environment,
                   :default_environment_id, :filter_paths, :whitelist_paths,
                   :commit_url_format, :critical_mailing_list, :all_mailing_list,
                   :critical_threshold, :sender, :locale, :owner, :owner_id,
                   :validate_repo_connectivity, :sends_emails_outside_team,
                   :trusted_email_domain, :pagerduty_enabled,
-                  :pagerduty_service_key, :uses_releases, as: :owner
+                  :pagerduty_service_key, :always_notify_pagerduty,
+                  :uses_releases, as: :owner
 
   include Slugalicious
   slugged :name
@@ -131,7 +133,7 @@ class Project < ActiveRecord::Base
 
       critical_mailing_list:     {email: true, allow_nil: true},
       all_mailing_list:          {email: true, allow_nil: true},
-      critical_threshold:        {type: Fixnum, presence: true, default: 100, numericality: {only_integer: true, greater_than: 1}},
+      critical_threshold:        {type: Fixnum, presence: true, default: 100, numericality: {only_integer: true, greater_than_or_equal_to: 1}},
       sender:                    {email: true, allow_nil: true},
       locale:                    {default: 'en', presence: true},
       sends_emails_outside_team: {type: Boolean, default: false, allow_nil: false},
@@ -139,6 +141,7 @@ class Project < ActiveRecord::Base
 
       pagerduty_enabled:         {type: Boolean, default: false},
       pagerduty_service_key:     {presence: {if: :pagerduty_enabled}},
+      always_notify_pagerduty:   {type: Boolean, default: false},
 
       uses_releases:             {type: Boolean, default: false},
       uses_releases_override:    {type: Boolean, default: false}
