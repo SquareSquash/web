@@ -1,4 +1,5 @@
 source :rubygems
+ruby "1.9.3"
 
 # FRAMEWORK
 gem 'rails', git: 'git://github.com/rails/rails.git', branch: '3-2-stable'
