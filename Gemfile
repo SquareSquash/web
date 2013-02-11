@@ -11,6 +11,8 @@ gem 'rack-cors', require: 'rack/cors'
 
 # MODELS
 gem 'pg', platform: :mri
+# Version 1.2.6 introduces a bug relating to SQL binds
+gem 'activerecord-jdbc-adapter', '1.2.5', platform: :jruby
 gem 'activerecord-jdbcpostgresql-adapter', platform: :jruby
 gem 'has_metadata_column', git: 'git://github.com/RISCfuture/has_metadata_column.git'
 gem 'slugalicious'
