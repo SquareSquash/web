@@ -27,7 +27,7 @@ gem 'jquery-rails'
 gem 'kramdown'
 
 # UTILITIES
-gem 'json'
+gem 'json', '>= 1.7.7'
 gem 'git', git: 'git://github.com/RISCfuture/ruby-git.git'
 gem 'user-agent'
 
