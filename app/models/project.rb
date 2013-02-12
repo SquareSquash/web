@@ -52,11 +52,11 @@ require 'securerandom'
 # General
 # =======
 #
-# |                          |                                                                                                                                                                  |
-# |:-------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-# | `uses_releases`          | If `true`, bug views will be segregated by release, and release data will be displayed. Automatically set to true if any Deploys with release data are received. |
-# | `uses_releases_override` | `uses_releases` is set automatically. If the user has set the value at least once manually, this is `true`, and automatic updates are suppressed.                |
-# | `disable_message_filtering` | If `true`, Bug messages are not filtered for potentially sensitive information. |
+# |                             |                                                                                                                                                                  |
+# |:----------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+# | `uses_releases`             | If `true`, bug views will be segregated by release, and release data will be displayed. Automatically set to true if any Deploys with release data are received. |
+# | `uses_releases_override`    | `uses_releases` is set automatically. If the user has set the value at least once manually, this is `true`, and automatic updates are suppressed.                |
+# | `disable_message_filtering` | If `true`, Bug messages are not filtered for potentially sensitive information.                                                                                  |
 #
 # Code configuration
 # ------------------
