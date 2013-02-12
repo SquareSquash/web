@@ -4,7 +4,7 @@ set :application, 'squash'
 set :repository,  'git@github.com:optoro/squash-web.git'
 set :scm, :git
 set :deploy_to, "/var/www/railsapps/#{application}"
-server '33.33.33.20', :app, :web, :db, :primary => true
+server 'squash.optiturn.com', :app, :web, :db, :primary => true
 set :branch, 'master'
 set :deploy_via, :remote_cache
 set :use_sudo, false
