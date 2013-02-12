@@ -293,6 +293,18 @@ end
             # need the spaces before the radio button text because Rails helpers
             # add spurious spaces sometimes (not always), and the text needs to
             # line up
+
+            f.label(:disable_message_filtering, class: 'checkbox-label') do
+              f.check_box :disable_message_filtering
+              text ::Project.human_attribute_name(:disable_message_filtering)
+            end
+            p(class: 'help-block') do
+              text "If unchecked, exception messages will be scanned for "
+              text "potentially sensitive information (phone numbers, emails); "
+              text "those substrings will be replaced with tokens such as "
+              samp "[EMAIL?]"
+              text "."
+            end
           end
 
           fieldset do

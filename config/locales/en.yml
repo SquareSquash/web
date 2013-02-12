@@ -167,6 +167,7 @@ en:
         commit_url_format: commit URL format
         critical_mailing_list: critical exceptions mailing list
         critical_threshold: critical threshold
+        disable_message_filtering: disable exception message filtering
         filter_paths: filtered paths
         filter_paths_string: filtered paths
         locale: email locale

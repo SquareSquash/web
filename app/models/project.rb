@@ -56,6 +56,7 @@ require 'securerandom'
 # |:-------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
 # | `uses_releases`          | If `true`, bug views will be segregated by release, and release data will be displayed. Automatically set to true if any Deploys with release data are received. |
 # | `uses_releases_override` | `uses_releases` is set automatically. If the user has set the value at least once manually, this is `true`, and automatic updates are suppressed.                |
+# | `disable_message_filtering` | If `true`, Bug messages are not filtered for potentially sensitive information. |
 #
 # Code configuration
 # ------------------
@@ -112,7 +113,8 @@ class Project < ActiveRecord::Base
                   :critical_threshold, :sender, :locale,
                   :sends_emails_outside_team, :trusted_email_domain,
                   :pagerduty_enabled, :pagerduty_service_key,
-                  :always_notify_pagerduty, :uses_releases, as: :admin
+                  :always_notify_pagerduty, :uses_releases,
+                  :disable_message_filtering, as: :admin
   attr_accessible :name, :repository_url, :default_environment,
                   :default_environment_id, :filter_paths, :whitelist_paths,
                   :commit_url_format, :critical_mailing_list, :all_mailing_list,
@@ -120,7 +122,7 @@ class Project < ActiveRecord::Base
                   :validate_repo_connectivity, :sends_emails_outside_team,
                   :trusted_email_domain, :pagerduty_enabled,
                   :pagerduty_service_key, :always_notify_pagerduty,
-                  :uses_releases, as: :owner
+                  :uses_releases, :disable_message_filtering, as: :owner
 
   include Slugalicious
   slugged :name
@@ -144,7 +146,9 @@ class Project < ActiveRecord::Base
       always_notify_pagerduty:   {type: Boolean, default: false},
 
       uses_releases:             {type: Boolean, default: false},
-      uses_releases_override:    {type: Boolean, default: false}
+      uses_releases_override:    {type: Boolean, default: false},
+
+      disable_message_filtering: {type: Boolean, default: false}
   )
 
   validates :owner,
