@@ -13,6 +13,20 @@ ssh_options[:forward_agent] = true
 
 after "deploy:restart", "deploy:cleanup"
 
+namespace :deploy do
+  task :restart do
+    run "sudo /etc/init.d/unicorn-#{application}.sh upgrade"
+  end
+
+  task :stop do
+    run "sudo /etc/init.d/unicorn-#{application}.sh stop"
+  end
+
+  task :start do
+    run "sudo /etc/init.d/unicorn-#{application}.sh start"
+  end
+end
+
 
 # If you are using Passenger mod_rails uncomment this:
 # namespace :deploy do
