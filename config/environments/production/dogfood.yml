@@ -1,4 +1,4 @@
 --- 
 disabled: true
 api_key: YOUR_PRODUCTION_SQUASH_API_KEY
-api_host: https://squash.optiturn.com
+api_host: http://squash.optiturn.com
