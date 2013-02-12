@@ -115,6 +115,7 @@ en:
         cookies: cookies hash
         connectivity: network connectivity
         controller: Web controller
+        crashed: crashed
         device_id: client device ID
         device_type: client device type
         env_vars: environment variables
