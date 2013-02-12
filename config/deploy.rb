@@ -1,5 +1,4 @@
 require 'bundler/capistrano'
-require 'capistrano-unicorn'
 
 set :application, 'squash'
 set :repository,  'git@github.com:optoro/squash-web.git'
