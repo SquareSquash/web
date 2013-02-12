@@ -39,9 +39,14 @@ class root.Histogram
           return
 
         plot = $.plot @element, [data.occurrences],
+          series:
+            bars: {show: true}
           xaxis:
             mode: 'time'
+            timeformat: '%Y/%m/%d %H:%M'
             tickLength: 5
+          yaxis:
+            tickDecimals: 0
           grid:
             markings: ({color: '#00b', lineWidth: 1, xaxis: {from: deploy.deployed_at, to: deploy.deployed_at}} for deploy in data.deploys)
             borderWidth: 1
