@@ -44,7 +44,7 @@ Squash::Application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.force_ssl = false
   require "rack/cache"
-  config.middleware.insert_after ::Rack::SSL, Ping
+  config.middleware.insert_after ::Rack::Cache, Ping
 
   # See everything in the log (default is :info)
   # config.log_level = :debug
