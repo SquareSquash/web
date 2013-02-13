@@ -135,6 +135,16 @@ describe OccurrencesWorker do
           occ = OccurrencesWorker.new(@params).perform
           occ.message.should eql("Please remit to [CC/BANK?].")
         end
+
+        it "should not perform filtering if filtering is disabled" do
+          @project.update_attribute :disable_message_filtering, true
+
+          @params['message'] = "Please remit to 80054810."
+          occ = OccurrencesWorker.new(@params).perform
+          occ.message.should eql("Please remit to 80054810.")
+
+          @project.update_attribute :disable_message_filtering, false
+        end
       end
 
       it "should stick any attributes it doesn't recognize into the metadata attribute" do

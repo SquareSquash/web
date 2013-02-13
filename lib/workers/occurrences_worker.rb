@@ -120,7 +120,7 @@ class OccurrencesWorker
 
     # these must be done after Blamer runs
     add_user_agent_data occurrence
-    occurrence.message = pii_filter(MessageTemplateMatcher.instance.matched_substring(class_name, occurrence.message))
+    occurrence.message = pii_filter(MessageTemplateMatcher.instance.matched_substring(class_name, occurrence.message)) unless project.disable_message_filtering?
     occurrence.message = occurrence.message.truncate(1000)
 
     # hook things up and save
