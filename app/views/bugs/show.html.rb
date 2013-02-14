@@ -138,9 +138,19 @@ module Views
           li { a "The Fix", href: '#fix', rel: 'tab' } if @bug.resolution_revision
           li { a "Management", href: '#management', rel: 'tab' } if current_user.role(@project)
           li { a "Notifications", href: '#notifications', rel: 'tab' }
-          li { a "Comments", href: '#comments', rel: 'tab' }
+          li do
+            a(href: '#comments', rel: 'tab') do
+              text  "Comments"
+              text " (#{number_with_delimiter @bug.comments_count})" if @bug.comments_count > 0
+            end
+          end
           li { a "Aggregation", href: '#aggregation', rel: 'tab' }
-          li(class: 'with-table') { a "Occurrences", href: '#occurrences', rel: 'tab' }
+          li(class: 'with-table') do
+            a(href: '#occurrences', rel: 'tab') do
+              text "Occurrences"
+              text " (#{number_with_delimiter @bug.occurrences_count})" if @bug.occurrences_count > 0
+            end
+          end
         end
       end
 

@@ -43,13 +43,21 @@ form.labeled {
     // fix up spacing between label and help block
     &.checkbox-label { margin-bottom: 0; }
 
-    input[type=checkbox] {
+    // nuzzle up radio labels
+    &.radio-label {
+      margin-bottom: 0;
+      margin-top: 5px;
+
+      &:first-of-type { margin-top: 20px; }
+    }
+
+    input[type=checkbox], input[type=radio] {
       display: inline;
       margin-right: 5px;
     }
   }
 
-  input:not([type=checkbox]), select, textarea {
+  input:not([type=checkbox]):not([type=radio]), select, textarea {
     display: block;
     width: auto;
   }

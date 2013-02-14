@@ -280,6 +280,34 @@ end
       def configuration
         form_for(@project, html: {class: 'labeled'}) do |f|
           fieldset do
+            h5 "General settings"
+
+            f.label(:uses_releases, value: false, class: 'radio-label') do
+              f.radio_button :uses_releases, false
+              text " this product is deployed to a server"
+            end
+            f.label(:uses_releases, value: true, class: 'radio-label') do
+              f.radio_button :uses_releases, true
+              text " this product is distributed to client platforms"
+            end
+            # need the spaces before the radio button text because Rails helpers
+            # add spurious spaces sometimes (not always), and the text needs to
+            # line up
+
+            f.label(:disable_message_filtering, class: 'checkbox-label') do
+              f.check_box :disable_message_filtering
+              text ::Project.human_attribute_name(:disable_message_filtering)
+            end
+            p(class: 'help-block') do
+              text "If unchecked, exception messages will be scanned for "
+              text "potentially sensitive information (phone numbers, emails); "
+              text "those substrings will be replaced with tokens such as "
+              samp "[EMAIL?]"
+              text "."
+            end
+          end
+
+          fieldset do
             h5 "Application and library paths"
 
             f.label :filter_paths_string
@@ -357,7 +385,16 @@ end
           fieldset do
             h5 "PagerDuty integration"
 
-            p "Squash can create a PagerDuty incident for a bug once it’s reached its critical threshold (see above). When the bug is assigned, the incident will automatically be acknowledged. The incident will also be resolved automatically when the bug is resolved."
+            p "Squash can create a PagerDuty incident for new bugs. When the bug is assigned, the incident will automatically be acknowledged. The incident will also be resolved automatically when the bug is resolved."
+
+            f.label(:always_notify_pagerduty, value: false, class: 'radio-label') do
+              f.radio_button :always_notify_pagerduty, false
+              text " notify PagerDuty when a bug exceeds the critical threshold (see above)"
+            end
+            f.label(:always_notify_pagerduty, value: true, class: 'radio-label') do
+              f.radio_button :always_notify_pagerduty, true
+              text " always notify PagerDuty"
+            end
 
             f.label :pagerduty_service_key
             f.text_field :pagerduty_service_key

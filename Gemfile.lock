@@ -21,7 +21,7 @@ GIT
 
 GIT
   remote: git://github.com/rails/rails.git
-  revision: c0022f8d885d5cca8a7f7d3d64c60af1e04684ea
+  revision: 4bb579a5f05788d10bc61920a68700591280ffb4
   branch: 3-2-stable
   specs:
     actionmailer (3.2.12)
@@ -70,9 +70,9 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
-    activerecord-jdbc-adapter (1.2.7)
-    activerecord-jdbcpostgresql-adapter (1.2.7)
-      activerecord-jdbc-adapter (~> 1.2.7)
+    activerecord-jdbc-adapter (1.2.5)
+    activerecord-jdbcpostgresql-adapter (1.2.5)
+      activerecord-jdbc-adapter (~> 1.2.5)
       jdbc-postgres (>= 9.1, < 9.3)
     activerecord-postgresql-cursors (0.0.2)
     addressable (2.3.2)
@@ -247,6 +247,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-jdbc-adapter (= 1.2.5)
   activerecord-jdbcpostgresql-adapter
   activerecord-postgresql-cursors
   coffee-rails

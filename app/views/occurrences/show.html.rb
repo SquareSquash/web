@@ -111,7 +111,7 @@ module Views
           div(id: 'process') { process_tab } if @occurrence.server?
           div(id: 'device') { device_tab } if @occurrence.client? || @occurrence.geo? || @occurrence.mobile?
           div(id: 'browser') { browser_tab } if @occurrence.browser? || @occurrence.screen?
-          div(id: 'user_data') { user_data_tab } if @occurrence.additional?
+          div(id: 'user_data') { user_data_tab } if @occurrence.additional? || !orphan_data.empty?
         end
       end
 
@@ -347,6 +347,11 @@ module Views
           h4 "Unrecognized Fields"
           parameter_table @occurrence.extra_data
         end
+
+        unless orphan_data.empty?
+          h4 "Other Fields"
+          parameter_table orphan_data
+        end
       end
 
       def parameter_table(values)
@@ -395,6 +400,37 @@ module Views
               end
             end
           end
+        end
+      end
+
+      # @return [Hash] Any data that would have appeared in a different section
+      #   (e.g., as part of {#request?}) but didn't because one of the required
+      #   fields was not present.
+
+      def orphan_data
+        @orphans ||= begin
+          fields = Array.new
+          fields << :schema << :host << :port unless @occurrence.web?
+          fields << :params << :headers unless @occurrence.request?
+          fields << :controller << :action << :session << :flash unless @occurrence.rails?
+          fields << :hostname << :pid unless @occurrence.server?
+          fields << :build << :device_type << :architecture <<
+              :operating_system << :os_version << :os_build <<
+              :physical_memory << :power_state << :orientation << :version <<
+              :build unless @occurrence.client?
+          fields << :lat << :lon << :altitude << :location_precision <<
+              :heading << :speed unless @occurrence.geo?
+          fields << :network_operator << :network_type << :connectivity unless @occurrence.mobile?
+          fields << :browser_name << :browser_version << :browser_os <<
+              :browser_engine << :browser_engine_version unless @occurrence.browser?
+          fields << :window_width << :window_height << :screen_width <<
+              :screen_height << :color_depth unless @occurrence.screen?
+
+          orphans = @occurrence.send(:_metadata_hash).slice(*fields.map(&:to_s)).reject { |_, v| v.nil? }
+          # we need to valueify the top-level hashes since they will now appear
+          # underneath this new top-level hash (the "orphans")
+          orphans.each { |k, v| orphans[k] = Squash::Ruby.valueify(v) if orphans[k].kind_of?(Hash) }
+          orphans
         end
       end
     end

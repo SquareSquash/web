@@ -12,7 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# This observer on the {Occurrence} model sends an email when a Bug is critical.
+# This observer on the {Occurrence} model:
+#
+# * sends an email when a Bug is critical, and
+# * creates {DeviceBug DeviceBugs} as necessary.
 
 class OccurrenceObserver < ActiveRecord::Observer
   # @private
@@ -23,5 +26,12 @@ class OccurrenceObserver < ActiveRecord::Observer
 
     # notify pagerduty
     Multithread.spinoff("PagerDutyNotifier:#{occurrence.id}", 80) { PagerDutyNotifier.perform(occurrence.id) }
+  end
+
+  # @private
+  def after_create(occurrence)
+    if occurrence.device_id.present?
+      occurrence.bug.device_bugs.where(device_id: occurrence.device_id).find_or_create!
+    end
   end
 end

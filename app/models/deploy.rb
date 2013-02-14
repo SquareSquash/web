@@ -100,11 +100,19 @@ class Deploy < ActiveRecord::Base
   # @return [Git::Object::Commit] The Commit for this Deploy's `revision`.
   def commit() environment.project.repo.object revision end
 
+  # @return [true, false] `true` if this Deploy is a release of a distributed
+  #   Project; `false` if it is a deploy of a hosted Project.
+  def release?() build.present? end
+
   # @private
   def to_json(options={})
     options[:except] = Array.wrap(options[:except])
     options[:except] << :id
     options[:except] << :environment_id
     super options
+  end
+
+  def devices_affected
+    DeviceBug.joins(:bug).where(bugs: {deploy_id: id}).count(:device_id, distinct: true)
   end
 end

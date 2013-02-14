@@ -104,9 +104,15 @@ module Service
     def request(body)
       return nil if Squash::Configuration.pagerduty.disabled
 
-      uri = URI(Squash::Configuration.pagerduty.api_url)
-      Net::HTTP.start(uri.host, uri.port, use_ssl: Squash::Configuration.pagerduty.api_url.starts_with?('https://')) do |http|
-        request      = Net::HTTP::Post.new(uri.request_uri)
+      uri  = URI(Squash::Configuration.pagerduty.api_url)
+      http = if Squash::Configuration.pagerduty[:http_proxy]
+               Net::HTTP::Proxy(Squash::Configuration.pagerduty.http_proxy.host, Squash::Configuration.pagerduty.http_proxy.port)
+             else
+               Net::HTTP
+             end
+
+      http.start(uri.host, uri.port, use_ssl: Squash::Configuration.pagerduty.api_url.starts_with?('https://')) do |http|
+        request = Net::HTTP::Post.new(uri.request_uri)
         HEADERS.merge(authentication_headers).each do |name, value|
           request[name] = value
         end

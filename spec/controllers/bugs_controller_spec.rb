@@ -112,6 +112,23 @@ describe BugsController do
           JSON.parse(response.body).map { |r| r['number'] }.should include(undeployed.number)
         end
 
+        it "should treat crashed=nil as any crashed value" do
+          crashed = FactoryGirl.create(:bug, environment: @env, any_occurrence_crashed: true)
+          uncrashed = FactoryGirl.create(:bug, environment: @env, any_occurrence_crashed: false)
+
+          get :index, polymorphic_params(@env, true, format: 'json', filter: {any_occurrence_crashed: nil})
+          JSON.parse(response.body).map { |r| r['number'] }.should include(crashed.number)
+          JSON.parse(response.body).map { |r| r['number'] }.should include(uncrashed.number)
+
+          get :index, polymorphic_params(@env, true, format: 'json', filter: {any_occurrence_crashed: true})
+          JSON.parse(response.body).map { |r| r['number'] }.should include(crashed.number)
+          JSON.parse(response.body).map { |r| r['number'] }.should_not include(uncrashed.number)
+
+          get :index, polymorphic_params(@env, true, format: 'json', filter: {any_occurrence_crashed: false})
+          JSON.parse(response.body).map { |r| r['number'] }.should_not include(crashed.number)
+          JSON.parse(response.body).map { |r| r['number'] }.should include(uncrashed.number)
+        end
+
         it "should treat assigned_user_id=anybody as all exceptions" do
           assigned   = FactoryGirl.create(:bug, environment: @env, assigned_user: @user)
           unassigned = FactoryGirl.create(:bug, environment: @env, assigned_user: nil)

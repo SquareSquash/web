@@ -187,11 +187,15 @@ class ProjectsController < ApplicationController
       params[:project][:whitelist_paths] = wps.split(/[\r\n]+/).reject(&:blank?)
     end
 
-    @project.update_attributes params[:project].merge(validate_repo_connectivity: true), as: current_user.role(@project)
+    @project.assign_attributes params[:project].merge(validate_repo_connectivity: true), as: current_user.role(@project)
+    @project.uses_releases_override = true if @project.uses_releases_changed?
+    @project.save
+
     class << @project
       def filter_paths_string() filter_paths.join("\n") end
       def whitelist_paths_string() whitelist_paths.join("\n") end
     end
+
     respond_with @project
   end
 

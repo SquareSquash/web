@@ -34,17 +34,43 @@ module Views
 
       def breadcrumbs() [@project, @environment] end
 
+      def breadcrumbs_stats()
+        return super unless @project.uses_releases?
+        [
+            [@environment.bugs_count,
+             "unresolved, unassigned bug"],
+            [@environment.bugs.where(fixed: false, irrelevant: false, any_occurrence_crashed: true).count,
+             "bug with at least one occurrence that resulted in a crash",
+             "bugs with at least one occurrence that resulted in a crash"],
+            [Occurrence.joins(:bug).where(bugs: {fixed: false, irrelevant: false}, crashed: true).count,
+             "crash associated with an unresolved bug",
+             "crashes associated with an unresolved bug"],
+            [DeviceBug.joins(:bug).where(bugs: {fixed: false, irrelevant: false, environment_id: @environment.id}).count,
+             "device that crashed because of an unresolved bug",
+             "devices that crashed because of an unresolved bug"]
+        ]
+      end
+
       private
 
       def filter
         form(id: 'filter') do
           p do
             text "Show me "
+
             select_tag 'filter[fixed]', options_for_select([%w(unresolved false), %w(resolved true)]), class: 'input-small'
             text " "
             select_tag 'filter[irrelevant]', options_for_select([%w(critical false), %w(irrelevant true)]), class: 'input-small'
-            text " exceptions assigned to "
 
+            if @project.uses_releases?
+              text " exceptions that "
+              select_tag 'filter[any_occurrence_crashed]', options_for_select([['did or did not', nil], ['did', 'true'], ['did not', 'false']]), class: 'input-small'
+              text " result in a crash, "
+            else
+              text " exceptions"
+            end
+
+            text "assigned to "
             options = {'Sets' => [%w(nobody nobody), %w(somebody somebody), ['all bugs', 'anybody']]}
             options['Individuals'] = @filter_users.map { |fu| [fu.username, fu.id] } unless @filter_users.empty?
             select_tag 'filter[assigned_user_id]',

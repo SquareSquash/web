@@ -242,6 +242,7 @@
 # | `number`      | A consecutively incrementing value among other Occurrences of the same Bug. |
 # | `occurred_at` | The time at which this occurrence happened.                                 |
 # | `client`      | The client library that sent the occurrence (Rails, iOS, Android, etc.).    |
+# | `crashed`     | If true, the exception was not caught and resulted in a crash.              |
 #
 # Metadata
 # ========

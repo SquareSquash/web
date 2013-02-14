@@ -43,13 +43,15 @@ class root.Aggregation
             $.plot chart, values,
               series:
                 stack: true
-                lines: {show: true, fill: true, lineWidth: 0}
+                bars: {show: true, lineWidth: 0}
               xaxis:
                 mode: 'time'
+                timeformat: '%Y/%m/%d %H:%M'
                 tickLength: 5
               yaxis:
                 min: 0
                 max: 100
+                tickDecimals: 0
                 tickFormatter: (num) -> "#{num}%"
               grid:
                 borderWidth: 1

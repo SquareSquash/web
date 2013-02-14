@@ -424,7 +424,7 @@ In order to integrate Squash with PagerDuty, you must
 1. generate an API key that Squash can use for PagerDuty access (you must be a
    PagerDuty admin to do this),
 2. update the `config/environments/common/pagerduty.yml` file to enable
-   PagerDuty integration anmd provide the API key,
+   PagerDuty integration and provide the API key,
 3. configure Generic API services for each escalation policy you wish to use,
    and
 4. set the PagerDuty-related options in your Project's configuration page.

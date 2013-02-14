@@ -12,18 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-FactoryGirl.define do
-  factory :deploy do
-    association :environment
-    revision '2dc20c984283bede1f45863b8f3b4dd9b5b554cc'
-    deployed_at { Time.now }
-  end
+class DeviceBug < ActiveRecord::Base
+  self.primary_keys = [:bug_id, :device_id]
 
-  factory :release, class: 'Deploy' do
-    association :environment
-    revision '2dc20c984283bede1f45863b8f3b4dd9b5b554cc'
-    version '1.2.3'
-    sequence :build, &:to_s
-    deployed_at { Time.now }
-  end
+  belongs_to :bug, inverse_of: :device_bugs
+
+  validates :bug,
+            presence: true
+  validates :device_id,
+            presence: true,
+            length:   {maximum: 126}
 end

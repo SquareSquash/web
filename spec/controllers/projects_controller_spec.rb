@@ -171,6 +171,18 @@ describe ProjectsController do
       it "should not allow protected fields to be set" do
         pending "No protected fields"
       end
+
+      it "should set Project#uses_releases_override if uses_releases is changed" do
+        @project.update_attribute :uses_releases, true
+        put :update, id: @project.to_param, project: {uses_releases: false}, format: 'json'
+        @project.reload.uses_releases?.should be_false
+        @project.reload.uses_releases_override?.should be_true
+      end
+
+      it "should not set Project#uses_releases_override if uses_releases is not changed" do
+        put :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
+        @project.reload.uses_releases_override?.should be_false
+      end
     end
   end
 

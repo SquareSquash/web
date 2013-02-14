@@ -69,6 +69,8 @@
 //
 //= require aggregation
 //= require histogram
+//
+//= require navbar
 
 $(document).ready(function() {
   // run SyntaxHighlighter on PREs
@@ -77,11 +79,6 @@ $(document).ready(function() {
   // enable leanModal on all modal links
   $("a[rel*=modal]").leanModal({closeButton: '.close'});
   $("button[rel*=modal]").leanModal({closeButton: '.close'});
-
-  // new project form
-  new SmartForm($('.new_project'), function(project, status, xhr) {
-    window.location = project.url;
-  });
 });
 
 $.ajaxSetup({

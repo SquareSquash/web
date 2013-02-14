@@ -194,6 +194,50 @@ CREATE FUNCTION bugs_move_occurrences_count() RETURNS trigger
 
 
 --
+-- Name: bugs_new_crashed_occurrence(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION bugs_new_crashed_occurrence() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            UPDATE bugs
+              SET any_occurrence_crashed = EXISTS(
+                SELECT 1
+                  FROM occurrences o
+                  WHERE
+                    o.bug_id = NEW.bug_id AND
+                    o.crashed IS TRUE
+              )
+              WHERE id = NEW.bug_id;
+            RETURN NEW;
+          END;
+        $$;
+
+
+--
+-- Name: bugs_old_crashed_occurrence(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION bugs_old_crashed_occurrence() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+          BEGIN
+            UPDATE bugs
+              SET any_occurrence_crashed = EXISTS(
+                SELECT 1
+                  FROM occurrences o
+                  WHERE
+                    o.bug_id = OLD.bug_id AND
+                    o.crashed IS TRUE
+              )
+              WHERE id = OLD.bug_id;
+            RETURN OLD;
+          END;
+        $$;
+
+
+--
 -- Name: comments_calculate_number(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -376,6 +420,7 @@ CREATE TABLE bugs (
     resolution_revision character(40),
     revision character(40) NOT NULL,
     searchable_text tsvector,
+    any_occurrence_crashed boolean DEFAULT false NOT NULL,
     CONSTRAINT bugs_check CHECK ((((fix_deployed IS TRUE) AND (fixed IS TRUE)) OR (fix_deployed IS FALSE))),
     CONSTRAINT bugs_class_name_check CHECK ((char_length((class_name)::text) > 0)),
     CONSTRAINT bugs_comments_count_check CHECK ((comments_count >= 0)),
@@ -473,6 +518,16 @@ CREATE SEQUENCE deploys_id_seq
 --
 
 ALTER SEQUENCE deploys_id_seq OWNED BY deploys.id;
+
+
+--
+-- Name: device_bugs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE device_bugs (
+    bug_id integer NOT NULL,
+    device_id character varying(126) NOT NULL
+);
 
 
 --
@@ -646,6 +701,7 @@ CREATE TABLE occurrences (
     redirect_target_id integer,
     revision character(40) NOT NULL,
     symbolication_id uuid,
+    crashed boolean DEFAULT false NOT NULL,
     CONSTRAINT occurrences_number_check CHECK ((number > 0))
 );
 
@@ -956,6 +1012,14 @@ ALTER TABLE ONLY deploys
 
 
 --
+-- Name: device_bugs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY device_bugs
+    ADD CONSTRAINT device_bugs_pkey PRIMARY KEY (bug_id, device_id);
+
+
+--
 -- Name: emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1076,31 +1140,10 @@ ALTER TABLE ONLY watches
 
 
 --
--- Name: bugs_env_fo; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX bugs_env_fo ON bugs USING btree (environment_id, deploy_id, assigned_user_id, fixed, irrelevant, latest_occurrence, number);
-
-
---
--- Name: bugs_env_lo; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX bugs_env_lo ON bugs USING btree (environment_id, deploy_id, assigned_user_id, fixed, irrelevant, first_occurrence, number);
-
-
---
 -- Name: bugs_env_number; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX bugs_env_number ON bugs USING btree (environment_id, number);
-
-
---
--- Name: bugs_env_oc; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX bugs_env_oc ON bugs USING btree (environment_id, deploy_id, assigned_user_id, fixed, irrelevant, occurrences_count, number);
 
 
 --
@@ -1136,6 +1179,27 @@ CREATE INDEX bugs_find_for_occ2 ON bugs USING btree (environment_id, class_name,
 --
 
 CREATE INDEX bugs_fixed ON bugs USING btree (fixed);
+
+
+--
+-- Name: bugs_list_fo; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX bugs_list_fo ON bugs USING btree (environment_id, deploy_id, assigned_user_id, fixed, irrelevant, any_occurrence_crashed, first_occurrence, number);
+
+
+--
+-- Name: bugs_list_lo; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX bugs_list_lo ON bugs USING btree (environment_id, deploy_id, assigned_user_id, fixed, irrelevant, any_occurrence_crashed, latest_occurrence, number);
+
+
+--
+-- Name: bugs_list_oc; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX bugs_list_oc ON bugs USING btree (environment_id, deploy_id, assigned_user_id, fixed, irrelevant, any_occurrence_crashed, occurrences_count, number);
 
 
 --
@@ -1433,6 +1497,20 @@ CREATE TRIGGER environments_notify AFTER UPDATE ON environments FOR EACH ROW WHE
 
 
 --
+-- Name: occurrences_crashed_bug_deleted; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER occurrences_crashed_bug_deleted AFTER DELETE ON occurrences FOR EACH ROW EXECUTE PROCEDURE bugs_old_crashed_occurrence();
+
+
+--
+-- Name: occurrences_crashed_bug_updated; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER occurrences_crashed_bug_updated AFTER INSERT OR UPDATE ON occurrences FOR EACH ROW EXECUTE PROCEDURE bugs_new_crashed_occurrence();
+
+
+--
 -- Name: occurrences_set_number; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1493,6 +1571,14 @@ ALTER TABLE ONLY comments
 
 ALTER TABLE ONLY deploys
     ADD CONSTRAINT deploys_environment_id_fkey FOREIGN KEY (environment_id) REFERENCES environments(id) ON DELETE CASCADE;
+
+
+--
+-- Name: device_bugs_bug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY device_bugs
+    ADD CONSTRAINT device_bugs_bug_id_fkey FOREIGN KEY (bug_id) REFERENCES bugs(id) ON DELETE CASCADE;
 
 
 --
@@ -1654,3 +1740,7 @@ ALTER TABLE ONLY watches
 INSERT INTO schema_migrations (version) VALUES ('1');
 
 INSERT INTO schema_migrations (version) VALUES ('20130125021927');
+
+INSERT INTO schema_migrations (version) VALUES ('20130131002457');
+
+INSERT INTO schema_migrations (version) VALUES ('20130131002503');

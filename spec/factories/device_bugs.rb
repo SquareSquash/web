@@ -13,17 +13,8 @@
 #    limitations under the License.
 
 FactoryGirl.define do
-  factory :deploy do
-    association :environment
-    revision '2dc20c984283bede1f45863b8f3b4dd9b5b554cc'
-    deployed_at { Time.now }
-  end
-
-  factory :release, class: 'Deploy' do
-    association :environment
-    revision '2dc20c984283bede1f45863b8f3b4dd9b5b554cc'
-    version '1.2.3'
-    sequence :build, &:to_s
-    deployed_at { Time.now }
+  factory :device_bug do
+    association :bug
+    sequence(:device_id) { |i| "device-#{i}" }
   end
 end

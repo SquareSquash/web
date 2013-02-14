@@ -202,7 +202,12 @@ class Blamer
   end
 
   def bug_attributes
-    message = filter_message(occurrence.bug.class_name, occurrence.message).truncate(1000)
+    message = if project.disable_message_filtering?
+                occurrence.message
+              else
+                filter_message(occurrence.bug.class_name, occurrence.message)
+              end.truncate(1000)
+
     {
         message_template: message,
         revision:         occurrence.revision,

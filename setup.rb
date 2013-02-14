@@ -377,19 +377,19 @@ if step < 3
     }
     f.puts({
                'development' => common.merge(
-                   'hostname' => dev_host,
+                   'host' => dev_host,
                    'username' => dev_user,
                    'password' => dev_pw,
                    'database' => dev_db
                ),
                'test'        => common.merge(
-                   'hostname' => test_host,
+                   'host' => test_host,
                    'username' => test_user,
                    'password' => test_pw,
                    'database' => test_db
                ),
                'production'  => common.merge(
-                   'hostname' => prod_host,
+                   'host' => prod_host,
                    'username' => prod_user,
                    'password' => prod_pw,
                    'database' => prod_db,
@@ -404,12 +404,12 @@ end
 if step < 4
   db_config = YAML.load_file('config/database.yml')
 
-  dev_host  = db_config['development']['hostname']
+  dev_host  = db_config['development']['host']
   dev_user  = db_config['development']['username']
   dev_db    = db_config['development']['database']
   dev_local = (dev_host.nil? || dev_host == 'localhost' || dev_host == '0.0.0.0' || dev_host == '127.0.0.1')
 
-  test_host  = db_config['test']['hostname']
+  test_host  = db_config['test']['host']
   test_user  = db_config['test']['username']
   test_db    = db_config['test']['database']
   test_local = (test_host.nil? || test_host == 'localhost' || test_host == '0.0.0.0' || test_host == '127.0.0.1')

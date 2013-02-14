@@ -350,6 +350,21 @@ describe Blamer do
       bug                   = Blamer.new(@occurrence).find_or_create_bug!
       bug.message_template.should eql("Cannot drop index '[STRING]': needed in a foreign key")
     end
+
+    it "should not filter the message if filtering is disabled" do
+      @occurrence = FactoryGirl.build(:rails_occurrence,
+                                      bug:        @shell_bug,
+                                      message:    "Undefined 123 for #<Object:0x007fedfa0aa920>",
+                                      backtraces: [{"name"      => "Thread 0",
+                                                    "faulted"   => true,
+                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                     "line"   => 3,
+                                                                     "symbol" => "foo"}]}],
+                                      revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
+      @shell_bug.environment.project.update_attribute :disable_message_filtering, true
+      bug = Blamer.new(@occurrence).find_or_create_bug!
+      bug.message_template.should eql('Undefined 123 for #<Object:0x007fedfa0aa920>')
+    end
   end
 
   context "[reopening]" do

@@ -115,6 +115,7 @@ en:
         cookies: cookies hash
         connectivity: network connectivity
         controller: Web controller
+        crashed: crashed
         device_id: client device ID
         device_type: client device type
         env_vars: environment variables
@@ -162,10 +163,12 @@ en:
         window_height: window height
       project:
         all_mailing_list: all exceptions mailing list
+        always_notify_pagerduty: always notify pagerduty
         api_key: API key
         commit_url_format: commit URL format
         critical_mailing_list: critical exceptions mailing list
         critical_threshold: critical threshold
+        disable_message_filtering: disable exception message filtering
         filter_paths: filtered paths
         filter_paths_string: filtered paths
         locale: email locale
@@ -176,6 +179,7 @@ en:
         sender: sender
         sends_emails_outside_team: notify unknown email addresses
         trusted_email_domain: trusted domain for unknown email addresses
+        uses_releases: is a released and distributed application
         whitelist_paths_string: whitelisted paths
         whitelist_paths_string: whitelisted paths
       user:

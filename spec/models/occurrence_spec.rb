@@ -114,6 +114,16 @@ describe Occurrence do
         FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
       end
 
+      it "should send an incident if always_notify_pagerduty is set" do
+        @project.update_attribute :always_notify_pagerduty, true
+        Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+            /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+            @bug.pagerduty_incident_key,
+            an_instance_of(Hash)
+        )
+        FactoryGirl.create :rails_occurrence, bug: @bug
+      end
+
       it "should send an incident to PagerDuty once the critical threshold is breached" do
         FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
         Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
@@ -159,6 +169,37 @@ describe Occurrence do
         FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
       end
     end unless Squash::Configuration.pagerduty.disabled?
+
+    context "[setting any_occurrence_crashed]" do
+      it "should set any_occurrence_crashed to true if crashed is true" do
+        bug = FactoryGirl.create(:bug)
+        expect {
+          FactoryGirl.create(:rails_occurrence, bug: bug, crashed: true)
+        }.to change{ bug.reload.any_occurrence_crashed }.from(false).to(true)
+      end
+
+      it "should not change any_occurrence_crashed if crashed is false" do
+        bug = FactoryGirl.create(:bug)
+        expect {
+          FactoryGirl.create(:rails_occurrence, bug: bug, crashed: false)
+        }.to_not change{ bug.reload.any_occurrence_crashed }
+      end
+    end
+
+    context "[device bugs]" do
+      it "should create a device bug if the occurrence has a device" do
+        bug = FactoryGirl.create(:bug)
+
+        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
+        occurrence.bug.device_bugs.where(device_id: 'hello').should exist
+        expect {
+          FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
+        }.to_not change{ bug.device_bugs.where(device_id: 'hello').count }
+
+        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'goodbye')
+        occurrence.bug.device_bugs.where(device_id: 'goodbye').should exist
+      end
+    end
   end
 
   describe "#faulted_backtrace" do
