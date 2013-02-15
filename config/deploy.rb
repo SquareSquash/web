@@ -12,10 +12,13 @@ set :deploy_via, :remote_cache
 set :use_sudo, false
 set :user, 'deploy'
 set :web_script, "/etc/init.d/unicorn-#{application}.sh"
+set :resque_script, ". ~/.profile ; /etc/init.d/#{application}_resque"
 ssh_options[:forward_agent] = true
 
 after "deploy", "deploy:cleanup"
 after "deploy:restart", "deploy:resque:restart"
+after "deploy:start", "deploy:resque:start"
+after "deploy:stop", "deploy:resque:stop"
 
 namespace :deploy do
   task :restart do
@@ -32,17 +35,16 @@ namespace :deploy do
 
   namespace :resque do
     task :restart do
-      run ". ~/.profile ; /etc/init.d/#{application}_resque restart"
+      run "#{resque_script} restart"
+    end
+
+    task :start do
+      run "#{resque_script} start"
+    end
+
+    task :stop do
+      run "#{resque_script} stop"
     end
   end
 end
 
-
-# If you are using Passenger mod_rails uncomment this:
-# namespace :deploy do
-#   task :start do ; end
-#   task :stop do ; end
-#   task :restart, :roles => :app, :except => { :no_release => true } do
-#     run "#{try_sudo} touch #{File.join(current_path,'tmp','restart.txt')}"
-#   end
-# end
