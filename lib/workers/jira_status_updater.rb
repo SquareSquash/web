@@ -20,6 +20,7 @@
 
 class JiraStatusWorker
 
+  @queue = :squash
   # Creates a new instance and updates bug statuses.
 
   def self.perform

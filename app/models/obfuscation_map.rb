@@ -77,6 +77,7 @@ class ObfuscationMap < ActiveRecord::Base
 
   def deobfuscate_matching_traces
     worker = ObfuscationMapWorker.new(self)
-    Multithread.spinoff("ObfuscationMapWorker:#{id}", 60) { worker.perform }
+    # Multithread.spinoff("ObfuscationMapWorker:#{id}", 60) { worker.perform }
+    Resque.enqueue(ObfuscationMapWorker, id)
   end
 end

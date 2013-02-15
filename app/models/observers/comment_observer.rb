@@ -24,7 +24,8 @@ class CommentObserver < ActiveRecord::Observer
 
   # @private
   def after_commit_on_create(comment)
-    Multithread.spinoff("CommentNotificationMailer:#{comment.id}", 80) { CommentNotificationMailer.perform(comment.id) }
+    # Multithread.spinoff("CommentNotificationMailer:#{comment.id}", 80) { CommentNotificationMailer.perform(comment.id) }
+    Resque.enqueue(CommentNotificationMailer, comment.id)
     # force reload the comment in order to load triggered changes
   end
 

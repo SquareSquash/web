@@ -34,6 +34,7 @@ class OccurrencesWorker
   # `build` or `revision` keys.)
   REQUIRED_KEYS = %w( api_key environment client backtraces class_name message occurred_at )
 
+  @queue = :squash
   # @private
   attr_reader :project, :environment, :deploy
 

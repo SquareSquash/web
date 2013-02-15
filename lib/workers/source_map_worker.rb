@@ -17,6 +17,7 @@
 
 class SourceMapWorker
 
+  @queue = :squash
   # Creates a new worker instance and performs a sourcemapping.
   #
   # @param [Integer] map_id The ID of an {SourceMap}.

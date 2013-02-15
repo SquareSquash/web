@@ -90,7 +90,8 @@ class Deploy < ActiveRecord::Base
 
   after_commit(on: :create) do |deploy|
     worker = DeployFixMarker.new(deploy)
-    Multithread.spinoff("DeployFixMarker:#{deploy.id}", 70, deploy: deploy, changes: deploy.changes) { worker.perform }
+    # Multithread.spinoff("DeployFixMarker:#{deploy.id}", 70, deploy: deploy, changes: deploy.changes) { worker.perform }
+    Resque.enqueue(DeployFixMarker, deploy.id)
   end
   set_nil_if_blank :hostname, :build
 
