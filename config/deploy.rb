@@ -1,29 +1,39 @@
 require 'bundler/capistrano'
+require 'capistrano/ext/multistage'
 
+set :stages, %w(staging production)
+set :default_stage, 'staging'
 set :application, 'squash'
 set :repository,  'git@github.com:optoro/squash-web.git'
 set :scm, :git
 set :deploy_to, "/var/www/railsapps/#{application}"
-server 'squash.optiturn.com', :app, :web, :db, :primary => true
 set :branch, 'master'
 set :deploy_via, :remote_cache
 set :use_sudo, false
 set :user, 'deploy'
+set :web_script, "/etc/init.d/unicorn-#{application}.sh"
 ssh_options[:forward_agent] = true
 
-after "deploy:restart", "deploy:cleanup"
+after "deploy", "deploy:cleanup"
+after "deploy:restart", "deploy:resque:restart"
 
 namespace :deploy do
   task :restart do
-    run "sudo /etc/init.d/unicorn-#{application}.sh upgrade"
+    run "sudo #{web_script} upgrade"
   end
 
   task :stop do
-    run "sudo /etc/init.d/unicorn-#{application}.sh stop"
+    run "sudo #{web_script} stop"
   end
 
   task :start do
-    run "sudo /etc/init.d/unicorn-#{application}.sh start"
+    run "sudo #{web_script} start"
+  end
+
+  namespace :resque do
+    task :restart do
+      run ". ~/.profile ; /etc/init.d/#{application}_resque restart"
+    end
   end
 end
 
