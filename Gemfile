@@ -78,3 +78,4 @@ end
 
 gem 'sql_origin', groups: [:development, :test]
 gem 'unicorn'
+gem 'resque'
