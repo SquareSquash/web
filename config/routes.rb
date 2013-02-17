@@ -56,7 +56,9 @@ Squash::Application.routes.draw do
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'
   get 'logout' => 'sessions#destroy'
-  post 'signup' => 'users#create' if Squash::Configuration.authentication.strategy == 'password'
+  if Squash::Configuration.authentication.registration_enabled
+    post 'signup' => 'users#create' if Squash::Configuration.authentication.strategy == 'password'
+  end
 
   post 'api/1.0/notify' => 'api/v1#notify'
   post 'api/1.0/deploy' => 'api/v1#deploy'

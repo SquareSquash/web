@@ -26,12 +26,17 @@ module Views
       def page_title() "Log In" end
       def modal_view?() true end
 
+      def display_registration_form?
+        return Squash::Configuration.authentication.registration_enabled &&
+          Squash::Configuration.authentication.strategy == 'password'
+      end
+
       def body_content
         modal_section do
           title_section
           div(class: 'body-portion') do
             login_form
-            if Squash::Configuration.authentication.strategy == 'password'
+            if display_registration_form?
               signup_form
             end
           end
