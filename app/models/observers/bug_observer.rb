@@ -109,8 +109,11 @@ class BugObserver < ActiveRecord::Observer
   def send_update_emails(bug)
     if bug.previous_changes['fix_deployed'] == [false, true]
       worker = DeployNotificationMailer.new(bug)
-      # Multithread.spinoff(nil, 80) { worker.perform }
-      Resque.enqueue(DeployNotificationMailer, bug.id)
+      if Squash::Application.config.resque
+        Resque.enqueue(DeployNotificationMailer, bug.id)
+      else
+        Multithread.spinoff(nil, 80) { worker.perform }
+      end
     end
   end
 
@@ -128,22 +131,31 @@ class BugObserver < ActiveRecord::Observer
     ir = bug.previous_changes['irrelevant'] || []
     if (!au.first && au.last) || (!ir.first && ir.last)
       worker = PagerDutyAcknowledger.new(bug)
-      # Multithread.spinoff("PagerDutyAcknowledger:#{bug.id}", 20) { worker.perform }
-      Resque.enqueue(PagerDutyAcknowledger, bug.id)
+      if Squash::Application.config.resque
+        Resque.enqueue(PagerDutyAcknowledger, bug.id)
+      else
+        Multithread.spinoff("PagerDutyAcknowledger:#{bug.id}", 20) { worker.perform }
+      end
     end
 
     res = bug.previous_changes['fixed'] || []
     if !res.first && res.last
       worker = PagerDutyAcknowledger.new(bug)
-      # Multithread.spinoff("PagerDutyAcknowledger:#{bug.id}", 20) { worker.perform }
-      Resque.enqueue(PagerDutyAcknowledger, bug.id)
+      if Squash::Application.config.resque
+        Resque.enqueue(PagerDutyAcknowledger, bug.id)
+      else
+        Multithread.spinoff("PagerDutyAcknowledger:#{bug.id}", 20) { worker.perform }
+      end
     end
 
     res = bug.previous_changes['fix_deployed'] || []
     if !res.first && res.last
       worker = PagerDutyResolver.new(bug)
-      # Multithread.spinoff("PagerDutyResolver:#{bug.id}", 20) { worker.perform }
-      Resque.enqueue(PagerDutyResolver, bug.id)
+      if Squash::Application.config.resque
+        Resque.enqueue(PagerDutyResolver, bug.id)
+      else
+        Multithread.spinoff("PagerDutyResolver:#{bug.id}", 20) { worker.perform }
+      end
     end
   end
 end

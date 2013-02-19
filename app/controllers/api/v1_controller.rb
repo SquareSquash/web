@@ -68,8 +68,11 @@ class Api::V1Controller < ActionController::Base
 
   def notify
     worker = OccurrencesWorker.new(request.request_parameters)
-    # Multithread.spinoff(nil, 40, squash_rails_data) { worker.perform }
-    Resque.enqueue(OccurrencesWorker, request.request_parameters)
+    if Squash::Application.config.resque
+      Resque.enqueue(OccurrencesWorker, request.request_parameters)
+    else
+      Multithread.spinoff(nil, 40, squash_rails_data) { worker.perform }
+    end
     head :ok
   end
 

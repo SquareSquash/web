@@ -103,7 +103,12 @@ class SourceMap < ActiveRecord::Base
 
   def sourcemap_matching_traces
     worker = SourceMapWorker.new(self)
-    # Multithread.spinoff("SourceMapWorker:#{id}", 60) { worker.perform }
-    Resque.enqueue(SourceMapWorker, id)
+
+    if Squash::Application.config.resque
+      Resque.enqueue(SourceMapWorker, id)
+    else
+      Multithread.spinoff("SourceMapWorker:#{id}", 60) { worker.perform }
+    end
+
   end
 end

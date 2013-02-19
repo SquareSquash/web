@@ -24,8 +24,11 @@ class CommentObserver < ActiveRecord::Observer
 
   # @private
   def after_commit_on_create(comment)
-    # Multithread.spinoff("CommentNotificationMailer:#{comment.id}", 80) { CommentNotificationMailer.perform(comment.id) }
-    Resque.enqueue(CommentNotificationMailer, comment.id)
+    if Squash::Application.config.resque
+      Resque.enqueue(CommentNotificationMailer, comment.id)
+    else
+      Multithread.spinoff("CommentNotificationMailer:#{comment.id}", 80) { CommentNotificationMailer.perform(comment.id) }
+    end
     # force reload the comment in order to load triggered changes
   end
 
