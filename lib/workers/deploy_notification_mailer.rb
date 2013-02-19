@@ -16,7 +16,8 @@
 # of a new Deploy.
 
 class DeployNotificationMailer
-
+  
+  @queue = :squash
   # Creates a new instance and sends notification emails.
   #
   # @param [Fixnum] bug_id The ID of a Bug that a Deploy just fixed.

@@ -77,4 +77,9 @@ group :test do
 end
 
 gem 'sql_origin', groups: [:development, :test]
-gem 'unicorn'
+gem 'unicorn', groups: [:production]
+
+group :resque do
+  gem 'resque'
+  gem 'resque-pool'
+end

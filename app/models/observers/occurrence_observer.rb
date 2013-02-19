@@ -20,12 +20,15 @@
 class OccurrenceObserver < ActiveRecord::Observer
   # @private
   def after_commit_on_create(occurrence)
-    # send emails
-    Multithread.spinoff("OccurrenceNotificationMailer:#{occurrence.id}", 80) { OccurrenceNotificationMailer.perform(occurrence.id) }
+    # send emails and notify pagerduty
+    if Squash::Application.config.resque
+      Resque.enqueue(OccurrenceNotificationMailer, occurrence.id)
+      Resque.enqueue(PagerDutyNotifier, occurrence.id)
+    else
+      Multithread.spinoff("OccurrenceNotificationMailer:#{occurrence.id}", 80) { OccurrenceNotificationMailer.perform(occurrence.id) }
+      Multithread.spinoff("PagerDutyNotifier:#{occurrence.id}", 80) { PagerDutyNotifier.perform(occurrence.id) }
+    end
     # force-reload the occurrence to load triggered changes
-
-    # notify pagerduty
-    Multithread.spinoff("PagerDutyNotifier:#{occurrence.id}", 80) { PagerDutyNotifier.perform(occurrence.id) }
   end
 
   # @private

@@ -24,6 +24,7 @@
 
 class OccurrenceNotificationMailer
 
+  @queue = :squash
   # Creates a new instance and sends notification emails.
   #
   # @param [Fixnum] occurrence_id The ID of a new Occurrence.

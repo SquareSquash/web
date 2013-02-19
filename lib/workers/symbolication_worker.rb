@@ -17,6 +17,7 @@
 
 class SymbolicationWorker
 
+  @queue = :squash
   # Creates a new worker instance and performs a symbolication.
   #
   # @param [Integer] uuid The UUID of a {Symbolication}.

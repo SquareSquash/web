@@ -229,7 +229,13 @@ class Bug < ActiveRecord::Base
     @occurrence_commit ||= begin
       oc = environment.project.repo.object revision
       worker = ProjectRepoFetcher.new(environment.project)
-      Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless oc
+
+      if Squash::Application.config.resque
+        Resque.enqueue(ProjectRepoFetcher, environment.project_id) unless oc
+      else
+        Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless oc
+      end
+
       oc
     end
   end
@@ -241,7 +247,13 @@ class Bug < ActiveRecord::Base
     @blamed_commit ||= begin
       bc = environment.project.repo.object blamed_revision
       worker = ProjectRepoFetcher.new(environment.project)
-      Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless bc
+
+      if Squash::Application.config.resque
+        Resque.enqueue(ProjectRepoFetcher, environment.project_id) unless bc
+      else
+        Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless bc
+      end
+
       bc
     end
   end
@@ -254,7 +266,13 @@ class Bug < ActiveRecord::Base
     @resolution_commit ||= begin
       rc = environment.project.repo.object resolution_revision
       worker = ProjectRepoFetcher.new(environment.project)
-      Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless rc
+
+      if Squash::Application.config.resque
+        Resque.enqueue(ProjectRepoFetcher, environment.project_id) unless rc
+      else
+        Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless rc
+      end
+
       rc
     end
   end

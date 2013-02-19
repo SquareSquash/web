@@ -145,6 +145,11 @@ class Symbolication < ActiveRecord::Base
 
   def symbolicate_matching_traces
     worker = SymbolicationWorker.new(self)
-    Multithread.spinoff("SymbolicationWorker:#{id}", 60) { worker.perform }
+
+    if Squash::Application.config.resque
+      Resque.enqueue(SymbolicationWorker, id)
+    else
+      Multithread.spinoff("SymbolicationWorker:#{id}", 60) { worker.perform }
+    end
   end
 end
