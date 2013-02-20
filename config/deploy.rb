@@ -33,6 +33,10 @@ namespace :deploy do
     run "sudo #{web_script} start"
   end
 
+  task :link_credentials do
+    run "ln -s #{deploy_to}/shared/system/amazon_ses.yml #{release_path}/config/amazon_ses.yml"
+  end
+
   namespace :resque do
     task :restart do
       run "#{resque_script} restart"

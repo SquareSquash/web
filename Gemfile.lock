@@ -77,6 +77,11 @@ GEM
     activerecord-postgresql-cursors (0.0.2)
     addressable (2.3.2)
     arel (3.0.2)
+    aws-ses (0.4.4)
+      builder
+      mail (> 2.2.5)
+      mime-types
+      xml-simple
     boolean (1.0.1)
     builder (3.0.4)
     coffee-rails (3.2.2)
@@ -261,6 +266,7 @@ GEM
       timeliness (~> 0.3.6)
     vegas (0.1.11)
       rack (>= 1.0.0)
+    xml-simple (1.1.2)
     yard (0.8.4.1)
 
 PLATFORMS
@@ -271,6 +277,7 @@ DEPENDENCIES
   activerecord-jdbc-adapter (= 1.2.5)
   activerecord-jdbcpostgresql-adapter
   activerecord-postgresql-cursors
+  aws-ses
   coffee-rails
   composite_primary_keys!
   configoro
