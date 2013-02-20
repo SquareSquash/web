@@ -77,7 +77,11 @@ group :test do
 end
 
 gem 'sql_origin', groups: [:development, :test]
-gem 'unicorn', groups: [:production]
+
+group :production do 
+  gem 'unicorn'
+  gem 'aws-ses', :require => 'aws/ses'
+end
 
 group :resque do
   gem 'resque'
