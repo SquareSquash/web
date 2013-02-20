@@ -91,6 +91,16 @@ module BacktraceRendering
         render_minified_backtrace_element element, identifier, index, lindex
       when 'obfuscated'
         li format_backtrace_element(element['file'], element['line'], element['symbol']), class: 'lib long-words'
+      when 'java_native'
+        li "#{element['class']}.#{element['symbol']} (native method)", class: 'lib long-words'
+      when 'jruby_noline'
+        li format_backtrace_element(element['file'], '(no line number)', element['symbol']), class: 'lib long-words'
+      when 'jruby_block'
+        li "(block in #{element['class']}##{element['symbol']})", class: 'lib long-words'
+      when 'asm_invoker'
+        li "(ASM invoker class in #{element['file']})", class: 'lib long-words'
+      else
+        li "(unknown backtrace format #{element['type']})", class: 'lib long-words'
     end
   end
 
