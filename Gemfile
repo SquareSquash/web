@@ -67,6 +67,7 @@ group :development do
   gem 'yard', require: nil
   gem 'redcarpet', require: nil, platform: :mri
   gem 'fdoc'
+  gem 'warbler', git: 'git://github.com/jruby/warbler.git', platform: :jruby
 end
 
 
