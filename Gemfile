@@ -67,7 +67,6 @@ group :development do
   gem 'yard', require: nil
   gem 'redcarpet', require: nil, platform: :mri
   gem 'fdoc'
-  gem 'warbler', git: 'git://github.com/jruby/warbler.git', platform: :jruby
 end
 
 
@@ -79,3 +78,9 @@ group :test do
 end
 
 gem 'sql_origin', groups: [:development, :test]
+
+# Warbler seems to bundle its own gemspec even when skipping
+# :development. The gemspec requires warbler/version which doesn't
+# exist so the whole thing blows up. Putting this in :default group
+# until I can figure out how to fix it.
+gem 'warbler', git: 'git://github.com/jruby/warbler.git', platform: :jruby, require: nil
