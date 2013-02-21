@@ -87,7 +87,7 @@ module Squash
     end
 
     # Set to true to use Resque for workers instead of the default Multithread class.
-    config.resque = true
+    config.resque = false
   end
 end
 

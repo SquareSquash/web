@@ -1,4 +1,4 @@
---- 
-default_url_options: 
-  host: squash.optiturn.com
-  protocol: http
+---
+default_url_options:
+  host: YOUR_HOSTNAME
+  protocol: https

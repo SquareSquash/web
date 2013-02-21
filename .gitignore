@@ -3,5 +3,3 @@
 node_modules
 doc/fdoc-html
 tmp/cache/*
-*.swp
-config/amazon_ses.yml

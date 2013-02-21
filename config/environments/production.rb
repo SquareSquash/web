@@ -42,9 +42,9 @@ Squash::Application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = false
-  require "rack/cache"
-  config.middleware.insert_after ::Rack::Cache, Ping
+  config.force_ssl = true
+  require "rack/ssl"
+  config.middleware.insert_before ::Rack::SSL, Ping
 
   # See everything in the log (default is :info)
   # config.log_level = :debug
@@ -66,10 +66,9 @@ Squash::Application.configure do
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
-  config.action_mailer.delivery_method = :ses
 
   # Enable threaded mode
-  # config.threadsafe!
+  config.threadsafe!
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation can not be found)

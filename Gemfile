@@ -1,5 +1,5 @@
 source :rubygems
-ruby "1.9.2"
+ruby "1.9.3"
 
 # FRAMEWORK
 gem 'rails', git: 'git://github.com/rails/rails.git', branch: '3-2-stable'
@@ -30,7 +30,7 @@ gem 'jquery-rails'
 gem 'kramdown'
 
 # UTILITIES
-gem 'json', '>= 1.7.7'
+gem 'json'
 gem 'git', git: 'git://github.com/RISCfuture/ruby-git.git'
 gem 'user-agent'
 
@@ -77,11 +77,6 @@ group :test do
 end
 
 gem 'sql_origin', groups: [:development, :test]
-
-group :production do 
-  gem 'unicorn'
-  gem 'aws-ses', :require => 'aws/ses'
-end
 
 group :resque do
   gem 'resque'
