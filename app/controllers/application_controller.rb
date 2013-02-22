@@ -136,7 +136,7 @@ class ApplicationController < ActionController::Base
 
   rescue_from(ActiveRecord::RecordNotFound) do
     respond_to do |format|
-      format.html { render file: Rails.root.join('public/404.html'), status: :not_found }
+      format.html { render file: File.join(Rails.public_path, '404.html'), status: :not_found }
       format.json { head :not_found }
       format.atom { head :not_found }
     end
