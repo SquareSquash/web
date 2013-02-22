@@ -74,10 +74,6 @@ describe OccurrencesWorker do
       OccurrencesWorker.new(@params).perform
       @project.environments.pluck(:name).should eql(%w( production ))
     end
-
-    it "should raise an error if the build number is invalid" do
-      -> { OccurrencesWorker.new @params.merge('build' => 'not-found') }.should raise_error(API::InvalidAttributesError)
-    end
   end
 
   describe "#perform" do
@@ -85,6 +81,28 @@ describe OccurrencesWorker do
       Project.stub!(:find_by_api_key!).and_return(@project)
       @project.repo.should_receive(:fetch).once
       -> { OccurrencesWorker.new(@params.merge('revision' => '10b04c1ed63bec207db6ebdf14d31d2a86006cb4')).perform }.should raise_error(/Unknown revision/)
+    end
+
+    context "[finding Deploys and revisions]" do
+      it "should associate a Deploy if given a build" do
+        env    = FactoryGirl.create(:environment, name: 'production', project: @project)
+        deploy = FactoryGirl.create(:deploy, environment: env, build: '12345')
+        occ    = OccurrencesWorker.new(@params.merge('build' => '12345')).perform
+        occ.bug.deploy.should eql(deploy)
+      end
+
+      it "should create a new Deploy if one doesn't exist and a revision is given" do
+        Deploy.delete_all
+        occ = OccurrencesWorker.new(@params.merge('build' => 'new')).perform
+        occ.bug.deploy.revision.should eql(@commit.sha)
+        occ.bug.deploy.deployed_at.should be_within(5).of(Time.now)
+        occ.bug.deploy.build.should eql('new')
+      end
+
+      it "should raise an error if the Deploy doesn't exist and no revision is given" do
+        -> { OccurrencesWorker.new(@params.merge('build' => 'not-found', 'revision' => nil)).perform }.
+            should raise_error(API::InvalidAttributesError)
+      end
     end
 
     context "[attributes]" do
@@ -114,25 +132,25 @@ describe OccurrencesWorker do
       context "[PII filtering]" do
         it "should filter emails from the occurrence message" do
           @params['message'] = "Duplicate entry 'foo.2001@example.com' for key 'index_users_on_email'"
-          occ = OccurrencesWorker.new(@params).perform
+          occ                = OccurrencesWorker.new(@params).perform
           occ.message.should eql("Duplicate entry '[EMAIL?]' for key 'index_users_on_email'")
         end
 
         it "should filter phone numbers from the occurrence message" do
           @params['message'] = "My phone number is (206) 356-2754."
-          occ = OccurrencesWorker.new(@params).perform
+          occ                = OccurrencesWorker.new(@params).perform
           occ.message.should eql("My phone number is (206) [PHONE?].")
         end
 
         it "should filter credit card numbers from the occurrence message" do
           @params['message'] = "I bought this using my 4426-2480-0548-1000 card."
-          occ = OccurrencesWorker.new(@params).perform
+          occ                = OccurrencesWorker.new(@params).perform
           occ.message.should eql("I bought this using my [CC/BANK?] card.")
         end
 
         it "should filter bank account numbers from the occurrence message" do
           @params['message'] = "Please remit to 80054810."
-          occ = OccurrencesWorker.new(@params).perform
+          occ                = OccurrencesWorker.new(@params).perform
           occ.message.should eql("Please remit to [CC/BANK?].")
         end
 
@@ -140,7 +158,7 @@ describe OccurrencesWorker do
           @project.update_attribute :disable_message_filtering, true
 
           @params['message'] = "Please remit to 80054810."
-          occ = OccurrencesWorker.new(@params).perform
+          occ                = OccurrencesWorker.new(@params).perform
           occ.message.should eql("Please remit to 80054810.")
 
           @project.update_attribute :disable_message_filtering, false

@@ -52,7 +52,7 @@ class OccurrencesWorker
   def initialize(attrs)
     @attrs = attrs.deep_clone
 
-    raise API::InvalidAttributesError, "Missing required keys: #{(REQUIRED_KEYS - @attrs.select { |k,v| v.present? }.keys).to_sentence}" unless REQUIRED_KEYS.all? { |key| @attrs[key].present? }
+    raise API::InvalidAttributesError, "Missing required keys: #{(REQUIRED_KEYS - @attrs.select { |k, v| v.present? }.keys).to_sentence}" unless REQUIRED_KEYS.all? { |key| @attrs[key].present? }
     raise API::InvalidAttributesError, "revision or build must be specified" unless @attrs.include?('revision') || @attrs.include?('build')
 
     begin
@@ -61,15 +61,8 @@ class OccurrencesWorker
       raise API::UnknownAPIKeyError, "Unknown API key"
     end
 
-    env_name = @attrs.delete('environment')
+    env_name     = @attrs.delete('environment')
     @environment = project.environments.with_name(env_name).find_or_create!({name: env_name}, as: :worker)
-
-    begin
-      @deploy = environment.deploys.find_by_build!(@attrs['build']) if @attrs['build'].present?
-    rescue ActiveRecord::RecordNotFound
-      raise API::InvalidAttributesError, "Unknown build number"
-    end
-
   rescue ActiveRecord::RecordInvalid => err
     raise API::InvalidAttributesError, err.to_s
   end
@@ -78,53 +71,28 @@ class OccurrencesWorker
   # {Bug}.
 
   def perform
-    revision = @attrs['revision']
-    revision ||= deploy.revision
-    commit   = project.repo.object(revision)
-    if commit.nil?
-      project.repo(&:fetch)
-      commit = project.repo.object(revision)
-    end
-    raise "Unknown revision" unless commit
-
-    class_name       = @attrs.delete('class_name')
-
-    # extract top-level attributes and metadata; stick the rest in user_data
-    occurrence_attrs = Hash.new
-    other_data       = Hash.new
-    @attrs.each do |k, v|
-      if Occurrence.attribute_names.include?(k) || Occurrence.metadata_column_fields.keys.map(&:to_s).include?(k)
-        occurrence_attrs[k] = v
-      else
-        other_data[k] = v
-      end
-    end
-    occurrence_attrs['query'] = occurrence_attrs['query'][0, 255] if occurrence_attrs['query']
-    occurrence_attrs['revision'] = commit.sha
-
-    occurrence          = Occurrence.new(occurrence_attrs)
-    occurrence.metadata = JSON.parse(occurrence.metadata).reverse_merge(other_data).to_json
-    occurrence.symbolicate # must symbolicate before assigning blame
+    # First make an occurrence to perform a blame on
+    commit     = set_deploy_and_commit
+    class_name = @attrs.delete('class_name')
+    occurrence = build_occurrence(commit)
 
     # In order to use Blamer, we need to create a new, unsaved bug with the
     # class name and environment specified in @attrs. If blamer finds a matching
     # existing Bug, it will return that Bug, and the unsaved Bug will never be
     # saved. If however no matching bug is found, a new bug is created, saved,
     # and returned. In no case is the bug we create below saved.
+    occurrence.bug = build_temporary_bug(class_name)
     blamer         = Blamer.new(occurrence)
-    bug            = environment.bugs.build
-    bug.class_name = class_name
-    bug.deploy     = deploy
-    occurrence.bug = bug
     bug            = blamer.find_or_create_bug!
 
     # these must be done after Blamer runs
     add_user_agent_data occurrence
     occurrence.message = pii_filter(MessageTemplateMatcher.instance.matched_substring(class_name, occurrence.message)) unless project.disable_message_filtering?
     occurrence.message = occurrence.message.truncate(1000)
-
+    occurrence.message ||= occurrence.class_name # hack for Java
+    
     # hook things up and save
-    occurrence.bug = bug
+    occurrence.bug     = bug
     bug.save!
     occurrence.save!
 
@@ -155,6 +123,82 @@ class OccurrencesWorker
   end
 
   private
+
+  def build_temporary_bug(class_name)
+    bug            = environment.bugs.build
+    bug.class_name = class_name
+    bug.deploy     = deploy
+    return bug
+  end
+
+  def build_occurrence(commit)
+    # extract top-level attributes and metadata; stick the rest in user_data
+
+    occurrence_attrs = Hash.new
+    other_data       = Hash.new
+    @attrs.each do |k, v|
+      if Occurrence.attribute_names.include?(k) || Occurrence.metadata_column_fields.keys.map(&:to_s).include?(k)
+        occurrence_attrs[k] = v
+      else
+        other_data[k] = v
+      end
+    end
+    occurrence_attrs['query'] = occurrence_attrs['query'][0, 255] if occurrence_attrs['query']
+    occurrence_attrs['revision'] = commit.sha
+
+    occurrence          = Occurrence.new(occurrence_attrs)
+    occurrence.metadata = JSON.parse(occurrence.metadata).reverse_merge(other_data).to_json
+    occurrence.message  ||= occurrence.class_name # hack for Java
+    occurrence.symbolicate                        # must symbolicate before assigning blame
+    occurrence
+  end
+
+  def set_deploy_and_commit
+    # We have a couple of options here, depending on the attributes we got from
+    # the client...
+
+    if @attrs['revision'].present? && @attrs['build'].present?
+      # If we get both a revision and a build, then we can find a Deploy, or
+      # create one if it doesn't exist, and use that.
+
+      revision = @attrs['revision']
+      commit   = project.repo.object(revision)
+      if commit.nil?
+        project.repo(&:fetch)
+        commit = project.repo.object(revision)
+      end
+      raise "Unknown revision" unless commit
+
+      @deploy = @environment.deploys.where(build: @attrs['build']).find_or_create!(
+          {deployed_at: Time.now, revision: commit.sha}, as: :worker
+      )
+    elsif @attrs['revision'].present?
+      # If we get only a revision, the Bug won't have a Deploy, but we still
+      # have a revision to do blaming with.
+
+      revision = @attrs['revision']
+      commit   = project.repo.object(revision)
+      if commit.nil?
+        project.repo(&:fetch)
+        commit = project.repo.object(revision)
+      end
+      raise "Unknown revision" unless commit
+    elsif @attrs['build'].present?
+      # If we get only a build, we can find the Deploy with that build number
+      # and use it to get the revision.
+
+      begin
+        @deploy = environment.deploys.find_by_build(@attrs['build'])
+        raise API::InvalidAttributesError, "Unknown build number" unless deploy
+        commit = deploy.commit
+        raise "Unknown revision" unless commit
+      end
+    else
+      # If we get nothing, we can't do anything.
+      raise API::InvalidAttributesError, "Missing required keys"
+    end
+    commit
+  end
 
   def add_user_agent_data(occurrence)
     ua = if occurrence.headers && occurrence.headers['HTTP_USER_AGENT']
