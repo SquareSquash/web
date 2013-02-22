@@ -272,6 +272,11 @@ class Project < ActiveRecord::Base
     @pagerduty ||= (pagerduty_service_key? ? Service::PagerDuty.new(pagerduty_service_key) : nil)
   end
 
+  # @private
+  def repository_hash
+    Digest::SHA1.hexdigest(repository_url)
+  end
+
   private
 
   def repo_path
@@ -279,7 +284,7 @@ class Project < ActiveRecord::Base
   end
 
   def repo_directory
-    @repo_dir ||= Digest::SHA1.hexdigest(repository_url) + '.git'
+    @repo_dir ||= repository_hash + '.git'
   end
 
   def clone_repo

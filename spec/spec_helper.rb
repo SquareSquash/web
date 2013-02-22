@@ -126,3 +126,9 @@ Fdoc.service_path = 'doc/fdoc'
 Fdoc.decide_success_with do |response, status|
   status.to_i/100 == 2
 end
+
+# @return [String] A random 40-digit hex number.
+
+def random_sha
+  40.times.map { rand(16).to_s(16) }.join
+end

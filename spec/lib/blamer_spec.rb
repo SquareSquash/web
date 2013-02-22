@@ -114,15 +114,15 @@ describe Blamer do
 
     it "should not match an existing bug of a different class name" do
       @shell_bug.class_name = 'SomeOtherError'
-      @occurrence = FactoryGirl.build(:rails_occurrence,
-                                      bug:        @shell_bug,
-                                      backtraces: [{"name"      => "Thread 0",
-                                                    "faulted"   => true,
-                                                    "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
-                                                                     "line"   => 2,
-                                                                     "symbol" => "foo"}]}],
-                                      revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      @occurrence           = FactoryGirl.build(:rails_occurrence,
+                                                bug:        @shell_bug,
+                                                backtraces: [{"name"      => "Thread 0",
+                                                              "faulted"   => true,
+                                                              "backtrace" => [{"file"   => "lib/better_caller/extensions.rb",
+                                                                               "line"   => 2,
+                                                                               "symbol" => "foo"}]}],
+                                                revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
+      bug                   = Blamer.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
       bug.class_name.should eql('SomeOtherError')
     end
@@ -292,11 +292,11 @@ describe Blamer do
                                       bug:        @shell_bug,
                                       backtraces: [{"name"      => "Thread 0",
                                                     "faulted"   => true,
-                                                    "backtrace" => [{"type"   => "obfuscated",
-                                                                     "file"   => "A.java",
-                                                                     "line"   => 15,
-                                                                     "symbol" => "b",
-                                                                     "class_name"  => "A"}]}],
+                                                    "backtrace" => [{"type"       => "obfuscated",
+                                                                     "file"       => "A.java",
+                                                                     "line"       => 15,
+                                                                     "symbol"     => "b",
+                                                                     "class_name" => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')
@@ -309,11 +309,11 @@ describe Blamer do
                                       bug:        @shell_bug,
                                       backtraces: [{"name"      => "Thread 0",
                                                     "faulted"   => true,
-                                                    "backtrace" => [{"type"   => "obfuscated",
-                                                                     "file"   => "A.java",
-                                                                     "line"   => -15,
-                                                                     "symbol" => "b",
-                                                                     "class_name"  => "A"}]}],
+                                                    "backtrace" => [{"type"       => "obfuscated",
+                                                                     "file"       => "A.java",
+                                                                     "line"       => -15,
+                                                                     "symbol"     => "b",
+                                                                     "class_name" => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')
@@ -444,6 +444,92 @@ describe Blamer do
       blamer.reopen_bug_if_necessary! bug
 
       @bug.reload.should be_fixed
+    end
+  end
+end
+
+describe Blamer::Cache do
+  describe "#blame" do
+    before(:all) { @project = FactoryGirl.create(:project) }
+    before(:each) { Blame.delete_all }
+
+    it "should return a cached blame result if available" do
+      blame = FactoryGirl.create(:blame, repository_hash: @project.repository_hash, file: 'myfile.rb', line: 100)
+      @project.repo.should_not_receive(:blame)
+      commit = mock('Git::Object::Commit')
+      @project.repo.should_receive(:object).once.with(blame.blamed_revision).and_return(commit)
+      Blamer::Cache.instance.blame(@project, blame.revision, 'myfile.rb', 100).should eql(commit)
+    end
+
+    it "should fall back to a Git blame operation otherwise" do
+      @project.repo.should_receive(:blame).once.with(
+          'file.rb',
+          hash_including(
+              revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
+              start:    3,
+              end:      3
+          )
+      ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
+      commit = mock('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
+      @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
+
+      Blamer::Cache.instance.blame(@project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3).
+          should eql(commit)
+    end
+
+    it "should write the result of the operation for a cache miss" do
+      Blame.delete_all
+      @project.repo.should_receive(:blame).once.with(
+          'file.rb',
+          hash_including(
+              revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
+              start:    3,
+              end:      3
+          )
+      ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
+      commit = mock('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
+      @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
+
+      Blamer::Cache.instance.blame @project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3
+
+      Blame.for_project(@project).where(
+          revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
+          file:     'file.rb',
+          line:     3
+      ).first.blamed_revision.should eql('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
+    end
+
+    it "should update a Blame's updated_at for a cache hit" do
+      blame  = FactoryGirl.create(:blame, repository_hash: @project.repository_hash, file: 'myfile.rb', line: 100, updated_at: Time.now - 1.day)
+      commit = mock('Git::Object::Commit')
+      @project.repo.should_receive(:object).once.with(blame.blamed_revision).and_return(commit)
+      Blamer::Cache.instance.blame @project, blame.revision, 'myfile.rb', 100
+      -> { blame.reload }.should change(blame, :updated_at)
+    end
+
+    it "should drop the least recently used Blame when the cache is full" do
+      old_max                    = Blamer::Cache::MAX_ENTRIES
+      Blamer::Cache::MAX_ENTRIES = 3
+
+      FactoryGirl.create_list :blame, 4
+      doomed = FactoryGirl.create :blame, updated_at: Time.now - 1.day
+
+      @project.repo.should_receive(:blame).once.with(
+          'file.rb',
+          hash_including(
+              revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
+              start:    3,
+              end:      3
+          )
+      ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
+      commit = mock('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
+      @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
+      Blamer::Cache.instance.blame(@project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3)
+
+      -> { doomed.reload }.should raise_error(ActiveRecord::RecordNotFound)
+      Blame.count.should eql(3)
+
+      Blamer::Cache::MAX_ENTRIES = old_max
     end
   end
 end
