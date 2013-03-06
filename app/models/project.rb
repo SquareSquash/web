@@ -91,7 +91,7 @@ require 'securerandom'
 
 class Project < ActiveRecord::Base
   # The directory where repositories are checked out.
-  REPOS_DIRECTORY = Rails.root.join('tmp', 'repos')
+  REPOS_DIRECTORY = File.expand_path(Squash::Configuration.project.repos_directory, Rails.root.to_s)
   # File names that appear in backtraces that aren't really file names
   META_FILE_NAMES = %w( (irb) (eval) -e )
 
