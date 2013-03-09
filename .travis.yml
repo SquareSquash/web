@@ -1,0 +1,10 @@
+language: ruby
+bundler_args: --without development:assets:production
+rvm:
+  - 1.9.3
+  - jruby-19mode
+  - rbx-19mode
+before_script:
+  - cp -f config/database.travis.yml config/database.yml
+  - RAILS_ENV=test rake db:create db:migrate db:test:prepare
+script: bundle exec rspec spec
