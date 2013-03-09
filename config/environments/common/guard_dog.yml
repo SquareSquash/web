@@ -1,6 +1,0 @@
----
-enabled: true
-client:
-  key: /data/app/squash/secrets/squash-s2s.key
-  cert: /data/app/squash/secrets/squash-s2s.crt
-  ca: /etc/kwfs/square_root.crt
