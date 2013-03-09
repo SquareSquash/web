@@ -66,9 +66,7 @@ group :development do
   # DOCS
   gem 'yard', require: nil
   gem 'redcarpet', require: nil, platform: :mri
-  gem 'fdoc'
 end
-
 
 group :test do
   # SPECS
@@ -77,4 +75,7 @@ group :test do
   gem 'fakeweb'
 end
 
-gem 'sql_origin', groups: [:development, :test]
+group :test, :development do
+  gem 'fdoc'
+  gem 'sql_origin'
+end
