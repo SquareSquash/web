@@ -70,9 +70,9 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    activerecord-jdbc-adapter (1.2.5)
-    activerecord-jdbcpostgresql-adapter (1.2.5)
-      activerecord-jdbc-adapter (~> 1.2.5)
+    activerecord-jdbc-adapter (1.2.7)
+    activerecord-jdbcpostgresql-adapter (1.2.7)
+      activerecord-jdbc-adapter (~> 1.2.7)
       jdbc-postgres (>= 9.1, < 9.3)
     activerecord-postgresql-cursors (0.0.2)
     addressable (2.3.2)
@@ -241,7 +241,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord-jdbc-adapter (= 1.2.5)
+  activerecord-jdbc-adapter (= 1.2.7)
   activerecord-jdbcpostgresql-adapter
   activerecord-postgresql-cursors
   coffee-rails
