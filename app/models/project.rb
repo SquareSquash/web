@@ -91,7 +91,7 @@ require 'securerandom'
 
 class Project < ActiveRecord::Base
   # The directory where repositories are checked out.
-  REPOS_DIRECTORY = Rails.root.join('tmp', 'repos')
+  REPOS_DIRECTORY = File.expand_path(Squash::Configuration.repositories.directory, Rails.root.to_s)
   # File names that appear in backtraces that aren't really file names
   META_FILE_NAMES = %w( (irb) (eval) -e )
 
@@ -280,7 +280,7 @@ class Project < ActiveRecord::Base
   private
 
   def repo_path
-    @repo_path ||= REPOS_DIRECTORY.join(repo_directory)
+    @repo_path ||= File.join(REPOS_DIRECTORY, repo_directory)
   end
 
   def repo_directory
@@ -288,7 +288,7 @@ class Project < ActiveRecord::Base
   end
 
   def clone_repo
-    Git.clone repository_url, repo_directory, path: REPOS_DIRECTORY.to_s, mirror: true
+    Git.clone repository_url, repo_directory, path: REPOS_DIRECTORY, mirror: true
   rescue Git::GitExecuteError
     return nil
   end
