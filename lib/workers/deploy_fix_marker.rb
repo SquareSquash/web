@@ -23,6 +23,7 @@ class DeployFixMarker
   # The number of commits to load per page.
   COMMIT_PAGE_SIZE = 50
 
+  @queue = :squash
   # Loads a Deploy from an ID, and marks appropriate Bugs as `fix_deployed`.
   #
   # @param [Integer] deploy_id The ID of a {Deploy} to process.

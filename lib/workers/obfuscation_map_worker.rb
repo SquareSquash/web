@@ -17,6 +17,7 @@
 
 class ObfuscationMapWorker
 
+  @queue = :squash
   # Creates a new worker instance and performs a deobfuscation.
   #
   # @param [Integer] map_id The ID of an {ObfuscationMap}.

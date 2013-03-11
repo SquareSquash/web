@@ -17,6 +17,7 @@
 
 class PagerDutyAcknowledger
 
+  @queue = :squash
   # Creates a new instance and sends a PagerDuty acknowledgement.
   #
   # @param [Fixnum] bug_id The ID of a Bug.

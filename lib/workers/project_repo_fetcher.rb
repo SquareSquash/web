@@ -17,6 +17,7 @@
 
 class ProjectRepoFetcher
 
+  @queue = :squash
   # Creates a new instance and calls {#perform} on it.
   #
   # @param [Integer] project_id The ID of a {Project} whose repository should be

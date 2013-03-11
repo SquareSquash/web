@@ -17,6 +17,7 @@
 
 class CommentNotificationMailer
 
+  @queue = :squash
   # Creates a new instance and sends notification emails.
   #
   # @param [Fixnum] comment_id The ID of a Comment that was just posted.

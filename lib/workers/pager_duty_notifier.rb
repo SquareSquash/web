@@ -17,6 +17,7 @@
 
 class PagerDutyNotifier
 
+  @queue = :squash
   # Creates a new instance and sends a PagerDuty notification.
   #
   # @param [Fixnum] occurrence_id The ID of a new Occurrence.

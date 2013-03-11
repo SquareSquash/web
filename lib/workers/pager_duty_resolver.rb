@@ -17,6 +17,7 @@
 
 class PagerDutyResolver < PagerDutyAcknowledger
 
+  @queue = :squash
   # Sends a PagerDuty API call resolving an incident.
 
   def perform

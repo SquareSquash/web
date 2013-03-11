@@ -88,6 +88,9 @@ module Squash
       g.integration_tool    :rspec
       g.fixture_replacement :factory_girl, dir: 'spec/factories'
     end
+
+    # Set to true to use Resque for workers instead of the default Multithread class.
+    config.resque = false
   end
 end
 
