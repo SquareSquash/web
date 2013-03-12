@@ -1,0 +1,2 @@
+# Replace this with a random value (e.g. result of `head -c2048 /dev/urandom | openssl sha1`)
+secret_token:
