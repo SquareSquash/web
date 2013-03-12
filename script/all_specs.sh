@@ -81,7 +81,21 @@ echo
 echo "***** That was MRI with password auth ******"
 echo
 
-##### 2. JRuby (password auth)
+##### 2. MRI (password auth w/registration disabled)
+cat > ${AUTHFILE} <<YAML
+---
+strategy: password
+password:
+  salt: abc123
+registration_enabled: false
+YAML
+rvm 1.9.3@squash exec ${COMMAND}
+
+echo
+echo "***** That was MRI with password auth w/registration disabled ******"
+echo
+
+##### 3. JRuby (password auth)
 rvm jruby@squash exec ${COMMAND}
 
 echo

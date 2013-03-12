@@ -320,6 +320,7 @@ en:
     users:
       create:
         success: "Welcome to Squash, %{name}!"
+        disabled: New user registration is currently disabled.
   mailers:
     notifier:
       initial:

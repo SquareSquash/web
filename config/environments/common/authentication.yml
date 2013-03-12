@@ -1,2 +1,3 @@
 ---
 strategy: password
+registration_enabled: true

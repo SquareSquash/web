@@ -77,6 +77,10 @@ class UsersController < ApplicationController
   # | `user` | The new User parameters. |
 
   def create
+    unless Squash::Configuration.authentication.registration_enabled?
+      return redirect_to(login_url, alert: t('controllers.users.create.disabled'))
+    end
+
     @user = User.create(params[:user], as: :user)
     respond_with @user do |format|
       format.html do

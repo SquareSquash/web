@@ -76,27 +76,35 @@ describe UsersController do
       }
     end
 
-    it "should create the new user" do
-      post :create, user: @attrs
-      User.where(username: 'newguy').exists?.should be_true
-      response.should redirect_to(root_url)
-    end
+    if Squash::Configuration.authentication.registration_enabled?
+      it "should create the new user" do
+        post :create, user: @attrs
+        User.where(username: 'newguy').exists?.should be_true
+        response.should redirect_to(root_url)
+      end
 
-    it "should log the new user in" do
-      post :create, user: @attrs
-      user = User.find_by_username!('newguy')
-      session[:user_id].should eql(user.id)
-    end
+      it "should log the new user in" do
+        post :create, user: @attrs
+        user = User.find_by_username!('newguy')
+        session[:user_id].should eql(user.id)
+      end
 
-    it "should redirect to the :next parameter" do
-      post :create, user: @attrs, next: account_url
-      response.should redirect_to(account_url)
-    end
+      it "should redirect to the :next parameter" do
+        post :create, user: @attrs, next: account_url
+        response.should redirect_to(account_url)
+      end
 
-    it "should render the login page for invalid attributes" do
-      post :create, user: @attrs.merge('password_confirmation' => 'whoops'), next: account_url
-      response.should render_template('sessions/new')
-      assigns(:user).errors[:password].should eql(['didn’t match'])
+      it "should render the login page for invalid attributes" do
+        post :create, user: @attrs.merge('password_confirmation' => 'whoops'), next: account_url
+        response.should render_template('sessions/new')
+        assigns(:user).errors[:password].should eql(['didn’t match'])
+      end
+    else
+      it "should not be possible to create a new user" do
+        post :create, user: @attrs
+        User.where(username: 'newguy').exists?.should be_false
+        response.should redirect_to(login_url)
+      end
     end
   end if Squash::Configuration.authentication.strategy == 'password'
 end

@@ -31,7 +31,7 @@ module Views
           title_section
           div(class: 'body-portion') do
             login_form
-            if Squash::Configuration.authentication.strategy == 'password'
+            if display_registration_form?
               signup_form
             end
           end
@@ -80,6 +80,11 @@ module Views
           end
           div(class: 'two columns') { text! '&nbsp;' }
         end
+      end
+
+      def display_registration_form?
+        Squash::Configuration.authentication.registration_enabled? &&
+            Squash::Configuration.authentication.strategy == 'password'
       end
     end
   end
