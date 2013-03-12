@@ -30,14 +30,20 @@ Squash::Application.routes.draw do
         resource :notification_threshold, only: [:create, :update, :destroy]
       end
     end
-    resources :memberships, controller: 'project/memberships', only: [:index, :create, :update, :destroy]
+    resources :memberships, controller: 'project/memberships', only: [:index, :create, :update, :destroy], constraints: {id: /[^\/]+?/, format: 'json'}
     resource :membership, controller: 'project/membership', as: :my_membership, only: [:edit, :update, :destroy] do
       member { post :join }
       resources :emails, controller: 'emails', only: [:index, :create]
     end
   end
 
-  resources :users, only: [:index, :show]
+  constraints(id: /[^\/]+?/, format: 'html') do
+    resources :users, only: :show
+  end
+  actions = [:index]
+  actions << :create if Squash::Configuration.authentication.strategy == 'password'
+  resources :users, only: actions
+
   actions = [:show]
   actions << :update if Squash::Configuration.authentication.strategy == 'password'
   resource :account, only: actions do
