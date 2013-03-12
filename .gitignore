@@ -6,3 +6,4 @@ tmp/cache/*
 *.war
 public/assets
 bin/*
+config/database.yml
