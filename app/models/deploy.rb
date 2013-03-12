@@ -89,8 +89,7 @@ class Deploy < ActiveRecord::Base
             allow_nil: true
 
   after_commit(on: :create) do |deploy|
-    worker = DeployFixMarker.new(deploy)
-    Multithread.spinoff("DeployFixMarker:#{deploy.id}", 70, deploy: deploy, changes: deploy.changes) { worker.perform }
+    BackgroundRunner.run DeployFixMarker, deploy.id
   end
   set_nil_if_blank :hostname, :build
 

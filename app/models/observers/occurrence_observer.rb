@@ -21,11 +21,10 @@ class OccurrenceObserver < ActiveRecord::Observer
   # @private
   def after_commit_on_create(occurrence)
     # send emails
-    Multithread.spinoff("OccurrenceNotificationMailer:#{occurrence.id}", 80) { OccurrenceNotificationMailer.perform(occurrence.id) }
-    # force-reload the occurrence to load triggered changes
+    BackgroundRunner.run OccurrenceNotificationMailer, occurrence.id
 
     # notify pagerduty
-    Multithread.spinoff("PagerDutyNotifier:#{occurrence.id}", 80) { PagerDutyNotifier.perform(occurrence.id) }
+    BackgroundRunner.run PagerDutyNotifier, occurrence.id
   end
 
   # @private

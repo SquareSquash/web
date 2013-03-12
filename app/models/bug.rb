@@ -228,8 +228,7 @@ class Bug < ActiveRecord::Base
     return nil unless environment.project.repo
     @occurrence_commit ||= begin
       oc = environment.project.repo.object revision
-      worker = ProjectRepoFetcher.new(environment.project)
-      Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless oc
+      BackgroundRunner.run(ProjectRepoFetcher, environment.project_id) unless oc
       oc
     end
   end
@@ -240,8 +239,7 @@ class Bug < ActiveRecord::Base
     return nil unless environment.project.repo
     @blamed_commit ||= begin
       bc = environment.project.repo.object blamed_revision
-      worker = ProjectRepoFetcher.new(environment.project)
-      Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless bc
+      BackgroundRunner.run(ProjectRepoFetcher, environment.project_id) unless bc
       bc
     end
   end
@@ -253,8 +251,7 @@ class Bug < ActiveRecord::Base
     return nil unless environment.project.repo
     @resolution_commit ||= begin
       rc = environment.project.repo.object resolution_revision
-      worker = ProjectRepoFetcher.new(environment.project)
-      Multithread.spinoff("ProjectRepoFetcher:#{environment.project_id}", 30) { worker.perform } unless rc
+      BackgroundRunner.run(ProjectRepoFetcher, environment.project_id) unless rc
       rc
     end
   end

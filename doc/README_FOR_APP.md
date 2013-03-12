@@ -97,9 +97,13 @@ overhead of having to deploy both a website and workers.
 
 If you are running Squash in a non-thread-safe (or multithreading-unfriendly)
 environment, it should be easy to convert to a Resque-based environment. All
-threaded code is encapsulated in worker classes that respond to a `.perform`
-method, making them Resque-ready. Simply locate all occurrences of
-`Multithread.spinoff` in the code and replace it with calls to `Resque.enqueue`.
+threaded code is invoked using {BackgroundRunner.run}, which then uses the
+settings in the `concurrency.yml` Configoro file to invoke the correct module
+under `lib/background_runner`. The default is to use
+{BackgroundRunner::Multithread}, which uses the {Multithread} module to execute
+the task in its own thread. If you wish to use a different concurrency model,
+you can implement your own `BackgroundRunner` module and change the settings in
+the YAML file. See the {BackgroundRunner} documentation for more details.
 
 If you do this successfully and wish to save future Squash users the effort,
 feel free to turn your changes into a pull request.

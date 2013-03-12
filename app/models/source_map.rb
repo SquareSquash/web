@@ -58,7 +58,9 @@ class SourceMap < ActiveRecord::Base
             presence:       true,
             known_revision: {repo: ->(map) { RepoProxy.new(map, :environment, :project) }}
 
-  after_commit :sourcemap_matching_traces, on: :create
+  after_commit(on: :create) do |map|
+    BackgroundRunner.run SourceMapWorker, map.id
+  end
 
   attr_accessible :revision, :map, as: :api
   attr_readonly :revision
@@ -97,12 +99,5 @@ class SourceMap < ActiveRecord::Base
     else
       nil
     end
-  end
-
-  private
-
-  def sourcemap_matching_traces
-    worker = SourceMapWorker.new(self)
-    Multithread.spinoff("SourceMapWorker:#{id}", 60) { worker.perform }
   end
 end

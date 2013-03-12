@@ -67,8 +67,7 @@ class Api::V1Controller < ActionController::Base
   # * `POST /api/1.0/notify`
 
   def notify
-    worker = OccurrencesWorker.new(request.request_parameters)
-    Multithread.spinoff(nil, 40, squash_rails_data) { worker.perform }
+    BackgroundRunner.run OccurrencesWorker, request.request_parameters.to_hash
     head :ok
   end
 

@@ -65,7 +65,9 @@ class Symbolication < ActiveRecord::Base
             uniqueness: true,
             format:     {with: /^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$/i}
 
-  after_commit :symbolicate_matching_traces, on: :create
+  after_commit(on: :create) do |sym|
+    BackgroundRunner.run SymbolicationWorker, sym.id
+  end
 
   attr_accessible :uuid, :symbols, :lines, as: :api
   attr_readonly :uuid
@@ -139,12 +141,5 @@ class Symbolication < ActiveRecord::Base
     else
       nil
     end
-  end
-
-  private
-
-  def symbolicate_matching_traces
-    worker = SymbolicationWorker.new(self)
-    Multithread.spinoff("SymbolicationWorker:#{id}", 60) { worker.perform }
   end
 end

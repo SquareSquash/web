@@ -21,10 +21,10 @@ require 'thread'
 #
 # Multithread implements a thread pool backed by a priority queue. The size of
 # the thread pool is configured in
-# `config/environments/common/concurrency.yml`. That file also contains the
-# keys `priority_threshold` and `max_threads`; if the number of waiting
-# threads exceeds the latter value, incoming jobs with a priority lower than
-# the former value are ignored.
+# `config/environments/common/concurrency.yml`, in a hash under the
+# `multithread` key. That file also contains the keys `priority_threshold` and
+# `max_threads`; if the number of waiting threads exceeds the latter value,
+# incoming jobs with a priority lower than the former value are ignored.
 #
 # Each job is given a name that uniquely describes the operation. If later
 # jobs share the same name as a job already executing or waiting, these jobs
@@ -32,6 +32,9 @@ require 'thread'
 #
 # Each of the methods defined in Multithread have an alternative behavior if the
 # `allow_concurrency` Rails option is `false`.
+#
+# Note that this module is not used directly; it is only used (if so configured)
+# by the {BackgroundRunner} module.
 
 module Multithread
   extend self
@@ -68,9 +71,9 @@ module Multithread
   # Does nothing if `allow_concurrency` is `false`.
 
   def start
-    @queue = PriorityQueue.new(Squash::Configuration.concurrency.priority_threshold, Squash::Configuration.concurrency.max_threads)
+    @queue = PriorityQueue.new(Squash::Configuration.concurrency.multithread.priority_threshold, Squash::Configuration.concurrency.multithread.max_threads)
     return unless Squash::Application.config.allow_concurrency
-    @pool = Squash::Configuration.concurrency.pool_size.times.map do |i|
+    @pool = Squash::Configuration.concurrency.multithread.pool_size.times.map do |i|
       Thread.new { catch(:exit) { loop { @queue.deq.() } } }
     end
   end
@@ -82,7 +85,7 @@ module Multithread
 
   def stop
     return unless Squash::Application.config.allow_concurrency
-    Squash::Configuration.concurrency.pool_size.times { |i| spinoff(nil, 100) { throw :exit } }
+    Squash::Configuration.concurrency.multithread.pool_size.times { |i| spinoff(nil, 100) { throw :exit } }
     @pool.map &:join # make this a synchronous call
   end
 

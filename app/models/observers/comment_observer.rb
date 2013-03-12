@@ -24,8 +24,7 @@ class CommentObserver < ActiveRecord::Observer
 
   # @private
   def after_commit_on_create(comment)
-    Multithread.spinoff("CommentNotificationMailer:#{comment.id}", 80) { CommentNotificationMailer.perform(comment.id) }
-    # force reload the comment in order to load triggered changes
+    BackgroundRunner.run CommentNotificationMailer, comment.id
   end
 
   private

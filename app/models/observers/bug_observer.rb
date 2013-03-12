@@ -108,8 +108,7 @@ class BugObserver < ActiveRecord::Observer
 
   def send_update_emails(bug)
     if bug.previous_changes['fix_deployed'] == [false, true]
-      worker = DeployNotificationMailer.new(bug)
-      Multithread.spinoff(nil, 80) { worker.perform }
+      BackgroundRunner.run DeployNotificationMailer, bug.id
     end
   end
 
@@ -121,25 +120,22 @@ class BugObserver < ActiveRecord::Observer
 
   def notify_pagerduty(bug)
     return unless bug.environment.notifies_pagerduty?
-    return unless bug.environment.project.pagerduty_service_key
+    return unless bug.environment.project.pagerduty
 
     au = bug.previous_changes['assigned_user_id'] || []
     ir = bug.previous_changes['irrelevant'] || []
     if (!au.first && au.last) || (!ir.first && ir.last)
-      worker = PagerDutyAcknowledger.new(bug)
-      Multithread.spinoff("PagerDutyAcknowledger:#{bug.id}", 20) { worker.perform }
+      BackgroundRunner.run PagerDutyAcknowledger, bug.id
     end
 
     res = bug.previous_changes['fixed'] || []
     if !res.first && res.last
-      worker = PagerDutyAcknowledger.new(bug)
-      Multithread.spinoff("PagerDutyAcknowledger:#{bug.id}", 20) { worker.perform }
+      BackgroundRunner.run PagerDutyAcknowledger, bug.id
     end
 
     res = bug.previous_changes['fix_deployed'] || []
     if !res.first && res.last
-      worker = PagerDutyResolver.new(bug)
-      Multithread.spinoff("PagerDutyResolver:#{bug.id}", 20) { worker.perform }
+      BackgroundRunner.run PagerDutyResolver, bug.id
     end
   end
 end

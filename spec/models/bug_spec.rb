@@ -153,18 +153,21 @@ describe Bug do
 
       it "should not send any events when the environment has PagerDuty disabled" do
         @environment.update_attribute :notifies_pagerduty, false
+        @bug.reload
         Service::PagerDuty.any_instance.should_not_receive(:resolve)
         @bug.update_attribute :fixed, true
       end
 
       it "should not send any events when the project has no PagerDuty configuration" do
         @project.update_attribute :pagerduty_service_key, nil
+        @bug.reload
         Service::PagerDuty.any_instance.should_not_receive(:resolve)
         @bug.update_attribute :fixed, true
       end
 
       it "should send events when the project has PagerDuty incident reporting disabled" do
         @project.update_attribute :pagerduty_enabled, false
+        @bug.reload
         Service::PagerDuty.any_instance.should_receive(:acknowledge).once
         @bug.update_attribute :fixed, true
       end

@@ -1,4 +1,20 @@
 ---
-priority_threshold: 50
-pool_size: 20
-max_threads: 100
+background_runner: Multithread
+multithread:
+  priority_threshold: 50
+  pool_size: 20
+  max_threads: 100
+  priority:
+    CommentNotificationMailer: 80
+    DeployFixMarker: 70
+    DeployNotificationMailer: 80
+    JiraStatusUpdater: 20
+    ObfuscationMapWorker: 60
+    OccurrenceNotificationMailer: 80
+    OccurrencesWorker: 40
+    PagerDutyAcknowledger: 20
+    PagerDutyNotifier: 80
+    PagerDutyResolver: 20
+    ProjectRepoFetcher: 30
+    SourceMapWorker: 60
+    SymbolicationWorker: 60

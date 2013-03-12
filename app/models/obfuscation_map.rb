@@ -53,7 +53,9 @@ class ObfuscationMap < ActiveRecord::Base
   validates :deploy,
             presence: true
 
-  after_commit :deobfuscate_matching_traces, on: :create
+  after_commit(on: :create) do |map|
+    BackgroundRunner.run ObfuscationMapWorker, map.id
+  end
 
   attr_accessible :namespace, as: :api
   attr_readonly :namespace
@@ -71,12 +73,5 @@ class ObfuscationMap < ActiveRecord::Base
   def namespace=(ns)
     raise TypeError, "expected Squash::Java::Namespace, got #{ns.class}" unless ns.kind_of?(Squash::Java::Namespace)
     write_attribute :namespace, Base64.encode64(Zlib::Deflate.deflate(ns.to_yaml))
-  end
-
-  private
-
-  def deobfuscate_matching_traces
-    worker = ObfuscationMapWorker.new(self)
-    Multithread.spinoff("ObfuscationMapWorker:#{id}", 60) { worker.perform }
   end
 end
