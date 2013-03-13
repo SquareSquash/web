@@ -83,8 +83,8 @@ module Views
       end
 
       def display_registration_form?
-        Squash::Configuration.authentication.registration_enabled? &&
-            Squash::Configuration.authentication.strategy == 'password'
+        Squash::Configuration.authentication.strategy == 'password' &&
+          Squash::Configuration.authentication.registration_enabled?
       end
     end
   end
