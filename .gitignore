@@ -3,3 +3,7 @@
 node_modules
 doc/fdoc-html
 tmp/cache/*
+*.war
+public/assets
+bin/*
+config/database.yml

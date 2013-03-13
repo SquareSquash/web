@@ -78,3 +78,9 @@ group :test do
 end
 
 gem 'sql_origin', groups: [:development, :test]
+
+# Warbler seems to bundle its own gemspec even when skipping
+# :development. The gemspec requires warbler/version which doesn't
+# exist so the whole thing blows up. Putting this in :default group
+# until I can figure out how to fix it.
+gem 'warbler', github: 'bjeanes/warbler', platform: :jruby, require: nil
