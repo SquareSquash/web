@@ -337,6 +337,7 @@ if step < 2
     File.open('config/environments/common/authentication.yml', 'w') do |f|
       f.puts({
                  'strategy' => 'password',
+                 'registration_enabled' => true,
                  'password' => {
                      'salt' => SecureRandom.base64
                  }
