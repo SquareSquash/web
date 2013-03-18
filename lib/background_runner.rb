@@ -29,7 +29,7 @@ module BackgroundRunner
   #   background jobs.
 
   def self.runner
-    BackgroundRunner.const_get Squash::Configuration.concurrency.background_runner.to_sym
+    BackgroundRunner.const_get Squash::Configuration.concurrency.background_runner.to_sym, false
   end
 
   # Shortcut for `BackgroundRunner.runner.run`.
