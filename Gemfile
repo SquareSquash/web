@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby "1.9.3"
+ruby '1.9.3'
 
 # FRAMEWORK
 gem 'rails', git: 'git://github.com/rails/rails.git', branch: '3-2-stable'
@@ -24,6 +24,7 @@ gem 'validates_timeliness'
 gem 'find_or_create_on_scopes', '>= 1.2.1'
 gem 'composite_primary_keys', git: 'git://github.com/RISCfuture/composite_primary_keys.git'
 gem 'activerecord-postgresql-cursors'
+gem 'mongoid'
 
 # VIEWS
 gem 'erector'
@@ -75,6 +76,7 @@ group :test do
   gem 'rspec-rails'
   gem 'factory_girl_rails'
   gem 'fakeweb'
+  gem 'timecop'
 end
 
 gem 'sql_origin', groups: [:development, :test]

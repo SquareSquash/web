@@ -55,6 +55,7 @@ Squash requires the following:
 * Ruby 1.9.2 or newer (JRuby with `--1.9` is supported)
 * Multithreading support (see the next section)
 * PostgreSQL 9.0 or newer
+* MongoDB 2.2 or newer
 * The Bundler gem
 * Git 1.7 or newer
 
@@ -79,6 +80,14 @@ appropriate.)
 
 If you do successfully port Squash to another RDBMS, let me know. I'd be happy
 to take your changes.
+
+**Why do you specifically require MongoDB?** Exceptions reported to Squash can
+include arbitrary, schemaless metadata which must be quickly accessible using
+complex indexes. MongoDB is ideal for efficiently working with this kind of
+data.
+
+I would also be happy to take pull requests that port Squash to alternative
+NoSQL systems.
 
 **Why do you bundle an edge version of Rails?** The `3-2-stable` branch of Ruby
 on Rails includes some changes to Active Record that are required by Squash's
@@ -203,6 +212,10 @@ backed up by corresponding `CHECK` triggers. This helps ensure referential and
 data integrity even in situations where Rails fails, or outside of the Rails
 stack. See the various migrations to learn more about the triggers, rules, and
 constraints being used.
+
+The {Occurrence} model stores schemaless metadata in an associated
+{OccurrenceData} model that is backed by a MongoDB document store. See the class
+documentation for both models for more information.
 
 Observers are used for more high-level triggers, such as creating {Event Events}
 at the appropriate times, or sending emails. See the classes in

@@ -137,7 +137,7 @@ class OccurrencesWorker
     occurrence_attrs = Hash.new
     other_data       = Hash.new
     @attrs.each do |k, v|
-      if Occurrence.attribute_names.include?(k) || Occurrence.metadata_column_fields.keys.map(&:to_s).include?(k)
+      if Occurrence.attribute_names.include?(k) || OccurrenceData.fields.include?(k)
         occurrence_attrs[k] = v
       else
         other_data[k] = v
@@ -146,10 +146,10 @@ class OccurrencesWorker
     occurrence_attrs['query'] = occurrence_attrs['query'][0, 255] if occurrence_attrs['query']
     occurrence_attrs['revision'] = commit.sha
 
-    occurrence          = Occurrence.new(occurrence_attrs)
-    occurrence.metadata = JSON.parse(occurrence.metadata).reverse_merge(other_data).to_json
-    occurrence.message  ||= occurrence.class_name # hack for Java
-    occurrence.symbolicate                        # must symbolicate before assigning blame
+    occurrence = Occurrence.new(occurrence_attrs)
+    other_data.each { |k, v| occurrence._attribute_record[k] = v }
+    occurrence.message ||= occurrence.class_name # hack for Java
+    occurrence.symbolicate                       # must symbolicate before assigning blame
     occurrence
   end
 

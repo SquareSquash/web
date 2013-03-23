@@ -185,21 +185,6 @@ describe Occurrence do
         }.to_not change{ bug.reload.any_occurrence_crashed }
       end
     end
-
-    context "[device bugs]" do
-      it "should create a device bug if the occurrence has a device" do
-        bug = FactoryGirl.create(:bug)
-
-        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
-        occurrence.bug.device_bugs.where(device_id: 'hello').should exist
-        expect {
-          FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
-        }.to_not change{ bug.device_bugs.where(device_id: 'hello').count }
-
-        occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'goodbye')
-        occurrence.bug.device_bugs.where(device_id: 'goodbye').should exist
-      end
-    end
   end
 
   describe "#faulted_backtrace" do
@@ -220,29 +205,22 @@ describe Occurrence do
     end
   end
 
-  describe "#truncate!" do
-    it "should remove metadata" do
-      o   = FactoryGirl.create(:rails_occurrence)
-      old = o.attributes
+  describe "#truncated?" do
+    before(:all) { @bug = FactoryGirl.create(:bug) }
 
-      o.truncate!
-      o.should be_truncated
-
-      o.metadata.should be_nil
-      o.client.should eql(old['client'])
-      o.occurred_at.should eql(old['occurred_at'])
-      o.bug_id.should eql(old['bug_id'])
-      o.number.should eql(old['number'])
+    it "should return false for unsaved records" do
+      FactoryGirl.build(:rails_occurrence, bug: @bug).should_not be_truncated
     end
-  end
 
-  describe ".truncate!" do
-    it "should truncate a group of exceptions" do
-      os      = FactoryGirl.create_list :rails_occurrence, 4
-      another = FactoryGirl.create :rails_occurrence
-      Occurrence.truncate! Occurrence.where(id: os.map(&:id))
-      os.map(&:reload).all?(&:truncated?).should be_true
-      another.reload.should_not be_truncated
+    it "should return false for saved records with metadata" do
+      FactoryGirl.create(:rails_occurrence, bug: @bug).should_not be_truncated
+
+    end
+
+    it "should return true for saved records without metadata" do
+      occ = FactoryGirl.create(:rails_occurrence, bug: @bug)
+      occ._attribute_record.destroy
+      occ.should be_truncated
     end
   end
 
@@ -252,7 +230,7 @@ describe Occurrence do
       o2 = FactoryGirl.create(:rails_occurrence, bug: o1.bug)
       o1.redirect_to! o2
       o1.redirect_target.should eql(o2)
-      o1.should be_truncated
+      o1.reload.should be_truncated
       o1.bug.should_not be_irrelevant
     end
 
@@ -282,8 +260,9 @@ describe Occurrence do
     end
 
     it "should do nothing if the occurrence is truncated" do
-      @occurrence.truncate!
-      -> { @occurrence.symbolicate! }.should_not change(@occurrence, :metadata)
+      @occurrence._attribute_record.destroy
+      @occurrence.reload
+      -> { @occurrence.symbolicate! }.should_not change(@occurrence, :backtraces)
     end
 
     it "should do nothing if the occurrence is already symbolicated" do
@@ -496,8 +475,9 @@ describe Occurrence do
     end
 
     it "should do nothing if the occurrence is truncated" do
-      @occurrence.truncate!
-      -> { @occurrence.sourcemap! }.should_not change(@occurrence, :metadata)
+      @occurrence._attribute_record.destroy
+      @occurrence.reload
+      -> { @occurrence.sourcemap! }.should_not change(@occurrence, :backtraces)
     end
 
     it "should do nothing if the occurrence is already sourcemapped" do
@@ -678,8 +658,9 @@ describe Occurrence do
     end
 
     it "should do nothing if the occurrence is truncated" do
-      @occurrence.truncate!
-      -> { @occurrence.deobfuscate! }.should_not change(@occurrence, :metadata)
+      @occurrence._attribute_record.destroy
+      @occurrence.reload
+      -> { @occurrence.deobfuscate! }.should_not change(@occurrence, :backtraces)
     end
 
     it "should do nothing if the occurrence is already de-obfuscated" do

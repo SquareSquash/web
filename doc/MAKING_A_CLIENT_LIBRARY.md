@@ -244,7 +244,7 @@ hash that is passed to the `has_metadata_column` call. See the other hash
 elements for examples. The `Occurrence` class documentation includes a
 comprehensive table of known fields; you can add to that as well.
 
-The `Occurrence::NON_AGGREGATING_FIELDS` constant is a list of all fields that
+The `OccurrenceData::AGGREGATING_FIELDS` constant is a list of all fields that
 should not be available for the aggregation feature available on a bug's
 Occurrences tab. Any fields that are a) a continuous range of values, or b) of
 an unusual data type should be included in this list.

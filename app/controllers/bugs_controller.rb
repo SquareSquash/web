@@ -159,7 +159,7 @@ class BugsController < ApplicationController
   # | `id` | The Bug number (not ID). |
 
   def show
-    @aggregation_dimensions  = Occurrence::AGGREGATING_FIELDS.
+    @aggregation_dimensions  = OccurrenceData::AGGREGATING_FIELDS.
         map { |field| [Occurrence.human_attribute_name(field), field.to_s] }.
         unshift(['', nil])
 

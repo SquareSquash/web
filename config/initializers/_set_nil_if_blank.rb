@@ -12,7 +12,15 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+# Adds a before-hook that sets string fields to nil if they're empty.
 
-describe DeviceBug do
+module SetNilIfBlank
+
+  # Before-hook that sets string fields to nil if they're empty.
+
+  def set_nil_if_blank(*fields)
+    fields.each do |field|
+      before_validation { |obj| obj.send :"#{field}=", nil if obj.send(field).blank? }
+    end
+  end
 end

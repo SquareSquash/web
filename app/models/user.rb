@@ -84,6 +84,7 @@ class User < ActiveRecord::Base
   before_validation(on: :create) { |obj| obj.username = obj.username.downcase if obj.username }
   after_create :create_primary_email
 
+  extend SetNilIfBlank
   set_nil_if_blank :first_name, :last_name
 
   scope :prefix, ->(query) { where("LOWER(username) LIKE ?", query.downcase.gsub(/[^a-z0-9\-_]/, '') + '%') }

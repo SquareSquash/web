@@ -165,9 +165,9 @@ describe OccurrencesWorker do
         end
       end
 
-      it "should stick any attributes it doesn't recognize into the metadata attribute" do
+      it "should stick any attributes it doesn't recognize into the metadata record" do
         occ = OccurrencesWorker.new(@params.merge('testfoo' => 'testbar')).perform
-        JSON.parse(occ.metadata)['testfoo'].should eql('testbar')
+        occ._attribute_record['testfoo'].should eql('testbar')
       end
 
       it "should set user agent variables when a user agent is specified" do
@@ -184,7 +184,7 @@ describe OccurrencesWorker do
           Duplicate entry 'foo@bar.com' for key 'index_users_on_email': UPDATE `users` SET `name` = 'Sancho Sample', `crypted_password` = 'sughwgiuwgbajgw', `updated_at` = '2012-09-23 21:18:37', `email` = 'foo@bar.com' WHERE `id` = 26819622 -- app/controllers/api/v1/user_controller.rb:35
         ERR
         occ = OccurrencesWorker.new(@params.merge('class_name' => 'Mysql::Error', 'message' => msg)).perform
-        JSON.parse(occ.metadata)['message'].should eql("Duplicate entry '[EMAIL?]' for key 'index_users_on_email'")
+        occ.message.should eql("Duplicate entry '[EMAIL?]' for key 'index_users_on_email'")
       end
     end
 

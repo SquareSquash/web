@@ -15,9 +15,14 @@
 # This observer on the {Occurrence} model:
 #
 # * sends an email when a Bug is critical, and
-# * creates {DeviceBug DeviceBugs} as necessary.
+# * sets the `any_occurrence_crashed` field on the associated Bug.
 
 class OccurrenceObserver < ActiveRecord::Observer
+  # @private
+  def after_save(occurrence)
+    occurrence.bug.update_attribute :any_occurrence_crashed, true if occurrence.crashed?
+  end
+
   # @private
   def after_commit_on_create(occurrence)
     # send emails
@@ -25,12 +30,5 @@ class OccurrenceObserver < ActiveRecord::Observer
 
     # notify pagerduty
     BackgroundRunner.run PagerDutyNotifier, occurrence.id
-  end
-
-  # @private
-  def after_create(occurrence)
-    if occurrence.device_id.present?
-      occurrence.bug.device_bugs.where(device_id: occurrence.device_id).find_or_create!
-    end
   end
 end

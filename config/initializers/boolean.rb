@@ -12,9 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-FactoryGirl.define do
-  factory :device_bug do
-    association :bug
-    sequence(:device_id) { |i| "device-#{i}" }
-  end
+# Fixes a bug caused by `Boolean` being defined as a module in the boolean gem
+# (used by has_metadata_column) but as a class in Mongoid.
+
+module Boolean
+  include Mongoid::Extensions::Object
+  extend Mongoid::Extensions::Object::ClassMethods
 end

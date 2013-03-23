@@ -66,6 +66,8 @@ class Slug < ActiveRecord::Base
   
   after_save :invalidate_cache
   after_destroy :invalidate_cache
+
+  extend SetNilIfBlank
   set_nil_if_blank :scope
 
   # Marks a slug as active and deactivates all other slugs assigned to the

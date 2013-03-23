@@ -239,6 +239,18 @@ unless `psql -V` =~ /^psql \(PostgreSQL\) (\d{2,}|9)\./
   exit 1
 end
 
+if `which mongo`.empty?
+  say "You need MongoDB version 2.2 or newer to use Squash".red.bold
+  say "Please install MongoDB and rerun this script".magenta
+  exit 1
+end
+
+unless `mongo --version`.include?('MongoDB shell version: 2.2')
+  say "You need MongoDB version 2.2 or newer to use Squash".red.bold
+  say "Please upgrade MongoDB and re-run this script.".magenta
+  exit 1
+end
+
 if `which bundle`.empty?
   say "You need Bundler to use Squash.".red.bold
   say "Please run", "gem install bundler".bold, "and re-run this script.".magenta
@@ -350,7 +362,7 @@ end
 
 if step < 3
   say
-  say "Let's set up your database now.".bold
+  say "Let's set up your PostgreSQL database now.".bold
   say "If you don't know the answer to a question, give a best guess. You can always",
       "change your database.yml file later."
 
@@ -403,6 +415,76 @@ if step < 3
 end
 
 if step < 4
+  say
+  say "Let's set up your MongoDB database now.".bold
+  say "If you don't know the answer to a question, give a best guess. You can always",
+      "change your mongoid.yml file later."
+
+  dev_host = query("What is the hostname and port of the development MongoDB server?", 'localhost:27017')
+  dev_user = query("What MongoHQ user will Squash use in development, if any?", '')
+  dev_pw   = dev_user ? query("What is #{dev_user}'s password?", '') : nil
+  dev_db   = query("What is the name of your MongoDB development database?", 'squash_development')
+
+  test_host = query("What is the hostname and port of the test MongoDB server?", 'localhost:27017')
+  test_user  = query("What MongoHQ user will Squash use in test, if any?", '')
+  test_pw   = test_user ? query("What is #{dev_user}'s password?", '') : nil
+  test_db   = query("What is the name of your MongoDB test database?", 'squash_test')
+
+  prod_host = query("What is the hostname and port of the (or any) production MongoDB server?", '')
+  prod_user  = query("What MongoHQ user will Squash use in development, if any?", '')
+  prod_pw    = prod_user ? query("What is #{dev_user}'s password?", '') : nil
+  prod_db   = query("What is the name of your MongoDB production database?", 'squash_production')
+
+  say "Updating config/mongoid.yml..."
+  File.open('config/mongoid.yml', 'w') do |f|
+    settings = {
+        'development' => {
+            'sessions' => {
+                'default' => {
+                    'database' => dev_db,
+                    'hosts'    => [dev_host]
+                }
+            }
+        },
+        'test'        => {
+            'sessions' => {
+                'default' => {
+                    'database' => test_db,
+                    'hosts'    => [test_host],
+                    'options'  => {
+                        'consistency'    => :strong,
+                        'max_retries'    => 1,
+                        'retry_interval' => 0
+                    }
+                }
+            }
+        },
+        'production'  => {
+            'sessions' => {
+                'default' => {
+                    'database' => prod_db,
+                    'hosts'    => [prod_host],
+                    'options'  => nil
+                }
+            }
+        }
+    }
+
+    # mongo l/p settings cannot be present-but-nil
+    settings['development']['sessions']['default']['username'] = dev_user if dev_user
+    settings['development']['sessions']['default']['password'] = dev_pw if dev_pw
+    settings['test']['sessions']['default']['username'] = test_user if test_user
+    settings['test']['sessions']['default']['password'] = test_pw if test_pw
+    settings['production']['sessions']['default']['username'] = prod_user if prod_user
+    settings['production']['sessions']['default']['password'] = prod_pw if prod_pw
+
+    f.puts(settings.to_yaml)
+  end
+
+  File.open('/tmp/squash_install_progress', 'w') { |f| f.puts '4' }
+end
+
+if step < 5
   db_config = YAML.load_file('config/database.yml')
 
   dev_host  = db_config['development']['host']
@@ -437,17 +519,17 @@ if step < 4
   prompt_or_quit "Ready to migrate the test database?"
   run 'env', 'RAILS_ENV=test', 'rake', 'db:migrate'
 
-  File.open('/tmp/squash_install_progress', 'w') { |f| f.puts '4' }
+  File.open('/tmp/squash_install_progress', 'w') { |f| f.puts '5' }
 end
 
-if step < 5
+if step < 6
   say "Generating session secret..."
   secret = SecureRandom.hex
   contents = File.read('config/initializers/secret_token.rb')
   File.open('config/initializers/secret_token.rb', 'w') do |f|
     f.puts contents.sub('_SECRET_', secret)
   end
-  File.open('/tmp/squash_install_progress', 'w') { |f| f.puts '5' }
+  File.open('/tmp/squash_install_progress', 'w') { |f| f.puts '6' }
 end
 
 say

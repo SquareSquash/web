@@ -168,6 +168,8 @@ class Project < ActiveRecord::Base
   validate :can_clone_repo, if: :validate_repo_connectivity
 
   before_validation :create_api_key, on: :create
+
+  extend SetNilIfBlank
   set_nil_if_blank :commit_url_format, :critical_mailing_list,
                    :all_mailing_list, :sender, :trusted_email_domain,
                    :pagerduty_service_key

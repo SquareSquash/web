@@ -12,14 +12,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-class DeviceBug < ActiveRecord::Base
-  self.primary_keys = [:bug_id, :device_id]
+class RemoveDeviceBugs < ActiveRecord::Migration
+  def up
+    TrackBugsPerDevice.down
+  end
 
-  belongs_to :bug, inverse_of: :device_bugs
-
-  validates :bug,
-            presence: true
-  validates :device_id,
-            presence: true,
-            length:   {maximum: 126}
+  def down
+    TrackBugsPerDevice.up
+  end
 end

@@ -45,7 +45,7 @@ module Views
             [Occurrence.joins(:bug).where(bugs: {fixed: false, irrelevant: false}, crashed: true).count,
              "crash associated with an unresolved bug",
              "crashes associated with an unresolved bug"],
-            [DeviceBug.joins(:bug).where(bugs: {fixed: false, irrelevant: false, environment_id: @environment.id}).count,
+            [OccurrenceData.where(bug_id: @environment.bugs.where(irrelevant: false, fixed: false).pluck(:id)).distinct(:device_id).count,
              "device that crashed because of an unresolved bug",
              "devices that crashed because of an unresolved bug"]
         ]

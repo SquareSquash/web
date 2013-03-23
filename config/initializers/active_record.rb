@@ -12,19 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Reopen the Active Record base class to add a few very non-intrusive changes.
-# Yes, mixins are the correct way of doing this, but this is a really small
-# change and it's much more convenient this way. Also includes fixes for
-# composite primary keys.
+# Reopen the Active Record base class to add a few CPK fixes.
 
 class ActiveRecord::Base
-
-  # Before-hook that sets string fields to nil if they're empty.
-  def self.set_nil_if_blank(*fields)
-    fields.each do |field|
-      before_validation { |obj| obj.send :"#{field}=", nil if obj.send(field).blank? }
-    end
-  end
 
   # Apparently CPK forgot to override this method
   def touch(name = nil)

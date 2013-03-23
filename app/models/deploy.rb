@@ -91,6 +91,8 @@ class Deploy < ActiveRecord::Base
   after_commit(on: :create) do |deploy|
     BackgroundRunner.run DeployFixMarker, deploy.id
   end
+
+  extend SetNilIfBlank
   set_nil_if_blank :hostname, :build
 
   scope :builds, where('build IS NOT NULL')
@@ -112,6 +114,6 @@ class Deploy < ActiveRecord::Base
   end
 
   def devices_affected
-    DeviceBug.joins(:bug).where(bugs: {deploy_id: id}).count(:device_id, distinct: true)
+    OccurrenceData.where(deploy_id: id).distinct(:device_id).count
   end
 end

@@ -110,7 +110,6 @@ class Bug < ActiveRecord::Base
   has_many :events, dependent: :delete_all, inverse_of: :bug
   has_many :watches, dependent: :delete_all, inverse_of: :bug
   has_many :notification_thresholds, dependent: :delete_all, inverse_of: :bug
-  has_many :device_bugs, dependent: :delete_all, inverse_of: :bug
 
   # @return [User, Occurrence, JIRA::Resource::Issue] The User who is currently
   #   modifying this Bug, or the Occurrence that is causing this bug to be
@@ -190,6 +189,8 @@ class Bug < ActiveRecord::Base
   before_create { |obj| obj.notify_on_occurrence = [] } # if anyone can explain to me why this defaults to [1] and not []...
   after_create :reload # grab the number value after the rule has been run
   after_save :index_for_search!
+
+  extend SetNilIfBlank
   set_nil_if_blank :blamed_revision, :resolution_revision, :jira_issue
 
   scope :query, ->(query) {

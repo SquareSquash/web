@@ -116,16 +116,16 @@ class OccurrencesController < ApplicationController
   # Query Parameters
   # ----------------
   #
-  # |              |                                                                                                            |
-  # |:-------------|:-----------------------------------------------------------------------------------------------------------|
-  # | `dimensions` | A parameterized array of up to four dimensions. All must be {Occurrence::AGGREGATING_FIELDS valid fields}. |
-  # | `size`       | The number of buckets (and thus, the time range).                                                          |
-  # | `step`       | The time interval to bucket results by (milliseconds).                                                     |
+  # |              |                                                                                                                |
+  # |:-------------|:---------------------------------------------------------------------------------------------------------------|
+  # | `dimensions` | A parameterized array of up to four dimensions. All must be {OccurrenceData::AGGREGATING_FIELDS valid fields}. |
+  # | `size`       | The number of buckets (and thus, the time range).                                                              |
+  # | `step`       | The time interval to bucket results by (milliseconds).                                                         |
 
   def aggregate
     dimensions = Array.wrap(params[:dimensions]).reject(&:blank?)
     dimensions.uniq!
-    return head(:unprocessable_entity) if dimensions.size > 4 || dimensions.any? { |d| !Occurrence::AGGREGATING_FIELDS.include?(d) }
+    return head(:unprocessable_entity) if dimensions.size > 4 || dimensions.any? { |d| !OccurrenceData::AGGREGATING_FIELDS.include?(d) }
 
     if dimensions.empty?
       return respond_to do |format|
@@ -134,71 +134,115 @@ class OccurrencesController < ApplicationController
     end
     dimensions.map!(&:to_sym)
 
-    occurrences      = @bug.occurrences.
-        where("occurred_at >= ?", 30.days.ago).
-        order('occurred_at ASC').
-        limit(MAX_AGGREGATED_RECORDS)
-
-    # create a hash mapping dimension names to a hash mapping dimension values
-    # to a hash mapping timestmaps to the bucket count of that value in that
-    # time period:
-    #
-    # {
-    #   'operating_system' => {
-    #     'Mac OS X' => {
-    #       <9/1 12 AM> => 12
-    #     }
-    #   }
-    # }
-    #
-    # In addition, build a hash of total occurrences for each time bucket:
-    #
-    # {
-    #   'operating_system' => {
-    #     <9/1 12 AM> => 12
-    #   }
-    # }
-
-    dimension_values = dimensions.inject({}) { |hsh, dim| hsh[dim] = {}; hsh }
-    totals           = Hash.new(0)
-    top_values       = dimensions.inject({}) { |hsh, dim| hsh[dim] = Hash.new(0); hsh }
-
-    occurrences.each do |occurrence|
-      time = occurrence.occurred_at.change(min: 0, sec: 0, usec: 0).to_i * 1000
-      dimensions.each do |dimension|
-        dimension_values[dimension][occurrence.send(dimension)]       ||= Hash.new(0)
-        dimension_values[dimension][occurrence.send(dimension)][time] += 1
-        top_values[dimension][occurrence.send(dimension)]             += 1
-      end
-      totals[time] += 1
-    end
-
-    top_values.each do |dimension, value_totals|
-      top_values[dimension] = value_totals.sort_by(&:last).reverse.map(&:first)[0, 5]
-    end
-
-    # convert it to a hash mapping dimension names to an array of hashes each
-    # with two keys: label (the value) and data (an array of points, x being the
+    # build a hash mapping dimension names to an array of hashes each with two
+    # keys: label (the value) and data (an array of points, x being the
     # timestamp (ms) and y being the percentage of occurrences in that time
     # bucket with that value):
     #
     # {
     #   'operating_system' => [
-    #     {label: 'Mac OS X', data: [[9/1 12 AM, 100%]]}
-    #   ]
+    #     {label: 'Mac OS X', data: [[9/1 12 AM, 100%]]},
+    #     ...
+    #   ],
+    #   ...
     # }
 
-    dimension_values.each do |dim, values|
-      dimension_values[dim] = Array.new
-      values.each do |value, times|
-        next unless top_values[dim].include?(value)
-        series       = {label: value, data: []}
-        dimension_values[dim] << series
-        totals.each do |time, total|
-          series[:data] << [time, total.zero? ? 0 : (times[time]/total.to_f)*100]
+    # In order to do this, we'll have to execute two map/reduces in Mongo: the
+    # first will generate a result set that counts up dimension name/value pairs
+    # (such as "operating_system"/"Mac OS X").
+    #
+    # The result will be a temporary collection whose documents have compound
+    # keys consisting of a dimension name (such as "operating_system"), a
+    # dimension value (such as "Mac OS X"), and the timestamp of a bucket, in
+    # milliseconds, quantized to the hour. The document's value will be the
+    # total number of occurrences applying to that key.
+
+    collection_name = "aggregate_#{@bug.id}_#{Time.now.to_i}" #TODO not perfectly threadsafe
+
+    result = OccurrenceData.where(bug_id: @bug.id, :occurred_at.gte => 30.days.ago).
+        map_reduce(ERB.new(<<-ERB).result(binding), <<-JS).out(replace: collection_name)
+            function() {
+              <% dimensions.each do |dimension| %>
+                emit({
+                  dim: "<%= dimension %>",
+                  value: this.<%= dimension %>,
+                  ts: Math.floor(this.occurred_at.getTime()/3600000)*3600000
+                }, {count: 1});
+              <% end %>
+            }
+          ERB
+            function(key, values) {
+              var result = {count: 0};
+              values.forEach(function(value) { result.count += value.count; });
+              return result;
+            }
+          JS
+    result.counts # execute the first map/reduce
+
+    # Now, we will map/reduce those results to generate a new result set that
+    # organizes a dimension name and timestamp with the set of possible values
+    # for that dimension and the percentage of occurrences falling in that time
+    # bucket having that value (basically, a vertical slice of the final graph).
+    #
+    # The result will be a collection whose documents have compound keys
+    # consisting of a dimension name and a timestamp. The document value will be
+    # an array of pairs, a pair consisting of a dimension value and the
+    # percentage applicable to that value.
+
+    result = Mongoid::Contextual::MapReduce.new(result.session[collection_name], OccurrenceData.criteria, <<-JS, <<-JS).out(inline: true).to_a
+              function() {
+                emit({dim: this._id.dim, ts: this._id.ts}, {colval: this._id.value, total: this.value.count, values: [[this._id.value, 100.0]]});
+                // emit both the "values" key (which would be used if the reduce function is never
+                // called because there is only one mapped value), and also the "total" and "colval"
+                // keys (used by the reduce function)
+              }
+            JS
+              function(key, values) {
+                var total = 0;
+
+                var dimensionValues = new Object();
+                values.forEach(function(value) {
+                  if (dimensionValues[value.colval] == undefined)
+                    dimensionValues[value.colval] = 0;
+                  dimensionValues[value.colval] += value.total;
+                  total += value.total
+                });
+
+                var result = [];
+                for (var dimensionValue in dimensionValues) {
+                  if (!dimensionValues.hasOwnProperty(dimensionValue)) continue;
+                  result.push([dimensionValue, dimensionValues[dimensionValue]/total*100]);
+                }
+                return {values: result};
+              }
+            JS
+
+    # clean up temp collection
+    Mongoid.default_session[collection_name].drop
+
+    # OK, almost there. Now we have to convert the result from Mongo's format to
+    # the JSON format we want it in.
+
+    dimension_values = result.inject({}) do |hsh, dimension_ts|
+      dimension_name      = dimension_ts['_id']['dim']
+      hsh[dimension_name] ||= Array.new
+      dimension_ts['value']['values'].each do |(label, percent)|
+        value_element = hsh[dimension_name].detect { |v| v[:label] == label }
+        value_element ||= begin
+          ve = {label: label, data: []}
+          hsh[dimension_name] << ve
+          ve
         end
+
+        time_bucket = dimension_ts['_id']['ts'].to_i
+        value_element[:data] << [time_bucket, percent]
       end
+
+      hsh
     end
+
+    # Sort each array of pairs by time.
+    dimension_values.each { |_, values| values.each { |value| value[:data].sort_by!(&:first) } }
 
     respond_to do |format|
       format.json { render json: dimension_values.to_json }
@@ -206,21 +250,30 @@ class OccurrencesController < ApplicationController
   end
 
   def histogram
-    occurrences = @bug.occurrences.
-        where("occurred_at >= ?", 30.days.ago).
-        group("date_trunc('hour', occurred_at)").
-        count.map do |date_str, count|
-      [Time.parse(date_str + " UTC").to_i * 1000, count]
-    end
-    occurrences.sort_by!(&:first)
-    if occurrences.empty?
+    result = OccurrenceData.where(bug_id: @bug.id, :occurred_at.gte => 30.days.ago).
+        map_reduce(<<-JS, <<-JS).out(inline: true).to_a
+          function() {
+            emit(Math.floor(this.occurred_at.getTime()/3600000)*3600000, {count: 1});
+          }
+        JS
+          function(key, values) {
+            var result = {count: 0};
+            values.forEach(function(value) { result.count += value.count; });
+            return result;
+          }
+        JS
+
+    result.map! { |value| [value['_id'].to_i, value['value']['count'].to_i] }
+    result.sort_by!(&:first)
+
+    if result.empty?
       deploys = Array.new
     else
-      deploys = @environment.deploys.where('deployed_at >= ?', Time.at(occurrences.first.first/1000)).order('deployed_at DESC').limit(30)
+      deploys = @environment.deploys.where('deployed_at >= ?', Time.at(result.first.first/1000)).order('deployed_at DESC').limit(30)
     end
 
     respond_to do |format|
-      format.json { render json: {occurrences: occurrences, deploys: decorate_deploys(deploys)}.to_json }
+      format.json { render json: {occurrences: result, deploys: decorate_deploys(deploys)}.to_json }
     end
   end
 

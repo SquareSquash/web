@@ -26,6 +26,8 @@ Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
 ActiveRecord::Base.subclasses.each do |model|
   model.connection.execute "TRUNCATE #{model.table_name} CASCADE"
 end
+Mongoid::Sessions.default.drop
+Rails::Mongoid.create_indexes
 
 RSpec.configure do |config|
   # ## Mock Framework
