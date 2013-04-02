@@ -45,6 +45,7 @@ class root.Histogram
             mode: 'time'
             timeformat: '%Y/%m/%d %H:%M'
             tickLength: 5
+            rotateTicks: 45
           yaxis:
             tickDecimals: 0
           grid:

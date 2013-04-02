@@ -35,6 +35,7 @@
 //= require flot/flot
 //= require flot/resize
 //= require flot/stack
+//= require flot/tickrotor
 //= require flot/time
 //
 //= require sh/manifest

@@ -48,6 +48,7 @@ class root.Aggregation
                 mode: 'time'
                 timeformat: '%Y/%m/%d %H:%M'
                 tickLength: 5
+                rotateTicks: 45
               yaxis:
                 min: 0
                 max: 100
