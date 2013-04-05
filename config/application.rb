@@ -88,6 +88,13 @@ module Squash
       g.integration_tool    :rspec
       g.fixture_replacement :factory_girl, dir: 'spec/factories'
     end
+
+    config.middleware.use Rack::Cors do
+      allow do
+        origins *Squash::Configuration.squash_javascript.allowed_domains
+        resource '/api/1.0/notify', headers: :any, methods: [:post]
+      end
+    end
   end
 end
 
