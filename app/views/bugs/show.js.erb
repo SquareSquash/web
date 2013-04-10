@@ -192,6 +192,7 @@ function PageManager() {
         complete: function() { deploy_input[0].disabled = false; },
         success: function(bug) {
           deploy_input[0].checked = bug.notify_on_deploy;
+          new Flash('success').text("Your notification settings were updated.");
         },
         error: function() {
           new Flash('alert').text("Error updating email settings.");
@@ -208,6 +209,7 @@ function PageManager() {
         complete: function() { occurrence_input[0].disabled = false; },
         success: function(bug) {
           occurrence_input[0].checked = bug.notify_on_occurrence;
+          new Flash('success').text("Your notification settings were updated.");
         },
         error: function() {
           new Flash('alert').text("Error updating email settings.");
