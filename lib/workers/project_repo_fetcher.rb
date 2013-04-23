@@ -12,8 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Very simple worker that fetches a {Project}'s repository. Encapsulated into a
-# separate class just to make it easier for potential future Resque integration.
+# Very simple worker that fetches a {Project}'s repository.
 
 class ProjectRepoFetcher
 

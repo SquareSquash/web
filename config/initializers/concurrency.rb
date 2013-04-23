@@ -35,3 +35,7 @@ else
   Multithread.start
   at_exit { Multithread.stop }
 end
+
+# Load concurrency setup
+
+BackgroundRunner.runner.setup if BackgroundRunner.runner.respond_to?(:setup)

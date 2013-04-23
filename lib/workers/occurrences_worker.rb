@@ -37,7 +37,7 @@ class OccurrencesWorker
   # @private
   attr_reader :project, :environment, :deploy
 
-  # Included for Resque compatibility.
+  # Included for BackgroundRunner compatibility.
 
   def self.perform(attrs)
     new(attrs).perform

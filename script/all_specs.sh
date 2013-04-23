@@ -34,38 +34,31 @@ COMMAND="rspec spec"
 
 TESTDIR="config/environments/test"
 AUTHFILE="${TESTDIR}/authentication.yml"
+CONCFILE="${TESTDIR}/concurrency.yml"
 
-##### Cleanliness checks
-
-if [[ `git status --porcelain -- ${TESTDIR}` ]]; then
-    echo This script must be run with a clean ${TESTDIR} directory.
-    exit 1
-fi
-
-##### Perform global configuration
-
-# JIRA
-cat > ${TESTDIR}/jira.yml <<YAML
+function reset_config() {
+    # JIRA
+    cat > ${TESTDIR}/jira.yml <<YAML
 ---
 disabled: false
 YAML
 
-# PagerDuty
-cat > ${TESTDIR}/pagerduty.yml <<YAML
+    # PagerDuty
+    cat > ${TESTDIR}/pagerduty.yml <<YAML
 ---
 disabled: false
 YAML
 
-# Authentication
-cat > ${AUTHFILE} <<YAML
+    # Authentication
+    cat > ${AUTHFILE} <<YAML
 ---
 strategy: password
 password:
   salt: abc123
 YAML
 
-# Mailer
-cat > ${TESTDIR}/mailer.yml <<YAML
+    # Mailer
+    cat > ${TESTDIR}/mailer.yml <<YAML
 ---
 from: squash@example.com
 domain: example.com
@@ -74,36 +67,80 @@ default_url_options:
   protocol: http
 YAML
 
-##### 1. MRI (password auth)
-rvm 2.0.0@squash --create exec bundle && ${COMMAND}
+    # Concurrency
+    cat > ${CONCFILE} <<YAML
+---
+background_runner: Multithread
+multithread:
+  priority_threshold: 50
+  pool_size: 20
+  max_threads: 100
+  priority:
+    CommentNotificationMailer: 80
+    DeployFixMarker: 70
+    DeployNotificationMailer: 80
+    JiraStatusUpdater: 20
+    ObfuscationMapWorker: 60
+    OccurrenceNotificationMailer: 80
+    OccurrencesWorker: 40
+    PagerDutyAcknowledger: 20
+    PagerDutyNotifier: 80
+    PagerDutyResolver: 20
+    ProjectRepoFetcher: 30
+    SourceMapWorker: 60
+    SymbolicationWorker: 60
+YAML
+}
 
-echo
-echo "***** That was MRI with password auth ******"
-echo
+##### Cleanliness checks
+function check_clean() {
+    if [[ `git status --porcelain -- ${TESTDIR}` ]]; then
+        echo This script must be run with a clean ${TESTDIR} directory.
+        exit 1
+    fi
+}
+
+##### 1. MRI (password auth)
+function run_password() {
+    reset_config
+    rvm 2.0.0@squash --create exec bundle && ${COMMAND}
+
+    echo
+    echo "***** That was MRI with password auth ******"
+    echo
+}
 
 ##### 2. MRI (password auth w/registration disabled)
-cat > ${AUTHFILE} <<YAML
+function run_reg_disabled() {
+    reset_config
+    cat > ${AUTHFILE} <<YAML
 ---
 strategy: password
 password:
   salt: abc123
 registration_enabled: false
 YAML
-rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec bundle && ${COMMAND}
 
-echo
-echo "***** That was MRI with password auth w/registration disabled ******"
-echo
+    echo
+    echo "***** That was MRI with password auth w/registration disabled ******"
+    echo
+}
 
 ##### 3. JRuby (password auth)
-rvm jruby@squash --create exec bundle && ${COMMAND}
+function run_jruby() {
+    reset_config
+    rvm jruby@squash --create exec bundle && ${COMMAND}
 
-echo
-echo "***** That was JRuby with password auth ******"
-echo
+    echo
+    echo "***** That was JRuby with password auth ******"
+    echo
+}
 
 ##### 4. LDAP authentication, no bind DN (MRI)
-cat > ${AUTHFILE} <<YAML
+function run_ldap() {
+    reset_config
+    cat > ${AUTHFILE} <<YAML
 ---
 strategy: ldap
 ldap:
@@ -113,14 +150,17 @@ ldap:
   tree_base: cn=users,dc=mycompany,dc=com
   search_key: uid
 YAML
-rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec bundle && ${COMMAND}
 
-echo
-echo "***** That was MRI with LDAP auth, no bind DN ******"
-echo
+    echo
+    echo "***** That was MRI with LDAP auth, no bind DN ******"
+    echo
+}
 
 ##### 5. LDAP authentication, with bind DN (MRI)
-cat > ${AUTHFILE} <<YAML
+function run_ldap_bind_dn() {
+    reset_config
+    cat > ${AUTHFILE} <<YAML
 ---
 strategy: ldap
 ldap:
@@ -132,20 +172,57 @@ ldap:
   bind_dn: cn=admins,ou=System,dc=mycompany,dc=com
   bind_password: password123
 YAML
-rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec bundle && ${COMMAND}
 
-echo
-echo "***** That was MRI with LDAP auth + bind DN ******"
-echo
+    echo
+    echo "***** That was MRI with LDAP auth + bind DN ******"
+    echo
+}
 
-##### 6. MRI 1.9 (password auth)
-rvm 1.9.3@squash --create exec bundle && ${COMMAND}
+##### 6. Resque integration (MRI)
+function run_resque() {
+    reset_config
+    cat > ${CONCFILE} <<YAML
+---
+background_runner: Resque
+resque:
+  development: "localhost:6379"
+  production: "localhost:6379"
+  test: "localhost:6379"
+  pool:
+    squash: 2
+YAML
+    rvm 2.0.0@squash exec bundle && ${COMMAND}
 
-echo
-echo "***** That was MRI 1.9 with password auth ******"
-echo
+    echo
+    echo "***** That was MRI with Resque ******"
+    echo
+}
+
+##### 7. MRI 1.9 (password auth)
+function run_mri19() {
+    reset_config
+    rvm 1.9.3@squash --create exec bundle && ${COMMAND}
+
+    echo
+    echo "***** That was MRI 1.9 with password auth ******"
+    echo
+}
 
 ##### Reset configuration
+function restore() {
+    git checkout ${TESTDIR}
+    git clean -df -- ${TESTDIR}
+}
 
-git checkout ${TESTDIR}
-git clean -df -- ${TESTDIR}
+check_clean
+
+run_password
+run_reg_disabled
+run_jruby
+run_ldap
+run_ldap_bind_dn
+run_resque
+run_mri19
+
+restore

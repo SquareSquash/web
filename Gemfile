@@ -85,6 +85,12 @@ gem 'squash_ios_symbolicator', require: 'squash/symbolicator'
 gem 'squash_javascript', require: 'squash/javascript'
 gem 'squash_java', require: 'squash/java'
 
+# BACKGROUND JOBS
+conditionally('concurrency.background_runner', 'Resque') do
+  gem 'resque'
+  gem 'resque-pool'
+end
+
 group :assets do
   gem 'sass-rails'
   gem 'libv8', '~> 3.11.8', platform: :mri

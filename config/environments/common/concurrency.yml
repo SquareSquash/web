@@ -1,5 +1,6 @@
 ---
 background_runner: Multithread
+
 multithread:
   priority_threshold: 50
   pool_size: 20
@@ -18,3 +19,10 @@ multithread:
     ProjectRepoFetcher: 30
     SourceMapWorker: 60
     SymbolicationWorker: 60
+
+resque: 
+  development: "localhost:6379"
+  production: "localhost:6379"
+  test: "localhost:6379"
+  pool:
+    squash: 2
