@@ -33,8 +33,6 @@ describe Account::BugsController do
       context '[JSON]' do
         context "[type = watched]" do
           before :all do
-            Account::BugsController::PER_PAGE = 5 # speed it up
-
             @user = FactoryGirl.create(:user)
             env   = FactoryGirl.create(:environment)
             FactoryGirl.create :membership, user: @user, project: env.project
@@ -50,6 +48,8 @@ describe Account::BugsController do
             end
             @watches = @user.watches.includes(:bug).order('created_at DESC') # reload to get new triggered values
           end
+
+          before(:each) { stub_const 'Account::BugsController::PER_PAGE', 5 } # speed it up
 
           it "should load 50 of the most recently watched bugs by default" do
             get :index, format: 'json', type: 'watched'
@@ -71,8 +71,6 @@ describe Account::BugsController do
 
         context "[type = assigned]" do
           before :all do
-            Account::BugsController::PER_PAGE = 5 # speed it up
-
             @user = FactoryGirl.create(:user)
             env   = FactoryGirl.create(:environment)
             FactoryGirl.create :membership, user: @user, project: env.project
@@ -88,6 +86,8 @@ describe Account::BugsController do
             @bugs.map(&:reload) # get the new triggered values
             sort @bugs, 'latest_occurrence', true
           end
+
+          before(:each) { stub_const 'Account::BugsController::PER_PAGE', 5 } # speed it up
 
           it "should load 50 of the newest assigned bugs by default" do
             get :index, format: 'json'

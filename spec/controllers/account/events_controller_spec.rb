@@ -19,8 +19,6 @@ describe Account::EventsController do
 
   describe "#index" do
     before :all do
-      Account::EventsController::PER_PAGE = 5 # speed it up
-
       membership = FactoryGirl.create(:membership)
       @env       = FactoryGirl.create(:environment, project: membership.project)
       @bug       = FactoryGirl.create(:bug, environment: @env)
@@ -38,6 +36,8 @@ describe Account::EventsController do
       @user.user_events.delete_all # creating the comment created a watch which copied events over
       @events.each { |event| FactoryGirl.create :user_event, event: event, user: @user, created_at: event.created_at }
     end
+
+    before(:each) { stub_const 'Account::EventsController::PER_PAGE', 5 } # speed it up
 
     it "should require a logged-in user" do
       get :index, format: 'json'

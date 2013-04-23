@@ -17,8 +17,6 @@ require 'spec_helper'
 describe BugsController do
   describe "#index" do
     before :all do
-      BugsController::PER_PAGE = 5 # speed it up
-
       membership = FactoryGirl.create(:membership)
       @env       = FactoryGirl.create(:environment, project: membership.project)
       @bugs      = 10.times.map do |i|
@@ -39,6 +37,8 @@ describe BugsController do
       end
       @bugs = @env.bugs(true).all # reload to get those fields set by triggers
     end
+
+    before(:each) { stub_const 'BugsController::PER_PAGE', 5 } # speed it up
 
     def sort(bugs, field, reverse=false)
       bugs.sort_by! { |b| [b.send(field), b.number] }

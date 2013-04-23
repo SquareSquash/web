@@ -508,8 +508,7 @@ describe Blamer::Cache do
     end
 
     it "should drop the least recently used Blame when the cache is full" do
-      old_max                    = Blamer::Cache::MAX_ENTRIES
-      Blamer::Cache::MAX_ENTRIES = 3
+      stub_const 'Blamer::Cache::MAX_ENTRIES', 3
 
       FactoryGirl.create_list :blame, 4
       doomed = FactoryGirl.create :blame, updated_at: Time.now - 1.day
@@ -528,8 +527,6 @@ describe Blamer::Cache do
 
       -> { doomed.reload }.should raise_error(ActiveRecord::RecordNotFound)
       Blame.count.should eql(3)
-
-      Blamer::Cache::MAX_ENTRIES = old_max
     end
   end
 end
