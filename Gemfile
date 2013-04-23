@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 
-ruby "1.9.3"
+ruby '1.9.3'
 
 # FRAMEWORK
-gem 'rails', git: 'git://github.com/rails/rails.git', branch: '3-2-stable'
+gem 'rails', github: 'rails/rails', branch: '3-2-stable'
 # We need to use this branch of Rails because it includes fixes for ActiveRecord
 # and concurrency that we need for our thread-spawning background job paradigm
 # to work
@@ -15,14 +15,14 @@ gem 'pg', platform: :mri
 # Version 1.2.6 introduces a bug relating to SQL binds
 gem 'activerecord-jdbc-adapter', '1.2.5', platform: :jruby
 gem 'activerecord-jdbcpostgresql-adapter', platform: :jruby
-gem 'has_metadata_column', git: 'git://github.com/RISCfuture/has_metadata_column.git'
+gem 'has_metadata_column', github: 'RISCfuture/has_metadata_column'
 gem 'slugalicious'
 gem 'email_validation'
 gem 'url_validation'
 gem 'json_serialize'
 gem 'validates_timeliness'
 gem 'find_or_create_on_scopes', '>= 1.2.1'
-gem 'composite_primary_keys', git: 'git://github.com/RISCfuture/composite_primary_keys.git'
+gem 'composite_primary_keys', github: 'RISCfuture/composite_primary_keys'
 gem 'activerecord-postgresql-cursors'
 
 # VIEWS
@@ -32,11 +32,11 @@ gem 'kramdown'
 
 # UTILITIES
 gem 'json'
-gem 'git', git: 'git://github.com/RISCfuture/ruby-git.git'
+gem 'git', github: 'RISCfuture/ruby-git'
 gem 'user-agent'
 
 # AUTH
-gem 'net-ldap', require: 'net/ldap'
+gem 'net-ldap', github: 'RoryO/ruby-net-ldap', require: 'net/ldap'
 
 # INTEGRATION
 gem 'jira-ruby', require: 'jira'

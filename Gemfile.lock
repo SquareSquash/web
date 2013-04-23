@@ -20,6 +20,12 @@ GIT
     git (1.2.5)
 
 GIT
+  remote: git://github.com/RoryO/ruby-net-ldap.git
+  revision: cb1966a35b7b52a600f3880710854f14c77ab784
+  specs:
+    net-ldap (0.2.20110317223538)
+
+GIT
   remote: git://github.com/rails/rails.git
   revision: ba12ef6ae15208a608733a06b78940ef92f305b8
   branch: 3-2-stable
@@ -146,7 +152,6 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.23)
     multi_json (1.7.2)
-    net-ldap (0.3.1)
     oauth (0.4.7)
     pg (0.15.1)
     plist (3.1.0)
@@ -263,7 +268,7 @@ DEPENDENCIES
   kramdown
   less-rails
   libv8 (~> 3.11.8)
-  net-ldap
+  net-ldap!
   pg
   rack-cors
   rails!
