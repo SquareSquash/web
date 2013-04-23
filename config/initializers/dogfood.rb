@@ -58,13 +58,19 @@ unless defined?(IRB)
             from.puts "Access-Control-Allow-Headers: origin, content-type, x-category"
           else
             from.puts "HTTP/1.1 200 OK"
+            from.puts "Date: #{Time.now.to_s}"
+            from.puts "Access-Control-Allow-Origin: http://localhost:#{$own_port}"
+            from.puts "Access-Control-Allow-Methods: POST, GET, OPTIONS"
+            from.puts "Access-Control-Allow-Headers: origin, content-type, x-category"
           end
           from.puts
           from.close
 
-          to = TCPSocket.new('localhost', $own_port)
-          request.each { |line| to.puts line }
-          to.close
+          unless request.first.starts_with?('OPTIONS')
+            to = TCPSocket.new('localhost', $own_port)
+            request.each { |line| to.puts line }
+            to.close
+          end
         end
       end
     end
