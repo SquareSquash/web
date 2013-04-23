@@ -44,7 +44,8 @@ class OccurrenceNotificationMailer
   # frequency-based notifications as appropriate.
 
   def perform
-    if @occurrence.bug.occurrences_count == @occurrence.bug.environment.project.critical_threshold
+    if @occurrence.bug.occurrences_count == @occurrence.bug.environment.project.critical_threshold &&
+        !@occurrence.bug.fixed? && !@occurrence.bug.irrelevant?
       NotificationMailer.critical(@occurrence.bug).deliver
     end
 

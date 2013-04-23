@@ -730,6 +730,24 @@ describe Bug do
         ActionMailer::Base.deliveries.size.should eql(1)
       end
 
+      it "should not send an email if the bug is marked as irrelevant" do
+        FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
+        @bug.update_attribute :irrelevant, true
+        ActionMailer::Base.deliveries.should be_empty
+
+        FactoryGirl.create :rails_occurrence, bug: @bug
+        ActionMailer::Base.deliveries.should be_empty
+      end
+
+      it "should not send an email if the bug is fixed" do
+        FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
+        @bug.update_attribute :fixed, true
+        ActionMailer::Base.deliveries.should be_empty
+
+        FactoryGirl.create :rails_occurrence, bug: @bug
+        ActionMailer::Base.deliveries.should be_empty
+      end
+
       it "should not send an email if no critical mailing list is specified" do
         @project.update_attribute :critical_mailing_list, nil
         FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
