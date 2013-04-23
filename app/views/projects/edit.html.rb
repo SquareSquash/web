@@ -94,8 +94,11 @@ module Views
         end
         pre <<-RUBY, class: 'brush: ruby; light: true'
 Squash::Ruby.configure :api_host => '#{request.protocol + request.host_with_port}',
-                       :api_key => '#{@project.api_key}'
+                       :api_key => '#{@project.api_key}',
+                       :disabled => (Rails.env.development? || Rails.env.test?)
         RUBY
+
+        p "(This code is specific to Rails 3 but Squash is also compatible with Rails 2.)"
 
         p do
           text "Enable automatic exception notification as part of the request process by extending your "
