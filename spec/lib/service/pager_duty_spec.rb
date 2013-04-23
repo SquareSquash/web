@@ -49,7 +49,7 @@ describe Service::PagerDuty do
         http = Net::HTTP
         proxy = Net::HTTP::Proxy(nil, nil, nil, nil)
         Net::HTTP.should_receive(:Proxy).once.with('myhost', 123).and_return(http)
-        Net::HTTP.should_receive(:Proxy).once.with(nil, nil, nil, nil).and_return(proxy)
+        Net::HTTP.stub!(:Proxy).and_return(proxy)
 
         resp = @pagerduty.send(method, 'abc123')
         resp.http_status.should eql(200)

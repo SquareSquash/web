@@ -1,7 +1,5 @@
 source 'https://rubygems.org'
 
-ruby '1.9.3'
-
 # FRAMEWORK
 gem 'rails', github: 'rails/rails', branch: '3-2-stable'
 # We need to use this branch of Rails because it includes fixes for ActiveRecord

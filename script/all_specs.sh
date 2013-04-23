@@ -75,7 +75,8 @@ default_url_options:
 YAML
 
 ##### 1. MRI (password auth)
-rvm 1.9.3@squash exec ${COMMAND}
+rvm 2.0.0@squash exec bundle
+rvm 2.0.0@squash exec ${COMMAND}
 
 echo
 echo "***** That was MRI with password auth ******"
@@ -89,13 +90,14 @@ password:
   salt: abc123
 registration_enabled: false
 YAML
-rvm 1.9.3@squash exec ${COMMAND}
+rvm 2.0.0@squash exec ${COMMAND}
 
 echo
 echo "***** That was MRI with password auth w/registration disabled ******"
 echo
 
 ##### 3. JRuby (password auth)
+rvm jruby@squash exec bundle
 rvm jruby@squash exec ${COMMAND}
 
 echo
@@ -113,7 +115,7 @@ ldap:
   tree_base: cn=users,dc=mycompany,dc=com
   search_key: uid
 YAML
-rvm 1.9.3@squash exec ${COMMAND}
+rvm 2.0.0@squash exec ${COMMAND}
 
 echo
 echo "***** That was MRI with LDAP auth, no bind DN ******"
@@ -132,10 +134,18 @@ ldap:
   bind_dn: cn=admins,ou=System,dc=mycompany,dc=com
   bind_password: password123
 YAML
-rvm 1.9.3@squash exec ${COMMAND}
+rvm 2.0.0@squash exec ${COMMAND}
 
 echo
 echo "***** That was MRI with LDAP auth + bind DN ******"
+echo
+
+##### 6. MRI 1.9 (password auth)
+rvm 1.9.3@squash exec bundle
+rvm 1.9.3@squash exec ${COMMAND}
+
+echo
+echo "***** That was MRI 1.9 with password auth ******"
 echo
 
 ##### Reset configuration
