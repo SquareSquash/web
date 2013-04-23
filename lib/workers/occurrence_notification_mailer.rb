@@ -45,17 +45,17 @@ class OccurrenceNotificationMailer
 
   def perform
     if @occurrence.bug.occurrences_count == @occurrence.bug.environment.project.critical_threshold
-      NotificationMailer.deliver :critical, @occurrence.bug
+      NotificationMailer.critical(@occurrence.bug).deliver
     end
 
     User.where(id: @occurrence.bug.notify_on_occurrence).each do |user|
-      NotificationMailer.deliver :occurrence, @occurrence, user
+      NotificationMailer.occurrence(@occurrence, user).deliver
     end
 
     @occurrence.bug.notification_thresholds.cursor.each do |thresh|
       begin
         if thresh.tripped?
-          NotificationMailer.deliver :threshold, @occurrence.bug, thresh.user
+          NotificationMailer.threshold(@occurrence.bug, thresh.user).deliver
           thresh.touch :last_tripped_at
         end
       rescue => err

@@ -94,7 +94,9 @@ class BugObserver < ActiveRecord::Observer
     if !bug.fixed? && bug.fixed_was && !bug.irrelevant?
       attrs[:data]['from'] = 'fixed'
       Event.create! attrs
-      NotificationMailer.deliver :reopened, bug unless bug.modifier.kind_of?(User)
+      Squash::Ruby.fail_silently do
+        NotificationMailer.reopened(bug).deliver unless bug.modifier.kind_of?(User)
+      end
     elsif !bug.fixed? && !bug.irrelevant? && bug.irrelevant_was
       attrs[:data]['from'] = 'irrelevant'
       Event.create! attrs
@@ -102,8 +104,10 @@ class BugObserver < ActiveRecord::Observer
   end
 
   def send_create_emails(bug)
-    NotificationMailer.deliver :initial, bug
-    NotificationMailer.deliver(:blame, bug) if bug.blamed_commit
+    Squash::Ruby.fail_silently do
+      NotificationMailer.initial(bug).deliver
+      NotificationMailer.blame(bug).deliver if bug.blamed_commit
+    end
   end
 
   def send_update_emails(bug)

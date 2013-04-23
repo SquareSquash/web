@@ -27,23 +27,6 @@ class NotificationMailer < ActionMailer::Base
   default from: Squash::Configuration.mailer.from
   default_url_options.merge! Squash::Configuration.mailer.default_url_options.symbolize_keys
 
-  # Creates and delivers an email. If the message is empty (i.e., `nil` was
-  # returned from the mailer action), no email is delivered.
-  #
-  # @param [Symbol] template The mailer action to invoke.
-  # @param args Arguments to pass to the action.
-  # @return [true, false] Whether an email was delivered.
-
-  def self.deliver(template, *args)
-    mail = send(template, *args)
-    if mail.from.present? #HACK generates empty mails when nil is returned
-      mail.deliver
-      return true
-    else
-      return false
-    end
-  end
-
   # Creates a message addressed to the {Project}'s `all_mailing_list` informing
   # of a new Bug.
   #

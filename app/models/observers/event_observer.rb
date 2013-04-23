@@ -42,7 +42,10 @@ class EventObserver < ActiveRecord::Observer
     if event.kind == 'assign' &&
         !event.bug.fixed? && !event.bug.irrelevant? &&
         event.user && event.assignee && event.user != event.assignee
-      NotificationMailer.deliver :assign, event.bug, event.user, event.assignee
+
+      Squash::Ruby.fail_silently do
+        NotificationMailer.assign(event.bug, event.user, event.assignee).deliver
+      end
     end
 
     if event.kind == 'close' &&
@@ -50,7 +53,9 @@ class EventObserver < ActiveRecord::Observer
         (!event.user_id && event.bug.assigned_user_id)) &&                 # or no user performed the action but there is an assigned user
         !(event.data['status'] == 'fixed' && event.bug.irrelevant?) &&     # an irrelevant bug was not marked as fixed
         !(event.data['status'] == 'irrelevant' && event.bug.fixed?)        # a fixed bug was not marked as irrelevant
-      NotificationMailer.deliver :resolved, event.bug, event.user
+      Squash::Ruby.fail_silently do
+        NotificationMailer.resolved(event.bug, event.user).deliver
+      end
     end
   end
 end
