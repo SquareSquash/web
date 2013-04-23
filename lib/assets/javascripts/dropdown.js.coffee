@@ -18,29 +18,29 @@
 # `display: none` without the "shown" class./
 #
 $(window).ready ->
+  roll_everything_up = ->
+    $('a[rel=dropdown]>.icon-chevron-up').removeClass('icon-chevron-up').addClass 'icon-chevron-down'
+    $('nav .shown').removeClass 'shown'
+
   # Clicking on a dropdown link toggles the dropdown
   $('a[rel=dropdown]').click (e) ->
     link = $(e.currentTarget)
     target = $(link.attr('href'))
 
+    roll_everything_up()
     target.toggleClass('shown')
     if target.hasClass('shown')
       link.find('.icon-chevron-down').removeClass('icon-chevron-down').addClass 'icon-chevron-up'
-      if link.hasClass('icon-chevron-down')
-        link.removeClass('icon-chevron-down').addClass 'icon-chevron-up'
-    else
-      link.find('.icon-chevron-up').removeClass('icon-chevron-up').addClass 'icon-chevron-down'
-      if link.hasClass('icon-chevron-up')
-        link.removeClass('icon-chevron-up').addClass 'icon-chevron-down'
+
+    return false
 
   # Clicking elsewhere hides all dropdowns
   $('body').click (e) =>
     # don't roll up dropdowns if we are clicking inside a dropdown
     return if $(e.target).closest('[rel=dropdown]').length > 0
-    return if $(e.target).closest('.shown').length > 0
+    return if $(e.target).closest('nav .shown').length > 0
 
-    $('a[rel=dropdown]>.icon-chevron-up').removeClass('icon-chevron-up').addClass 'icon-chevron-down'
-    $('.shown').removeClass 'shown'
+    roll_everything_up()
 
     return true
 

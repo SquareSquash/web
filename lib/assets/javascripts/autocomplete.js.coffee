@@ -46,13 +46,15 @@ class root.Autocomplete
     @element.wrap $('<div/>').css('position', 'relative')
     @element.attr 'autocomplete', 'off'
     @dropdown = $('<ul/>').addClass('autocomplete').appendTo(@element.parent())
-    @dropdown.css 'top', '' + @element.outerHeight() + 'px'
-    @dropdown.css 'width', '' + @element.outerWidth() + 'px'
 
     @itemList = this.renderItems(@options.suggestions)
     this.resetSelection()
 
-    @element.focus(=> @dropdown.addClass('shown')).blur =>
+    @element.focus( =>
+      @dropdown.css 'top', '' + @element.outerHeight() + 'px'
+      @dropdown.css 'width', '' + @element.outerWidth() + 'px'
+      @dropdown.addClass('shown')
+    ).blur =>
       @dropdown.oneTime 100, => @dropdown.removeClass('shown')
       # we add the delay to allow a click event to fire on an LI if we clicked
       # on it, before hiding the menu
