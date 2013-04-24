@@ -23,12 +23,12 @@ jQuery.fn.applyContext = ->
       $.ajax "/projects/#{element.attr 'data-project'}/context.json",
         type: 'GET'
         data: $.param
-          revision: element.attr('data-revision')
-          file: element.attr('data-file')
-          line: element.attr('data-line')
-          context: (element.attr('data-context') || 3)
+          revision: element.data('revision')
+          file: element.data('file')
+          line: element.data('line')
+          context: (element.data('context') || 3)
         success: (snippet) ->
-          element.text(snippet.code).removeClass().addClass("brush: #{snippet.brush}; ruler: true; first-line: #{snippet.first_line}; highlight: #{element.attr('data-line')}; toolbar: false; unindent: false")
+          element.text(snippet.code).removeClass().addClass("brush: #{snippet.brush}; ruler: true; first-line: #{snippet.first_line}; highlight: #{element.data('line')}; toolbar: false; unindent: false")
           SyntaxHighlighter.highlight()
         error: (xhr) ->
           if xhr && xhr.responseText

@@ -37,7 +37,7 @@ function processProjectSearchResults(query) {
           $('<button/>').attr({href: membership.project.url + '?show_environments=true#change_owner', type: 'button'}).
                   text("Change Ownership").autoButton().prependTo(li);
         else
-          $('<button/>').attr({ 'data-method': 'DELETE', href: membership.delete_url }).
+          $('<button/>').attr({ 'data-sqmethod': 'DELETE', href: membership.delete_url }).
                   addClass('warning').text("Leave Project").autoButton().prependTo(li);
         $('<strong/>').text(membership.human_role).prependTo(p);
       });

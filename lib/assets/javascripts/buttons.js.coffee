@@ -13,7 +13,8 @@
 #    limitations under the License.
 
 # Any buttons with HREF attributes automatically act as links. These buttons can
-# also have a DATA-METHOD attribute like Rails magic links.
+# also have DATA-SQMETHOD and DATA-SQCONFIRM attributes similar to Rails magic
+# links.
 #
 jQuery.fn.autoButton =  ->
   for element in this
@@ -22,13 +23,13 @@ jQuery.fn.autoButton =  ->
         button = $(e.currentTarget)
 
         perform = true
-        if button.attr('data-confirm')
-          perform = confirm(button.attr('data-confirm'))
-        unless perform then return
+        if button.data('sqconfirm')
+          perform = confirm(button.data('sqconfirm'))
+        unless perform then return false
 
-        if button.attr('data-method')
+        if button.data('sqmethod')
           form = $('<form/>').attr(action: button.attr('href'), method: 'POST')
-          $('<input/>').attr(type: 'hidden', name: '_method', value: button.attr('data-method')).appendTo form
+          $('<input/>').attr(type: 'hidden', name: '_method', value: button.data('sqmethod')).appendTo form
           $('<input/>').attr(type: 'hidden', name: $('meta[name=csrf-param]').attr('content'), value: $('meta[name=csrf-token]').attr('content')).appendTo form
           form.submit()
         else

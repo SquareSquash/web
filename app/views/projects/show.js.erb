@@ -43,19 +43,19 @@ function PageManager() {
       $.ajax("<%= project_url @project, format: 'json' %>", {
         type: 'PUT',
         data: $.param({
-                        'project[default_environment_id]': $(e.currentTarget).attr('data-id'),
+                        'project[default_environment_id]': $(e.currentTarget).data('id'),
                         '<%= request_forgery_protection_token %>': '<%= form_authenticity_token %>'
                       }),
         success: function() {
           // change Default to Make Default
           var parent = $('#default-indicator').parent();
-          var id = $('#default-indicator').attr('data-id');
+          var id = $('#default-indicator').data('id');
           parent.empty();
           $('<a/>').text('Make default').attr({href: '#', 'data-id': id}).addClass('make-default').appendTo(parent);
 
           // change Make Default to Default
           parent = $(e.currentTarget).parent();
-          id = $(e.currentTarget).attr('data-id');
+          id = $(e.currentTarget).data('id');
           parent.empty();
           $('<strong/>').text("Default").attr({'data-id': id, id: 'default-indicator'}).appendTo(parent);
 

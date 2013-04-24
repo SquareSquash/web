@@ -49,7 +49,7 @@ module Views
             if current_user.role(@project) == :owner
               delete_project
             elsif !current_user.role(@project).nil?
-              p { button_to "Leave Project", project_my_membership_url(@project), :'data-method' => 'DELETE', class: 'warning' }
+              p { button_to "Leave Project", project_my_membership_url(@project), :'data-sqmethod' => 'DELETE', class: 'warning' }
             end
           end
         end
@@ -85,7 +85,7 @@ module Views
         if current_user.role(@project)
           p { link_to "Change membership settings", edit_project_my_membership_url(@project) }
         else
-          p { button_to "Join this team", join_project_my_membership_url(@project), :'data-method' => 'POST' }
+          p { button_to "Join this team", join_project_my_membership_url(@project), :'data-sqmethod' => 'POST' }
         end
       end
 
@@ -95,7 +95,13 @@ module Views
           strong "Beware!"
           text " Deleting this project will delete all environments, all bugs, all occurrences, all comments, and all other data."
         end
-        p { button_to "Delete", project_url(@project), :'data-method' => :delete, :'data-confirm' => "Are you SURE you want to delete the project #{@project.name}?", class: 'warning' }
+        p do
+          button_to "Delete",
+                    project_url(@project),
+                    :'data-sqmethod'  => :delete,
+                    :'data-sqconfirm' => "Are you SURE you want to delete the project #{@project.name}?",
+                    class:            'warning'
+        end
       end
 
       def environments_grid

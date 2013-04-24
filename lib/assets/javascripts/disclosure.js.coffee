@@ -25,7 +25,7 @@ jQuery.fn.details = ->
       triangle = $('<i/>').addClass('icon-play').prependTo(header)
       shown = false
 
-      if container.attr('data-open')
+      if container.data('open')
         triangle.css("-#{browser}-transform", "rotate(90deg)") for browser in ['webkit', 'moz', 'o']
         shown = true
       else

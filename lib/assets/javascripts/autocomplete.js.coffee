@@ -90,7 +90,7 @@ class root.Autocomplete
     @dropdown.empty()
     items = $.map(items, (suggestion, idx) =>
       val = @options.fieldValue(suggestion)
-      li = $('<li/>').attr('data-id', val)
+      li = $('<li/>').data('id', val)
       @options.elementBuilder li, suggestion
       @dropdown.append li
       # have the selection follow the mouse cursor

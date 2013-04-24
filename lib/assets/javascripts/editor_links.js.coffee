@@ -30,10 +30,10 @@ jQuery.fn.editorLink = ->
       element = $(tag)
       url = null
       command = null
-      file = element.attr('data-file')
-      line = element.attr('data-line')
-      project = element.attr('data-project')
-      editor = element.attr('data-editor')
+      file = element.data('file')
+      line = element.data('line')
+      project = element.data('project')
+      editor = element.data('editor')
 
       if editor == 'textmate'
         url = (file) -> "txmt://open?" + $.param({url: file, line: line})

@@ -80,7 +80,7 @@ module Views
       def uneditable_bar
         p(class: 'alert info') do
           text "You will need to "
-          a "join this project", href: join_project_my_membership_url(@project), :'data-method' => 'POST', id: 'join-link'
+          a "join this project", href: join_project_my_membership_url(@project), :'data-sqmethod' => 'POST', id: 'join-link'
           text " to edit this bug. "
         end
       end
@@ -276,7 +276,11 @@ module Views
 
             p "… or …"
 
-            button_to "Delete this bug", project_environment_bug_url(@project, @environment, @bug), :'data-method' => 'delete', class: 'warning'
+            button "Delete this bug",
+                   href:            project_environment_bug_url(@project, @environment, @bug),
+                   'data-sqmethod'  => 'DELETE',
+                   class:           'warning',
+                   'data-sqconfirm' => "Are you sure you want to delete this bug and all its occurrences?"
             p(class: 'help-block') do
               text "This will remove all occurrences, comments, etc. Use for (e.g.) sensitive data or false notifications."
               text " All bugs marked as duplicate of this bug will be deleted as well." if @bug.duplicate?
@@ -346,7 +350,7 @@ module Views
 
             div(class: 'form-actions') do
               f.submit class: 'default'
-              button_to 'Remove', project_environment_bug_notification_threshold_url(@project, @environment, @bug), :'data-method' => 'DELETE'
+              button_to 'Remove', project_environment_bug_notification_threshold_url(@project, @environment, @bug), :'data-sqmethod' => 'DELETE'
             end
           end
         end

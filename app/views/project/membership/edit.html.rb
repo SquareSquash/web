@@ -47,7 +47,7 @@ module Views
             project_owner
             project_overview
             if current_user.role(@project) != :owner && !current_user.role(@project).nil?
-              p { button_to "Leave Project", project_my_membership_url(@project), 'data-method' => 'DELETE', class: 'warning' }
+              p { button_to "Leave Project", project_my_membership_url(@project), 'data-sqmethod' => 'DELETE', class: 'warning' }
             end
           end
 

@@ -27,7 +27,7 @@ class root.ValueInspector
 
   # @private
   constructor: (@element) ->
-    @object = JSON.parse(@element.attr('data-object'))
+    @object = @element.data('object')
     if typeof @object == 'string'
       @element.append(@object.slice(0, 50) + '&hellip;')
       $('<br/>').appendTo @element
@@ -128,7 +128,7 @@ class root.ValueInspector
   buildJSONFields: (object, open=false) ->
     if object && typeof object == 'object'
       details = $('<details/>')
-      if open then details.attr('data-open', 'open')
+      if open then details.data('open', 'open')
       $('<summary/>').text(object.constructor.toString().match(/^function (\w+)/)[1]).appendTo details
       table = $('<table/>').appendTo(details)
       for name, value of object

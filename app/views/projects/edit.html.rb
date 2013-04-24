@@ -56,9 +56,9 @@ module Views
         end
         p do
           button "Regenerate your API key",
-                 href:              rekey_project_url(@project),
-                 :'data-method' =>  'put',
-                 :'data-confirm' => "This will break any existing Squash client integrations. Continue?"
+                 href:             rekey_project_url(@project),
+                 :'data-sqmethod'  => 'put',
+                 :'data-sqconfirm' => "This will break any existing Squash client integrations. Continue?"
         end if [:owner, :admin].include?(current_user.role(@project))
 
         h3 do
