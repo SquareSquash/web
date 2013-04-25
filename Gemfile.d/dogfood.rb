@@ -1,0 +1,5 @@
+gem 'squash_ruby', require: 'squash/ruby'
+gem 'squash_rails', require: 'squash/rails'
+gem 'squash_ios_symbolicator', require: 'squash/symbolicator'
+gem 'squash_javascript', require: 'squash/javascript'
+gem 'squash_java', require: 'squash/java'
