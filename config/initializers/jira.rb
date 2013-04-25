@@ -30,4 +30,4 @@ module JIRA
     end
     alias_method_chain :http_conn, :timeout
   end
-end
+end unless Squash::Configuration.jira.disabled?

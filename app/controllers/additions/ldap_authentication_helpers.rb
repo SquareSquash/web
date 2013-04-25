@@ -68,6 +68,13 @@ module LdapAuthenticationHelpers
       logger.tagged('AuthenticationHelpers') { logger.info "Denying login to #{username}: LDAP authentication failed." }
       return false
     end
+  rescue Net::LDAP::LdapError
+    respond_to do |format|
+      format.html do
+        flash.now[:alert] = t('controllers.sessions.create.ldap_error')
+        return false
+      end
+    end
   end
 
   private

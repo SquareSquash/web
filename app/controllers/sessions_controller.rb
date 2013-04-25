@@ -77,16 +77,9 @@ class SessionsController < ApplicationController
     else
       respond_to do |format|
         format.html do
-          flash.now[:alert] = t('controllers.sessions.create.incorrect_login')
+          flash.now[:alert] ||= t('controllers.sessions.create.incorrect_login')
           render 'new'
         end
-      end
-    end
-  rescue Net::LDAP::LdapError
-    respond_to do |format|
-      format.html do
-        flash.now[:alert] = t('controllers.sessions.create.ldap_error')
-        render 'new'
       end
     end
   end

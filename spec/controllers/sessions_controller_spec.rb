@@ -22,8 +22,10 @@ describe SessionsController do
 
   describe "#create" do
     before :each do
-      @ldap = mock('Net::LDAP', :host= => nil, :port= => nil, :auth => nil)
-      Net::LDAP.stub!(:new).and_return(@ldap)
+      if defined?(Net::LDAP)
+        @ldap = mock('Net::LDAP', :host= => nil, :port= => nil, :auth => nil)
+        Net::LDAP.stub!(:new).and_return(@ldap)
+      end
     end
 
     context '[valid credentials]' do

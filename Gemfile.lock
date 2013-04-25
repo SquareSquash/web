@@ -20,12 +20,6 @@ GIT
     git (1.2.5)
 
 GIT
-  remote: git://github.com/RoryO/ruby-net-ldap.git
-  revision: cb1966a35b7b52a600f3880710854f14c77ab784
-  specs:
-    net-ldap (0.2.20110317223538)
-
-GIT
   remote: git://github.com/rails/rails.git
   revision: ba12ef6ae15208a608733a06b78940ef92f305b8
   branch: 3-2-stable
@@ -93,8 +87,8 @@ GEM
       execjs
     coffee-script-source (1.6.2)
     commonjs (0.2.6)
-    configoro (1.1.0)
-      rails (>= 3.0)
+    configoro (1.2.4)
+      activesupport
     diff-lcs (1.2.4)
     email_validation (1.1.1)
       localized_each_validator (>= 1.0.1)
@@ -122,10 +116,6 @@ GEM
       rack
     i18n (0.6.4)
     jdbc-postgres (9.2.1002.1)
-    jira-ruby (0.1.2)
-      activesupport
-      oauth
-      railties
     journey (1.0.4)
     jquery-rails (2.2.1)
       railties (>= 3.0, < 5.0)
@@ -152,7 +142,6 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.23)
     multi_json (1.7.2)
-    oauth (0.4.7)
     pg (0.15.1)
     plist (3.1.0)
     polyglot (0.3.3)
@@ -253,7 +242,7 @@ DEPENDENCIES
   activerecord-postgresql-cursors
   coffee-rails
   composite_primary_keys!
-  configoro
+  configoro (>= 1.2.4)
   email_validation
   erector
   factory_girl_rails
@@ -263,14 +252,12 @@ DEPENDENCIES
   font-awesome-rails
   git!
   has_metadata_column!
-  jira-ruby
   jquery-rails
   json
   json_serialize
   kramdown
   less-rails
   libv8 (~> 3.11.8)
-  net-ldap!
   pg
   rack-cors
   rails!

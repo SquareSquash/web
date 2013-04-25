@@ -1,3 +1,38 @@
+paths = Gem.find_files('configoro/simple')
+if paths.empty?
+  puts "NOTE: Because Configoro is not installed, only required gems will be",
+       "installed. Re-run 'bundle' again to install additional gems."
+  # not necessary; make conditionally a noop
+  def conditionally(*) end
+else
+  paths.each { |p| require p }
+
+  rails_root = ENV['RAILS_ROOT'] || File.dirname(__FILE__)
+  Configoro.paths << File.join(rails_root, 'config', 'environments')
+
+  def traverse_hash(hsh, *keys)
+    if keys.size == 1
+      hsh[keys.first]
+    else
+      traverse_hash hsh[keys.shift], *keys
+    end
+  end
+
+  def conditionally(configuration_path, *values, &block)
+    groups = []
+    dev    = Configoro.load_environment('development')
+    test   = Configoro.load_environment('test')
+    prod   = Configoro.load_environment('production')
+
+    configuration_path = configuration_path.split('.')
+    groups << :development if values.include?(traverse_hash(dev,  *configuration_path))
+    groups << :test        if values.include?(traverse_hash(test, *configuration_path))
+    groups << :production  if values.include?(traverse_hash(prod, *configuration_path))
+
+    groups.each { |g| group g, &block }
+  end
+end
+
 source 'https://rubygems.org'
 
 # FRAMEWORK
@@ -5,7 +40,7 @@ gem 'rails', github: 'rails/rails', branch: '3-2-stable'
 # We need to use this branch of Rails because it includes fixes for ActiveRecord
 # and concurrency that we need for our thread-spawning background job paradigm
 # to work
-gem 'configoro'
+gem 'configoro', '>= 1.2.4'
 gem 'rack-cors', require: 'rack/cors'
 
 # MODELS
@@ -34,10 +69,14 @@ gem 'git', github: 'RISCfuture/ruby-git'
 gem 'user-agent'
 
 # AUTH
-gem 'net-ldap', github: 'RoryO/ruby-net-ldap', require: 'net/ldap'
+conditionally('authentication.strategy', 'ldap') do
+  gem 'net-ldap', github: 'RoryO/ruby-net-ldap', require: 'net/ldap'
+end
 
 # INTEGRATION
-gem 'jira-ruby', require: 'jira'
+conditionally('jira.disabled', false, nil) do
+  gem 'jira-ruby', require: 'jira'
+end
 
 # DOGFOOD
 gem 'squash_ruby', require: 'squash/ruby'
@@ -76,3 +115,5 @@ group :test do
 end
 
 gem 'sql_origin', groups: [:development, :test]
+
+Configoro.paths.clear if defined?(Configoro)
