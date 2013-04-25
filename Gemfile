@@ -76,3 +76,8 @@ group :test do
 end
 
 gem 'sql_origin', groups: [:development, :test]
+
+group :resque do
+  gem 'resque'
+  gem 'resque-pool'
+end
