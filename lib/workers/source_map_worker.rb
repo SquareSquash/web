@@ -16,6 +16,7 @@
 # SourceMap, and attempts to sourcemap them using the new map.
 
 class SourceMapWorker
+  include BackgroundRunner::Job
 
   # Creates a new worker instance and performs a sourcemapping.
   #

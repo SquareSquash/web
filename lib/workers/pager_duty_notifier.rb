@@ -16,6 +16,7 @@
 # incident. The incident key is shared with other Occurrences of the same Bug.
 
 class PagerDutyNotifier
+  include BackgroundRunner::Job
 
   # Creates a new instance and sends a PagerDuty notification.
   #

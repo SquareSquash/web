@@ -16,6 +16,7 @@
 # {Comment} on a {Bug}.
 
 class CommentNotificationMailer
+  include BackgroundRunner::Job
 
   # Creates a new instance and sends notification emails.
   #

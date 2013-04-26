@@ -26,3 +26,17 @@ resque:
   test: "localhost:6379"
   pool:
     squash: 2
+  queue:
+    CommentNotificationMailer: squash
+    DeployFixMarker: squash
+    DeployNotificationMailer: squash
+    JiraStatusUpdater: squash
+    ObfuscationMapWorker: squash
+    OccurrenceNotificationMailer: squash
+    OccurrencesWorker: squash
+    PagerDutyAcknowledger: squash
+    PagerDutyNotifier: squash
+    PagerDutyResolver: squash
+    ProjectRepoFetcher: squash
+    SourceMapWorker: squash
+    SymbolicationWorker: squash

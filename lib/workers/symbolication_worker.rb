@@ -16,6 +16,7 @@
 # Symbolication, and attempts to symbolicate them using the new map.
 
 class SymbolicationWorker
+  include BackgroundRunner::Job
 
   # Creates a new worker instance and performs a symbolication.
   #

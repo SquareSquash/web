@@ -15,6 +15,7 @@
 # Very simple worker that fetches a {Project}'s repository.
 
 class ProjectRepoFetcher
+  include BackgroundRunner::Job
 
   # Creates a new instance and calls {#perform} on it.
   #

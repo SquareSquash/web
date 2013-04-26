@@ -20,6 +20,8 @@
 # large history.
 
 class DeployFixMarker
+  include BackgroundRunner::Job
+
   # The number of commits to load per page.
   COMMIT_PAGE_SIZE = 50
 

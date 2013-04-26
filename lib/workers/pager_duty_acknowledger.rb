@@ -16,6 +16,7 @@
 # when a Bug is marked as irrelevant or assigned to a User.
 
 class PagerDutyAcknowledger
+  include BackgroundRunner::Job
 
   # Creates a new instance and sends a PagerDuty acknowledgement.
   #

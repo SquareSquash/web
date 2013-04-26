@@ -16,6 +16,7 @@
 # ObfuscationMap, and attempts to deobfuscate them using the new map.
 
 class ObfuscationMapWorker
+  include BackgroundRunner::Job
 
   # Creates a new worker instance and performs a deobfuscation.
   #

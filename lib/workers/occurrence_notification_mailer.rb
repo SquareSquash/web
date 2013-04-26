@@ -23,6 +23,7 @@
 # notification.
 
 class OccurrenceNotificationMailer
+  include BackgroundRunner::Job
 
   # Creates a new instance and sends notification emails.
   #

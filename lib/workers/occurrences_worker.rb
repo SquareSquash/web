@@ -30,6 +30,8 @@
 # When the Occurrence is created, it is assigned to a Bug by the {Blamer} class.
 
 class OccurrencesWorker
+  include BackgroundRunner::Job
+
   # Keys that must be passed to the {.perform} method. (We also need either the
   # `build` or `revision` keys.)
   REQUIRED_KEYS = %w( api_key environment client backtraces class_name message occurred_at )

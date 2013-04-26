@@ -19,6 +19,7 @@
 # task, or otherwise periodically, to fully support JIRA integration.
 
 class JiraStatusWorker
+  include BackgroundRunner::Job
 
   # Creates a new instance and updates bug statuses.
 

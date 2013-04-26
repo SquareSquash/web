@@ -16,6 +16,7 @@
 # of a new Deploy.
 
 class DeployNotificationMailer
+  include BackgroundRunner::Job
 
   # Creates a new instance and sends notification emails.
   #
