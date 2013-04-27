@@ -40,3 +40,22 @@ resque:
     ProjectRepoFetcher: squash
     SourceMapWorker: squash
     SymbolicationWorker: squash
+
+sidekiq:
+  redis:
+    url: "localhost:6379"
+    namespace: squash
+  queue:
+    CommentNotificationMailer: default
+    DeployFixMarker: default
+    DeployNotificationMailer: default
+    JiraStatusUpdater: default
+    ObfuscationMapWorker: default
+    OccurrenceNotificationMailer: default
+    OccurrencesWorker: default
+    PagerDutyAcknowledger: default
+    PagerDutyNotifier: default
+    PagerDutyResolver: default
+    ProjectRepoFetcher: default
+    SourceMapWorker: default
+    SymbolicationWorker: default

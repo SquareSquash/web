@@ -30,7 +30,7 @@
 # aborted partway through, you will need to clean up the files yourself.
 
 # Change this to test only certain spec files
-COMMAND="rspec spec"
+COMMAND="rspec"
 
 TESTDIR="config/environments/test"
 AUTHFILE="${TESTDIR}/authentication.yml"
@@ -199,7 +199,24 @@ YAML
     echo
 }
 
-##### 7. MRI 1.9 (password auth)
+##### 7. Sidekiq integration (MRI)
+function run_sidekiq() {
+    reset_config
+    cat > ${CONCFILE} <<YAML
+---
+background_runner: Sidekiq
+sidekiq:
+  redis:
+    queue: "localhost:6379"
+YAML
+    rvm 2.0.0@squash exec bundle && ${COMMAND}
+
+    echo
+    echo "***** That was MRI with Sidekiq ******"
+    echo
+}
+
+##### 8. MRI 1.9 (password auth)
 function run_mri19() {
     reset_config
     rvm 1.9.3@squash --create exec bundle && ${COMMAND}
@@ -223,6 +240,7 @@ run_jruby
 run_ldap
 run_ldap_bind_dn
 run_resque
+run_sidekiq
 run_mri19
 
 restore

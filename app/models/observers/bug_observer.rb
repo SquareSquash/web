@@ -125,14 +125,10 @@ class BugObserver < ActiveRecord::Observer
     return unless bug.environment.notifies_pagerduty?
     return unless bug.environment.project.pagerduty
 
-    au = bug.previous_changes['assigned_user_id'] || []
-    ir = bug.previous_changes['irrelevant'] || []
-    if (!au.first && au.last) || (!ir.first && ir.last)
-      BackgroundRunner.run PagerDutyAcknowledger, bug.id
-    end
-
+    au  = bug.previous_changes['assigned_user_id'] || []
+    ir  = bug.previous_changes['irrelevant'] || []
     res = bug.previous_changes['fixed'] || []
-    if !res.first && res.last
+    if (!au.first && au.last) || (!ir.first && ir.last) || (!res.first && res.last)
       BackgroundRunner.run PagerDutyAcknowledger, bug.id
     end
 
