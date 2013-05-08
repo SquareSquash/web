@@ -431,7 +431,7 @@ class Occurrence < ActiveRecord::Base
       orientation:            {length: {maximum: 100}, allow_nil: true},
 
       # HTTP
-      request_method:         {inclusion: {in: %w( GET POST PUT PATCH DELETE HEAD TRACE OPTIONS CONNECT )}, allow_nil: true},
+      request_method:         {inclusion: {in: %w( GET POST PUT PATCH DELETE HEAD TRACE OPTIONS CONNECT PROPFIND PROPPATCH MKCOL COPY MOVE LOCK USERINFO )}, allow_nil: true},
       schema:                 {length: {maximum: 50}, allow_nil: true},
       host:                   {length: {maximum: 255}, allow_nil: true},
       port:                   {type: Fixnum, allow_nil: true},
