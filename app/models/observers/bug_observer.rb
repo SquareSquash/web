@@ -64,13 +64,12 @@ class BugObserver < ActiveRecord::Observer
   end
 
   def create_close_event(bug)
-    modifier_data = case bug.modifier
-                      when User
-                        {user: bug.modifier}
-                      when JIRA::Resource::Issue
-                        {data: {'issue' => bug.modifier.key}}
-                      else
-                        {}
+    modifier_data = if bug.modifier.kind_of?(User)
+                      {user: bug.modifier}
+                    elsif defined?(JIRA::Resource::Issue) && bug.modifier.kind_of?(JIRA::Resource::Issue)
+                      {data: {'issue' => bug.modifier.key}}
+                    else
+                      {}
                     end
 
     if bug.fixed? && !bug.fixed_was

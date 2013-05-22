@@ -55,9 +55,13 @@ module Service
     # @return [JIRA::Resource::Issue, nil] The issue with that key, if found.
 
     def issue(key)
-      client.Issue.find(key)
-    rescue ::JIRA::HTTPError
-      nil
+      return nil if Squash::Configuration.jira.disabled?
+
+      begin
+        client.Issue.find(key)
+      rescue ::JIRA::HTTPError
+        nil
+      end
     end
 
     # @return [Array<JIRA::Resource::Status>] All known JIRA issue statuses.
