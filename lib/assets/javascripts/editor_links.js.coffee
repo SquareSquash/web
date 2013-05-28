@@ -51,6 +51,11 @@ jQuery.fn.editorLink = ->
         url = (file) -> "emacs://open?" + $.param({url: "file://#{file}", line: line})
         command = "emacs +#{line} #{shellEscape(file)}"
         element.attr('title', "This link requires EmacsURLHandler to work.").tooltip()
+      else if editor == 'rubymine'
+        url = (file) ->
+          "x-mine://open?" + $.param({url: "file://#{file}", line: line})
+        command = "mine #{shellEscape(file)}:#{line}"
+        element.attr('title', "This link requires RubyMine 5.4 or newer to work.").tooltip()
       else
         return
 

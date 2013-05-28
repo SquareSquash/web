@@ -147,6 +147,7 @@ module BacktraceRendering
             text! editor_link 'sublime', @project, element['file'], element['line']; br
             text! editor_link 'vim', @project, element['file'], element['line']; br
             text! editor_link 'emacs', @project, element['file'], element['line']
+            text! editor_link 'rubymine', @project, element['file'], element['line']; br
           end
           pre class: 'context', :'data-project' => @project.to_param, :'data-revision' => @occurrence.revision, :'data-file' => element['file'], :'data-line' => element['line']
         end
