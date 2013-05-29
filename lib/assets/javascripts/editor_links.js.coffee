@@ -55,7 +55,6 @@ jQuery.fn.editorLink = ->
         url = (file) ->
           "x-mine://open?" + $.param({url: "file://#{file}", line: line})
         command = "mine #{shellEscape(file)}:#{line}"
-        element.attr('title', "This link requires RubyMine 5.4 or newer to work.").tooltip()
       else
         return
 
