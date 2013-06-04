@@ -10,4 +10,7 @@ gem 'json_serialize'
 gem 'validates_timeliness'
 gem 'find_or_create_on_scopes', '>= 1.2.1'
 gem 'composite_primary_keys', github: 'RISCfuture/composite_primary_keys'
-gem 'activerecord-postgresql-cursors'
+
+conditionally('activerecord.cursors', true) do
+  gem 'activerecord-postgresql-cursors'
+end

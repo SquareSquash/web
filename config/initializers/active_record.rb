@@ -68,4 +68,19 @@ class ActiveRecord::Relation
 
   # Returns the first record if count is 1, nil otherwise.
   def only() count == 1 ? first : nil end
+
+  # In the event that we're not using cursors, define #cursor to proxy to
+  # #find_each.
+  def cursor
+    CursorProxy.new(self)
+  end
+
+  # @private
+  class CursorProxy
+    delegate :each, to: :relation
+    attr_reader :relation
+    def initialize(relation)
+      @relation = relation
+    end
+  end
 end

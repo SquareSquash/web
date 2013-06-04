@@ -19,7 +19,7 @@
 # * MRI and JRuby
 # * LDAP-based and password-based authentication
 # * LDAP authentication with and without a bind DN
-#rvm
+#
 # All specs are run with JIRA and PagerDuty enabled.
 #
 # Note: This will take a long time, and requires that you have JRuby and MRI
@@ -34,9 +34,12 @@ COMMAND="rspec"
 
 TESTDIR="config/environments/test"
 AUTHFILE="${TESTDIR}/authentication.yml"
+ARFILE="${TESTDIR}/activerecord.yml"
 CONCFILE="${TESTDIR}/concurrency.yml"
 
 function reset_config() {
+    git checkout Gemfile.lock
+
     # JIRA
     cat > ${TESTDIR}/jira.yml <<YAML
 ---
@@ -55,6 +58,12 @@ YAML
 strategy: password
 password:
   salt: abc123
+YAML
+
+    # Active Record
+    cat > ${ARFILE} <<YAML
+---
+cursor: false
 YAML
 
     # Mailer
@@ -100,7 +109,7 @@ function check_clean() {
     fi
 }
 
-##### 1. MRI (password auth)
+##### MRI (password auth)
 function run_password() {
     reset_config
     rvm 2.0.0@squash --create exec bundle && ${COMMAND}
@@ -110,7 +119,22 @@ function run_password() {
     echo
 }
 
-##### 2. MRI (password auth w/registration disabled)
+##### MRI (PostgreSQL cursors)
+function run_cursors() {
+    reset_config
+    cat > ${ARFILE} <<YAML
+---
+cursors: true
+YAML
+    rvm 2.0.0@squash exec bundle && ${COMMAND}
+
+    echo
+    echo "***** That was MRI with password auth w/registration disabled ******"
+    echo
+}
+
+
+##### MRI (password auth w/registration disabled)
 function run_reg_disabled() {
     reset_config
     cat > ${AUTHFILE} <<YAML
@@ -127,7 +151,7 @@ YAML
     echo
 }
 
-##### 3. JRuby (password auth)
+##### JRuby (password auth)
 function run_jruby() {
     reset_config
     rvm jruby@squash --create exec bundle && ${COMMAND}
@@ -137,7 +161,7 @@ function run_jruby() {
     echo
 }
 
-##### 4. LDAP authentication, no bind DN (MRI)
+##### LDAP authentication, no bind DN (MRI)
 function run_ldap() {
     reset_config
     cat > ${AUTHFILE} <<YAML
@@ -157,7 +181,7 @@ YAML
     echo
 }
 
-##### 5. LDAP authentication, with bind DN (MRI)
+##### LDAP authentication, with bind DN (MRI)
 function run_ldap_bind_dn() {
     reset_config
     cat > ${AUTHFILE} <<YAML
@@ -179,7 +203,7 @@ YAML
     echo
 }
 
-##### 6. Resque integration (MRI)
+##### Resque integration (MRI)
 function run_resque() {
     reset_config
     cat > ${CONCFILE} <<YAML
@@ -199,7 +223,7 @@ YAML
     echo
 }
 
-##### 7. Sidekiq integration (MRI)
+##### Sidekiq integration (MRI)
 function run_sidekiq() {
     reset_config
     cat > ${CONCFILE} <<YAML
@@ -216,7 +240,7 @@ YAML
     echo
 }
 
-##### 8. MRI 1.9 (password auth)
+##### MRI 1.9 (password auth)
 function run_mri19() {
     reset_config
     rvm 1.9.3@squash --create exec bundle && ${COMMAND}
@@ -235,6 +259,7 @@ function restore() {
 check_clean
 
 run_password
+run_cursors
 run_reg_disabled
 run_jruby
 run_ldap
