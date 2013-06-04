@@ -84,11 +84,9 @@ to take your changes.
 on Rails includes some changes to Active Record that are required by Squash's
 multithreaded concurrency model (see next question). In particular, that version
 of Active Record includes crucial changes to the connection pool and connection
-reopening logic. If you do not wish to use edge Rails, you can drop the Gemfile
-entry back down to a release version, provided you are using an alternative
-concurrency model (e.g., Resque workers), or have backported the necessary
-changes. In the future, when these changes are released, the Gemfile will be
-altered.
+reopening logic. If you set the `background_runner` option in the
+`concurrency.yml` file to something other than `Multithread`, the Gemfile will
+automatically drop Rails back down to the latest release version.
 
 **Why don't you use my favorite backgrounding library?** Squash was originally
 built for Square, which runs all its services on JRuby. Using threads is very
@@ -96,10 +94,10 @@ efficient in JRuby, and avoids the overhead of having to deploy both a website
 and workers.
 
 If you are running Squash in a non-thread-safe (or multithreading-unfriendly)
-environment, you can use Resque instead. If you want to use some other
-backgrounding library, you can easily write your own adapter. All threaded code
-is invoked using {BackgroundRunner.run}, which then uses the settings in the
-`concurrency.yml` Configoro file to invoke the correct module under
+environment, you can use Sidekiq or Resque instead. If you want to use some
+other backgrounding library, you can easily write your own adapter. All threaded
+code is invoked using {BackgroundRunner.run}, which then uses the settings in
+the `concurrency.yml` Configoro file to invoke the correct module under
 `lib/background_runner`. The default is to use {BackgroundRunner::Multithread},
 which uses the {Multithread} module to execute the task in its own thread. You
 can edit the YAML file and switch the background runner to Resque, or implement
