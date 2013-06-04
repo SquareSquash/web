@@ -49,4 +49,4 @@ describe JiraStatusWorker do
       linked_bugs.first.events.last.user.should be_nil
     end
   end
-end
+end unless Squash::Configuration.jira.disabled?
