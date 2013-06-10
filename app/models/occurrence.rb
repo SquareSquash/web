@@ -549,7 +549,7 @@ class Occurrence < ActiveRecord::Base
   #   request information.
 
   def request?
-    params? && headers?
+    params? || headers?
   end
 
   # @return [true, false] Whether or not this Occurrence has Rails information.
