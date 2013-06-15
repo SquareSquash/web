@@ -193,7 +193,7 @@ end
 
 say "Welcome! Let's set up your Squash installation.".bold
 puts "I'll ask you some questions to help configure Squash for your needs.",
-     "Remember read the README.md file to familiarize yourself with the Squash",
+     "Remember to read the README.md file to familiarize yourself with the Squash",
      "codebase, as there's a strong likelihood you'll need to make other tweaks",
      "to fully support your particular environment."
 puts
