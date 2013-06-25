@@ -29,8 +29,10 @@
 # It must be run with a clean `config/environments/test` directory. If it is
 # aborted partway through, you will need to clean up the files yourself.
 
+# Change this to, e.g., bundle update
+BUNDLE="bundle"
 # Change this to test only certain spec files
-COMMAND="rspec"
+COMMAND="rspec spec"
 
 TESTDIR="config/environments/test"
 AUTHFILE="${TESTDIR}/authentication.yml"
@@ -112,7 +114,7 @@ function check_clean() {
 ##### MRI (password auth)
 function run_password() {
     reset_config
-    rvm 2.0.0@squash --create exec bundle && ${COMMAND}
+    rvm 2.0.0@squash --create exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth ******"
@@ -126,7 +128,7 @@ function run_cursors() {
 ---
 cursors: true
 YAML
-    rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth w/registration disabled ******"
@@ -144,7 +146,7 @@ password:
   salt: abc123
 registration_enabled: false
 YAML
-    rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth w/registration disabled ******"
@@ -154,7 +156,7 @@ YAML
 ##### JRuby (password auth)
 function run_jruby() {
     reset_config
-    rvm jruby@squash --create exec bundle && ${COMMAND}
+    rvm jruby@squash --create exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was JRuby with password auth ******"
@@ -174,7 +176,7 @@ ldap:
   tree_base: cn=users,dc=mycompany,dc=com
   search_key: uid
 YAML
-    rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI with LDAP auth, no bind DN ******"
@@ -196,7 +198,7 @@ ldap:
   bind_dn: cn=admins,ou=System,dc=mycompany,dc=com
   bind_password: password123
 YAML
-    rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI with LDAP auth + bind DN ******"
@@ -216,7 +218,7 @@ resque:
   pool:
     squash: 2
 YAML
-    rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI with Resque ******"
@@ -233,7 +235,7 @@ sidekiq:
   redis:
     queue: "localhost:6379"
 YAML
-    rvm 2.0.0@squash exec bundle && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI with Sidekiq ******"
@@ -243,7 +245,7 @@ YAML
 ##### MRI 1.9 (password auth)
 function run_mri19() {
     reset_config
-    rvm 1.9.3@squash --create exec bundle && ${COMMAND}
+    rvm 1.9.3@squash --create exec ${BUNDLE} && ${COMMAND}
 
     echo
     echo "***** That was MRI 1.9 with password auth ******"
