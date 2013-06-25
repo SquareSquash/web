@@ -30,7 +30,7 @@ class Blame < ActiveRecord::Base
   validates :repository_hash, :revision, :blamed_revision,
             presence: true,
             length:   {is: 40},
-            format:   {with: /[0-9a-f]+/}
+            format:   {with: /\A[0-9a-f]+\z/}
   validates :file,
             presence: true,
             length:   {maximum: 255}

@@ -12,8 +12,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-Dir.glob(File.expand_path('../preinitializers/**/*.rb', __FILE__)).each { |f| require f }
-
 # Load the rails application
 require File.expand_path('../application', __FILE__)
 

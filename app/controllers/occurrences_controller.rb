@@ -88,7 +88,7 @@ class OccurrencesController < ApplicationController
     respond_to do |format|
       format.json do
         dir = params[:dir]
-        dir = 'desc' unless SORT_DIRECTIONS.include?(dir.try(:upcase))
+        dir = 'DESC' unless SORT_DIRECTIONS.include?(dir.try(:upcase))
 
         @occurrences = @bug.occurrences.order("occurred_at #{dir}").limit(50)
 

@@ -78,7 +78,7 @@ class User < ActiveRecord::Base
   validates :username,
             presence:   true,
             length:     {maximum: 50},
-            format:     {with: /[a-z0-9_\-]+/},
+            format:     {with: /\A[a-z0-9_\-]+\z/},
             uniqueness: true
 
   before_validation(on: :create) { |obj| obj.username = obj.username.downcase if obj.username }

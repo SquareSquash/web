@@ -159,12 +159,12 @@ class Bug < ActiveRecord::Base
             numericality: {only_integer: true, greater_than: 0}
   validates :blamed_revision, :resolution_revision,
             length:    {is: 40},
-            format:    {with: /[0-9a-f]+/},
+            format:    {with: /\A[0-9a-f]+\z/},
             allow_nil: true
   validates :revision,
             presence: true,
             length:   {is: 40},
-            format:   {with: /[0-9a-f]+/}
+            format:   {with: /\A[0-9a-f]+\z/}
   #validates :first_occurrence,
   #          presence: true
   #validates :latest_occurrence,

@@ -68,6 +68,8 @@ class Slug < ActiveRecord::Base
   after_destroy :invalidate_cache
   set_nil_if_blank :scope
 
+  attr_accessible :sluggable, :slug, :active, :scope
+
   # Marks a slug as active and deactivates all other slugs assigned to the
   # record.
 

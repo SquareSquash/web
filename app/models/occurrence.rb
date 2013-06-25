@@ -378,8 +378,6 @@ class Occurrence < ActiveRecord::Base
   belongs_to :redirect_target, class_name: 'Occurrence', foreign_key: 'redirect_target_id', inverse_of: :redirected_occurrence
   has_one :redirected_occurrence, class_name: 'Occurrence', foreign_key: 'redirect_target_id', inverse_of: :redirect_target, dependent: :destroy
 
-  attr_readonly :bug, :revision, :number, :occurred_at
-
   include HasMetadataColumn
   has_metadata_column(
       # Universal
@@ -466,6 +464,9 @@ class Occurrence < ActiveRecord::Base
       color_depth:            {type: Integer, allow_nil: true}
   )
 
+  attr_accessible :revision, :occurred_at, :client, :crashed, *metadata_column_fields.keys
+  attr_readonly :bug, :revision, :number, :occurred_at
+
   # Fields that cannot be used by the aggregation view. These are fields with a
   # a continuous range of possible values, or fields with unusual data types.
   NON_AGGREGATING_FIELDS = %w( number message backtraces ivars arguments env_vars
@@ -482,7 +483,7 @@ class Occurrence < ActiveRecord::Base
   validates :revision,
             presence: true,
             length:   {is: 40},
-            format:   {with: /[0-9a-f]+/}
+            format:   {with: /\A[0-9a-f]+\z/}
   #validates :number,
   #          presence:     true,
   #          numericality: {only_integer: true, greater_than: 0},
@@ -837,8 +838,9 @@ class Occurrence < ActiveRecord::Base
     blamer = Blamer.new(self)
     new_bug    = blamer.find_or_create_bug!
     if new_bug.id != bug_id
-      copy            = new_bug.occurrences.build
-      copy.attributes = attributes.except('number', 'id', 'bug_id')
+      copy = new_bug.occurrences.build
+      copy.assign_attributes attributes.except('number', 'id', 'bug_id'),
+                             without_protection: true
       copy.save!
       blamer.reopen_bug_if_necessary! new_bug
       redirect_to! copy

@@ -16,7 +16,7 @@
 # {AuthenticationHelpers} for more information on how authentication works.
 
 class SessionsController < ApplicationController
-  skip_before_filter :login_required, except: :destroy
+  skip_before_filter :login_required, only: [:new, :create]
   before_filter :must_be_unauthenticated, except: :destroy
 
   respond_to :html

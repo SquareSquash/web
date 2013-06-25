@@ -16,6 +16,11 @@
 # Squash install is configured to use LDAP-based authentication.
 
 module LdapAuthentication
+  extend ActiveSupport::Concern
+
+  included do
+    attr_accessible :first_name, :last_name, as: :system
+  end
 
   # @return [String] This user's LDAP distinguished name (DN).
 

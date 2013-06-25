@@ -44,6 +44,7 @@ class Event < ActiveRecord::Base
   belongs_to :user, inverse_of: :events
   has_many :user_events, dependent: :delete_all, inverse_of: :event
 
+  attr_accessible :bug, :user, :kind, :data
   attr_readonly :bug, :user, :kind, :data
 
   include JsonSerialize

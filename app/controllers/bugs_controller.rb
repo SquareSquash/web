@@ -115,7 +115,7 @@ class BugsController < ApplicationController
         sort_column, default_dir = SORTS[params[:sort]]
 
         dir = if params[:dir].kind_of?(String) then
-                SORT_DIRECTIONS.include?(params[:dir].upcase) ? params[:dir] : default_dir
+                SORT_DIRECTIONS.include?(params[:dir].upcase) ? params[:dir].upcase : default_dir
               else
                 default_dir
               end

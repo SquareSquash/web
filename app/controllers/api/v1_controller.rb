@@ -121,7 +121,7 @@ class Api::V1Controller < ActionController::Base
   def deobfuscation
     require_params :api_key, :environment, :build, :namespace
 
-    map = YAML.load(Zlib::Inflate.inflate(Base64.decode64(params['namespace'])))
+    map = YAML.load(Zlib::Inflate.inflate(Base64.decode64(params['namespace'])), safe: true, deserialize_symbols: false)
     return head(:unprocessable_entity) unless map.kind_of?(Squash::Java::Namespace)
 
     deploy = Project.find_by_api_key!(params['api_key']).
@@ -145,7 +145,7 @@ class Api::V1Controller < ActionController::Base
   def sourcemap
     require_params :api_key, :environment, :revision, :sourcemap
 
-    sourcemap = YAML.load(Zlib::Inflate.inflate(Base64.decode64(params['sourcemap'])))
+    sourcemap = YAML.load(Zlib::Inflate.inflate(Base64.decode64(params['sourcemap'])), safe: true, deserialize_symbols: false)
     return head(:unprocessable_entity) unless sourcemap.kind_of?(Squash::Javascript::SourceMap)
 
     Project.find_by_api_key!(params['api_key']).

@@ -27,6 +27,9 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
+# Load preinitializers
+Dir.glob(File.expand_path('../preinitializers/**/*.rb', __FILE__)).each { |f| require f }
+
 module Squash
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
@@ -72,7 +75,7 @@ module Squash
     # This will create an empty whitelist of attributes available for mass-assignment for all models
     # in your app. As such, your models will need to explicitly whitelist or blacklist accessible
     # parameters by using an attr_accessible or attr_protected declaration.
-    # config.active_record.whitelist_attributes = true
+    config.active_record.whitelist_attributes = true
 
     # Enable the asset pipeline
     config.assets.enabled = true

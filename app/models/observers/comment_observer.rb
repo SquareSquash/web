@@ -30,7 +30,12 @@ class CommentObserver < ActiveRecord::Observer
   private
 
   def create_event(comment)
-    Event.create! bug_id: comment.bug_id, kind: 'comment', data: {'comment_id' => comment.id}, user_id: comment.user_id
+    Event.create! do |event|
+      event.bug_id  = comment.bug_id
+      event.kind    = 'comment'
+      event.data    = {'comment_id' => comment.id}
+      event.user_id = comment.user_id
+    end
   end
 
   def watch_bug(comment)
