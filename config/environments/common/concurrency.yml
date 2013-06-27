@@ -1,5 +1,5 @@
 ---
-background_runner: Multithread
+background_runner: Sidekiq
 
 multithread:
   priority_threshold: 50
@@ -43,19 +43,27 @@ resque:
 
 sidekiq:
   redis:
-    url: "localhost:6379"
+    url: "redis://localhost:6379"
     namespace: squash
+    pidfile: ./tmp/pids/sidekiq.pid
+    concurrency: 12
+    queues:
+    - [emails, 3]
+    - [git, 2]
+    - [occurrences, 1]
+    - [processing, 3]
+    - [services, 2]
   queue:
-    CommentNotificationMailer: default
-    DeployFixMarker: default
-    DeployNotificationMailer: default
-    JiraStatusUpdater: default
-    ObfuscationMapWorker: default
-    OccurrenceNotificationMailer: default
-    OccurrencesWorker: default
-    PagerDutyAcknowledger: default
-    PagerDutyNotifier: default
-    PagerDutyResolver: default
-    ProjectRepoFetcher: default
-    SourceMapWorker: default
-    SymbolicationWorker: default
+    CommentNotificationMailer: emails
+    DeployFixMarker: processing
+    DeployNotificationMailer: emails
+    JiraStatusUpdater: services
+    ObfuscationMapWorker: processing
+    OccurrenceNotificationMailer: emails
+    OccurrencesWorker: occurrences
+    PagerDutyAcknowledger: services
+    PagerDutyNotifier: services
+    PagerDutyResolver: services
+    ProjectRepoFetcher: git
+    SourceMapWorker: processing
+    SymbolicationWorker: processing

@@ -74,4 +74,11 @@ Squash::Application.routes.draw do
   get 'search' => 'search#search'
 
   root to: 'projects#index'
+
+  if Squash::Configuration.concurrency.background_runner == 'Sidekiq'
+    require 'sidekiq/web'
+    constraints lambda { |request| SidekiqAuthConstraint.authorized?(request) } do
+      mount Sidekiq::Web => '/sidekiq'
+    end
+  end
 end
