@@ -1,5 +1,5 @@
 ---
-background_runner: Sidekiq
+background_runner: Multithread
 
 multithread:
   priority_threshold: 50
@@ -20,7 +20,7 @@ multithread:
     SourceMapWorker: 60
     SymbolicationWorker: 60
 
-resque: 
+resque:
   development: "localhost:6379"
   production: "localhost:6379"
   test: "localhost:6379"
