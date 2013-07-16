@@ -1,13 +1,15 @@
 GIT
   remote: git://github.com/RISCfuture/composite_primary_keys.git
-  revision: 5c549017daf48a4e5c2b73f15fd10b86e71ded8c
+  revision: 94059068169ff1c0735329d600a80eed99ecd58c
+  ref: 94059068169ff1c0735329d600a80eed99ecd58c
   specs:
-    composite_primary_keys (5.0.12)
+    composite_primary_keys (5.0.13)
       activerecord (~> 3.2.0, >= 3.2.9)
 
 GIT
   remote: git://github.com/RISCfuture/has_metadata_column.git
   revision: b0ab7837884d78ec6da492d822d31f2da6682dc7
+  ref: b0ab7837884d78ec6da492d822d31f2da6682dc7
   specs:
     has_metadata_column (1.0.3)
       boolean
@@ -65,7 +67,7 @@ GEM
       execjs
     coffee-script-source (1.6.3)
     commonjs (0.2.6)
-    configoro (1.2.4)
+    configoro (1.3.0)
       activesupport
     diff-lcs (1.2.4)
     email_validation (1.1.1)
@@ -86,7 +88,7 @@ GEM
       json-schema (>= 1.0.1)
       kramdown
       thor
-    find_or_create_on_scopes (1.3.0)
+    find_or_create_on_scopes (1.4.0)
       activerecord (>= 3.1)
     font-awesome-rails (3.2.1.2)
       railties (>= 3.2, < 5.0)
@@ -96,7 +98,7 @@ GEM
     i18n (0.6.1)
     jdbc-postgres (9.2.1002.1)
     journey (1.0.4)
-    jquery-rails (3.0.2)
+    jquery-rails (3.0.4)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     json (1.8.0)
@@ -150,20 +152,20 @@ GEM
     rake (10.1.0)
     rdoc (3.12.2)
       json (~> 1.4)
-    redcarpet (2.3.0)
+    redcarpet (3.0.0)
     ref (1.0.5)
-    rspec-core (2.13.1)
-    rspec-expectations (2.13.0)
+    rspec-core (2.14.3)
+    rspec-expectations (2.14.0)
       diff-lcs (>= 1.1.3, < 2.0)
-    rspec-mocks (2.13.1)
-    rspec-rails (2.13.2)
+    rspec-mocks (2.14.1)
+    rspec-rails (2.14.0)
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       railties (>= 3.0)
-      rspec-core (~> 2.13.0)
-      rspec-expectations (~> 2.13.0)
-      rspec-mocks (~> 2.13.0)
-    safe_yaml (0.9.3)
+      rspec-core (~> 2.14.0)
+      rspec-expectations (~> 2.14.0)
+      rspec-mocks (~> 2.14.0)
+    safe_yaml (0.9.4)
     sass (3.2.9)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -193,13 +195,13 @@ GEM
       json
       railties (>= 3.1)
       squash_uploader
-    squash_rails (1.1.2)
+    squash_rails (1.1.4)
       squash_ruby
     squash_ruby (1.2.0)
       json
     squash_uploader (1.0.1)
       json
-    stringex (2.0.3)
+    stringex (2.0.5)
     therubyracer (0.11.4)
       libv8 (~> 3.11.8.12)
       ref
@@ -213,7 +215,7 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.37)
-    uglifier (2.1.1)
+    uglifier (2.1.2)
       execjs (>= 0.3.0)
       multi_json (~> 1.0, >= 1.0.2)
     url_validation (1.0.0)
