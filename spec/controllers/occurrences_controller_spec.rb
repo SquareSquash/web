@@ -81,7 +81,7 @@ describe OccurrencesController do
 
       before :each do
         login_as @bug.environment.project.owner
-        Time.stub!(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
+        Time.stub(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
       end
 
       it_should_behave_like "action that 404s at appropriate times", :get, :histogram, "polymorphic_params(@bug, true, dimensions: %w( host pid ), step: 1000*60*60*5, size: 20, format: 'json')"
@@ -127,7 +127,7 @@ describe OccurrencesController do
 
       before :each do
         login_as @bug.environment.project.owner
-        Time.stub!(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
+        Time.stub(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
       end
 
       it_should_behave_like "action that 404s at appropriate times", :get, :aggregate, "polymorphic_params(@bug, true, dimensions: %w( host pid ), step: 1000*60*60*5, size: 20, format: 'json')"

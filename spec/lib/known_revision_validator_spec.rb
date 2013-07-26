@@ -39,12 +39,12 @@ describe KnownRevisionValidator do
 
   context "[:repo option]" do
     before :each do
-      @model  = mock('Model', :foo= => nil)
-      @commit = mock('Git::Object::Commit', sha: '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
+      @model  = double('Model', :foo= => nil)
+      @commit = double('Git::Object::Commit', sha: '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
     end
 
     it "should accept repository objects" do
-      repo = mock('Git::Repository', fetch: nil)
+      repo = double('Git::Repository', fetch: nil)
       repo.should_receive(:object).once.and_return(@commit)
 
       validator = KnownRevisionValidator.new(repo: repo, attributes: [:foo])
@@ -52,18 +52,18 @@ describe KnownRevisionValidator do
     end
 
     it "should accept method names" do
-      repo = mock('Git::Repository', fetch: nil)
+      repo = double('Git::Repository', fetch: nil)
       repo.should_receive(:object).once.and_return(@commit)
-      @model.stub!(:repo).and_return(repo)
+      @model.stub(:repo).and_return(repo)
 
       validator = KnownRevisionValidator.new(repo: :repo, attributes: [:foo])
       validator.validate_each(@model, :foo, 'HEAD')
     end
 
     it "should accept procs" do
-      repo = mock('Git::Repository', fetch: nil)
+      repo = double('Git::Repository', fetch: nil)
       repo.should_receive(:object).once.and_return(@commit)
-      @model.stub!(:repo).and_return(repo)
+      @model.stub(:repo).and_return(repo)
 
       validator = KnownRevisionValidator.new(repo: ->(m) { m.repo }, attributes: [:foo])
       validator.validate_each(@model, :foo, 'HEAD')

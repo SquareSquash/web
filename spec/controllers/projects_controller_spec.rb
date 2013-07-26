@@ -227,7 +227,7 @@ describe ProjectsController do
     it "should require a logged-in user" do
       delete :destroy, id: @project.to_param
       response.status.should redirect_to(login_url(next: request.fullpath))
-      -> { @project.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+      -> { @project.reload }.should_not raise_error
     end
 
     context '[authenticated]' do
@@ -237,14 +237,14 @@ describe ProjectsController do
         login_as FactoryGirl.create(:membership, project: @project, admin: true).user
         delete :destroy, id: @project.to_param
         response.status.should redirect_to(root_url)
-        -> { @project.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+        -> { @project.reload }.should_not raise_error
       end
 
       it "should not allow members to delete the project" do
         login_as FactoryGirl.create(:membership, project: @project, admin: false).user
         delete :destroy, id: @project.to_param
         response.status.should redirect_to(root_url)
-        -> { @project.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+        -> { @project.reload }.should_not raise_error
       end
 
       it "should allow owners to delete project" do
@@ -377,7 +377,7 @@ end
       end
 
       it "should update the repo given an unknown revision" do
-        Project.stub!(:find_from_slug!).and_return(@project)
+        Project.stub(:find_from_slug!).and_return(@project)
         @project.repo.should_receive(:fetch).once
 
         get :context, @valid_params.merge(revision: '39aacf78b603ade2034e93b9b12420b350dfa151') # unknown revision

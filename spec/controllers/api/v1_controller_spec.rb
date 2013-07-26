@@ -65,9 +65,9 @@ describe Api::V1Controller do
     end
 
     it "should start a worker thread and return 200 given valid parameters" do
-      mock = mock('OccurrencesWorker')
-      OccurrencesWorker.stub!(:new).and_return(mock)
-      Thread.stub!(:new).and_yield
+      mock = double('OccurrencesWorker')
+      OccurrencesWorker.stub(:new).and_return(mock)
+      Thread.stub(:new).and_yield
 
       mock.should_receive(:perform).once
       post :notify, @valid_params

@@ -172,7 +172,7 @@ describe BugsController do
       @project = FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git')
       @bug     = FactoryGirl.create(:bug, environment: FactoryGirl.create(:environment, project: @project))
       FactoryGirl.create :rails_occurrence, bug: @bug
-      repo = mock('Git::Repo')
+      repo = double('Git::Repo')
     end
 
     it "should require a logged-in user" do
@@ -288,7 +288,7 @@ describe BugsController do
     it "should require a logged-in user" do
       delete :destroy, polymorphic_params(@bug, false)
       response.should redirect_to(login_url(next: request.fullpath))
-      -> { @bug.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+      -> { @bug.reload }.should_not raise_error
     end
 
     context '[authenticated]' do

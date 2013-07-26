@@ -456,7 +456,7 @@ describe Blamer::Cache do
     it "should return a cached blame result if available" do
       blame = FactoryGirl.create(:blame, repository_hash: @project.repository_hash, file: 'myfile.rb', line: 100)
       @project.repo.should_not_receive(:blame)
-      commit = mock('Git::Object::Commit')
+      commit = double('Git::Object::Commit')
       @project.repo.should_receive(:object).once.with(blame.blamed_revision).and_return(commit)
       Blamer::Cache.instance.blame(@project, blame.revision, 'myfile.rb', 100).should eql(commit)
     end
@@ -470,7 +470,7 @@ describe Blamer::Cache do
               end:      3
           )
       ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
-      commit = mock('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
+      commit = double('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
       @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
 
       Blamer::Cache.instance.blame(@project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3).
@@ -487,7 +487,7 @@ describe Blamer::Cache do
               end:      3
           )
       ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
-      commit = mock('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
+      commit = double('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
       @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
 
       Blamer::Cache.instance.blame @project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3
@@ -501,7 +501,7 @@ describe Blamer::Cache do
 
     it "should update a Blame's updated_at for a cache hit" do
       blame  = FactoryGirl.create(:blame, repository_hash: @project.repository_hash, file: 'myfile.rb', line: 100, updated_at: Time.now - 1.day)
-      commit = mock('Git::Object::Commit')
+      commit = double('Git::Object::Commit')
       @project.repo.should_receive(:object).once.with(blame.blamed_revision).and_return(commit)
       Blamer::Cache.instance.blame @project, blame.revision, 'myfile.rb', 100
       -> { blame.reload }.should change(blame, :updated_at)
@@ -521,7 +521,7 @@ describe Blamer::Cache do
               end:      3
           )
       ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
-      commit = mock('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
+      commit = double('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
       @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
       Blamer::Cache.instance.blame(@project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3)
 

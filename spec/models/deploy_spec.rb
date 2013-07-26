@@ -26,7 +26,7 @@ describe Deploy do
       environment = FactoryGirl.create(:environment, project: project)
       deploy      = FactoryGirl.build(:deploy, environment: environment)
 
-      dfm = mock('DeployFixMarker')
+      dfm = double('DeployFixMarker')
       DeployFixMarker.should_receive(:new).once.with(deploy).and_return(dfm)
       dfm.should_receive(:perform).once
 

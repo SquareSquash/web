@@ -29,8 +29,8 @@ if Squash::Configuration.authentication.strategy == 'ldap'
 
       before :each do
         @controller = FakeController.new
-        @ldap       = mock('Net::LDAP')
-        @controller.stub!(:build_ldap_interface).and_return(@ldap)
+        @ldap       = double('Net::LDAP')
+        @controller.stub(:build_ldap_interface).and_return(@ldap)
       end
 
       it "should return true if the LDAP entry exists and can bind" do
@@ -54,7 +54,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
           @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
         end
 
-        @ldap.stub!(:bind).and_return(true)
+        @ldap.stub(:bind).and_return(true)
 
         @controller.should_receive(:log_in_user).once.with(@user)
         @controller.log_in(@user.username, 'password').should be_true
@@ -81,7 +81,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
           @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
         end
 
-        @ldap.stub!(:bind).and_return(true)
+        @ldap.stub(:bind).and_return(true)
 
         @controller.should_receive(:log_in_user).once.with(@user)
         @controller.log_in("#{@user.username}@#{Squash::Configuration.mailer.domain}", 'password').should be_true
@@ -101,7 +101,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
           )
         end
 
-        @ldap.stub!(:bind).and_return(true)
+        @ldap.stub(:bind).and_return(true)
 
         @controller.should_not_receive :log_in_user
         @controller.log_in(@user.username, 'password').should be_false
@@ -133,7 +133,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
 
         it "should return false if the LDAP authenticator cannot bind" do
           @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
-          @ldap.stub!(:bind).once.and_return(false)
+          @ldap.stub(:bind).once.and_return(false)
 
           @controller.should_not_receive :log_in_user
           @controller.log_in(@user.username, 'password').should be_false
@@ -175,7 +175,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
           @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
         end
 
-        @ldap.stub!(:bind).and_return(true)
+        @ldap.stub(:bind).and_return(true)
 
         @controller.should_receive(:log_in_user).once do |user|
           user.username == 'newuser' &&

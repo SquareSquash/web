@@ -17,7 +17,7 @@ require 'spec_helper'
 describe ApplicationController do
   describe "#infinite_scroll_clause" do
     before :each do
-      @record = mock('Record', created_at: Time.at(12345890), id: 12345)
+      @record = double('Record', created_at: Time.at(12345890), id: 12345)
     end
 
     it "should return a proper WHERE clause for an ascending infinite scroll" do

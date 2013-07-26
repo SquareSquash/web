@@ -159,7 +159,7 @@ describe CommentsController do
     it "should require a logged-in user" do
       delete :destroy, polymorphic_params(@comment, false, format: 'json')
       response.status.should eql(401)
-      -> { @comment.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+      -> { @comment.reload }.should_not raise_error
     end
 
     context '[authenticated]' do

@@ -377,7 +377,7 @@ describe Bug do
       it "should send an email if the bug was reopened from a fixed state by the system" do
         ActionMailer::Base.deliveries.clear
         @bug.reopen @occurrence
-        @bug.stub!(:blamed_email).and_return('blamed@example.com')
+        @bug.stub(:blamed_email).and_return('blamed@example.com')
         @bug.assigned_user = @modifier
         @bug.save!
         ActionMailer::Base.deliveries.size.should eql(1)
@@ -388,7 +388,7 @@ describe Bug do
       it "should email the blamed user if no one is assigned" do
         ActionMailer::Base.deliveries.clear
         @bug.reopen @occurrence
-        @bug.stub!(:blamed_email).and_return('blamed@example.com')
+        @bug.stub(:blamed_email).and_return('blamed@example.com')
         @bug.save!
         ActionMailer::Base.deliveries.size.should eql(1)
         ActionMailer::Base.deliveries.first.subject.should include('Reopened')
@@ -399,7 +399,7 @@ describe Bug do
         @bug.update_attribute :irrelevant, true
         ActionMailer::Base.deliveries.clear
         @bug.reopen @occurrence
-        @bug.stub!(:blamed_email).and_return('blamed@example.com')
+        @bug.stub(:blamed_email).and_return('blamed@example.com')
         @bug.save!
         ActionMailer::Base.deliveries.should be_empty
       end
@@ -407,7 +407,7 @@ describe Bug do
       it "should not send an email if the bug was reopened by a user" do
         ActionMailer::Base.deliveries.clear
         @bug.reopen @modifier
-        @bug.stub!(:blamed_email).and_return('blamed@example.com')
+        @bug.stub(:blamed_email).and_return('blamed@example.com')
         @bug.save!
         ActionMailer::Base.deliveries.should be_empty
       end
@@ -680,8 +680,8 @@ describe Bug do
 
       it "should send an email to the blamed user" do
         @bug = FactoryGirl.build(:bug)
-        @bug.stub!(:blamed_email).and_return('foo@example.com')
-        @bug.stub!(:blamed_commit).and_return('abc123')
+        @bug.stub(:blamed_email).and_return('foo@example.com')
+        @bug.stub(:blamed_commit).and_return('abc123')
         @bug.save!
 
         ActionMailer::Base.deliveries.size.should eql(1)
@@ -692,7 +692,7 @@ describe Bug do
 
       it "should not send an email if no one is to blame" do
         @bug = FactoryGirl.build(:bug)
-        @bug.stub!(:blamed_email).and_return(nil)
+        @bug.stub(:blamed_email).and_return(nil)
         @bug.save!
 
         ActionMailer::Base.deliveries.should be_empty
@@ -700,7 +700,7 @@ describe Bug do
 
       it "should not send an email if the environment has email sending disabled" do
         @bug = FactoryGirl.build(:bug, environment: FactoryGirl.create(:environment, sends_emails: false))
-        @bug.stub!(:blamed_email).and_return('foo@example.com')
+        @bug.stub(:blamed_email).and_return('foo@example.com')
         @bug.save!
 
         ActionMailer::Base.deliveries.should be_empty
@@ -841,51 +841,51 @@ describe Bug do
     end
 
     before(:each) do
-      @bug.stub!(:blamed_commit).and_return(mock('Git::Commit'))
-      @bug.blamed_commit.stub!(:author).and_return(mock('Git::Author'))
+      @bug.stub(:blamed_commit).and_return(double('Git::Commit'))
+      @bug.blamed_commit.stub(:author).and_return(double('Git::Author'))
     end
 
     it "should return the commit author email for known emails" do
-      @bug.blamed_commit.author.stub!(:email).and_return(@sean.email)
-      @bug.blamed_commit.author.stub!(:name).and_return(nil)
+      @bug.blamed_commit.author.stub(:email).and_return(@sean.email)
+      @bug.blamed_commit.author.stub(:name).and_return(nil)
       @bug.blamed_users.should eql([@sean.emails.primary.first])
     end
 
     it "should match a single commit author by name" do
-      @bug.blamed_commit.author.stub!(:email).and_return("github+kliu@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Karen Liu")
+      @bug.blamed_commit.author.stub(:email).and_return("github+kliu@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Karen Liu")
       @bug.blamed_users.should eql([@karen.emails.primary.first])
     end
 
     it "should match multiple commit authors by name" do
-      @bug.blamed_commit.author.stub!(:email).and_return("github+ssorrell+lewis@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Sean Sorrell + Mike Lewis")
+      @bug.blamed_commit.author.stub(:email).and_return("github+ssorrell+lewis@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Sean Sorrell + Mike Lewis")
       @bug.blamed_users.should eql([@sean.emails.primary.first, @lewis.emails.primary.first])
     end
 
     it "should match as many commit authors as it can" do
-      @bug.blamed_commit.author.stub!(:email).and_return("github+lewis+zach@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Mike Lewis & Zach Brock")
+      @bug.blamed_commit.author.stub(:email).and_return("github+lewis+zach@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Mike Lewis & Zach Brock")
       @bug.blamed_users.should eql([@lewis.emails.primary.first])
     end
 
     it "should return an empty array if no matches can be found" do
-      @bug.blamed_commit.author.stub!(:email).and_return("github+ne+ek@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Nolan Evans + Erica Kwan")
+      @bug.blamed_commit.author.stub(:email).and_return("github+ne+ek@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Nolan Evans + Erica Kwan")
       @bug.blamed_users.should be_empty
     end
 
     it "should use the commit author if the project is sending to unknown emails and there's an author match" do
       @bug.environment.project.sends_emails_outside_team = true
-      @bug.blamed_commit.author.stub!(:email).and_return("github+lewis+zach@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Mike Lewis & Zach Brock")
+      @bug.blamed_commit.author.stub(:email).and_return("github+lewis+zach@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Mike Lewis & Zach Brock")
       @bug.blamed_users.should eql([@lewis.emails.primary.first])
     end
 
     it "should use the commit email if the project is sending to unknown emails and there's no author match" do
       @bug.environment.project.sends_emails_outside_team = true
-      @bug.blamed_commit.author.stub!(:email).and_return("github+ne+ek@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Nolan Evans + Erica Kwan")
+      @bug.blamed_commit.author.stub(:email).and_return("github+ne+ek@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Nolan Evans + Erica Kwan")
       @bug.blamed_users.size.should eql(1)
       @bug.blamed_users.first.should be_kind_of(Email)
       @bug.blamed_users.first.email.should eql("github+ne+ek@squareup.com")
@@ -895,16 +895,16 @@ describe Bug do
     it "should not use the commit email if the project is sending to unknown emails but the domain is not trusted" do
       @bug.environment.project.sends_emails_outside_team = true
       @bug.environment.project.trusted_email_domain      = 'paypal.com'
-      @bug.blamed_commit.author.stub!(:email).and_return("github+ne+ek@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Nolan Evans + Erica Kwan")
+      @bug.blamed_commit.author.stub(:email).and_return("github+ne+ek@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Nolan Evans + Erica Kwan")
       @bug.blamed_users.should be_empty
     end
 
     it "should use the commit email if the project is sending to unknown emails and the domain is trusted" do
       @bug.environment.project.sends_emails_outside_team = true
       @bug.environment.project.trusted_email_domain      = 'squareup.com'
-      @bug.blamed_commit.author.stub!(:email).and_return("github+ne+ek@squareup.com")
-      @bug.blamed_commit.author.stub!(:name).and_return("Nolan Evans + Erica Kwan")
+      @bug.blamed_commit.author.stub(:email).and_return("github+ne+ek@squareup.com")
+      @bug.blamed_commit.author.stub(:name).and_return("Nolan Evans + Erica Kwan")
       @bug.blamed_users.size.should eql(1)
       @bug.blamed_users.first.should be_kind_of(Email)
       @bug.blamed_users.first.email.should eql("github+ne+ek@squareup.com")
@@ -915,13 +915,13 @@ describe Bug do
       before(:each) { Email.redirected.delete_all }
 
       it "should return a user who has specified that the commit author's emails be redirected to him" do
-        @bug.blamed_commit.author.stub!(:email).and_return(@sean.email)
+        @bug.blamed_commit.author.stub(:email).and_return(@sean.email)
         FactoryGirl.create(:email, email: @sean.email, user: @karen) # Karen took over Sean's exceptions
         @bug.blamed_email.should eql(@karen.email)
       end
 
       it "should go deeper" do # BWWWWHHHHHHAAAAAAMMMMMMM
-        @bug.blamed_commit.author.stub!(:email).and_return(@sean.email)
+        @bug.blamed_commit.author.stub(:email).and_return(@sean.email)
         FactoryGirl.create(:email, email: @sean.email, user: @karen)  # Karen took over Sean's exceptions
         FactoryGirl.create(:email, email: @karen.email, user: @lewis) # ... then Mike took over Karen's exceptions
 
@@ -931,7 +931,7 @@ describe Bug do
       it "should give priority to project-specific redirects" do
         erica = FactoryGirl.create(:user, first_name: 'Erica', last_name: 'Kwan', username: 'erica')
 
-        @bug.blamed_commit.author.stub!(:email).and_return(@sean.email)
+        @bug.blamed_commit.author.stub(:email).and_return(@sean.email)
         FactoryGirl.create(:email, email: @sean.email, user: erica)                                     # Erica took over all of Sean's exceptions
         FactoryGirl.create(:email, email: @sean.email, user: @karen, project: @bug.environment.project) # .. but Karen took over Sean's exceptions *on that project only*
         FactoryGirl.create(:email, email: @karen.email, user: @lewis)                                   # ... then Mike took over *all* of Karen's exceptions
@@ -940,7 +940,7 @@ describe Bug do
       end
 
       it "raise an exception for circular redirect chains" do
-        @bug.blamed_commit.author.stub!(:email).and_return(@sean.email)
+        @bug.blamed_commit.author.stub(:email).and_return(@sean.email)
         FactoryGirl.create(:email, email: @sean.email, user: @karen)  # Karen took over Sean's exceptions
         FactoryGirl.create(:email, email: @karen.email, user: @lewis) # ... then Mike took over Karen's exceptions
         FactoryGirl.create(:email, email: @lewis.email, user: @sean)  # ... but then Sean took over Mike's exceptions!
@@ -949,7 +949,7 @@ describe Bug do
       end
 
       it "should email a user's corporate email if they commit with a personal email" do
-        @bug.blamed_commit.author.stub!(:email).and_return("karen.liu@gmail.com")
+        @bug.blamed_commit.author.stub(:email).and_return("karen.liu@gmail.com")
 
         # Karen has a tendency to commit under her gmail address
         FactoryGirl.create(:email, email: "karen.liu@gmail.com", user: @karen)

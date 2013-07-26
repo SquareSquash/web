@@ -24,7 +24,7 @@ describe NotificationMailer do
 
   describe "#blame" do
     it "should create an email event" do
-      @bug.stub!(:blamed_email).and_return('foo@bar.com')
+      @bug.stub(:blamed_email).and_return('foo@bar.com')
       NotificationMailer.blame(@bug).deliver
       @bug.events.count.should eql(@count + 1)
       @bug.events.order('id DESC').first.kind.should eql('email')

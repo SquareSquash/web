@@ -185,12 +185,12 @@ describe Project::MembershipsController do
     it "should require a logged-in administrator or owner" do
       delete :destroy, polymorphic_params(@membership, false, format: 'json')
       response.status.should eql(401)
-      -> { @membership.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+      -> { @membership.reload }.should_not raise_error
 
       login_as FactoryGirl.create(:membership, project: @project).user
       delete :destroy, polymorphic_params(@membership, false, format: 'json')
       response.status.should eql(403)
-      -> { @membership.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+      -> { @membership.reload }.should_not raise_error
     end
 
     context '[authenticated]' do
@@ -215,7 +215,7 @@ describe Project::MembershipsController do
         @membership.update_attribute :admin, true
         delete :destroy, polymorphic_params(@membership, false, format: 'json')
         response.status.should eql(403)
-        -> { @membership.reload }.should_not raise_error(ActiveRecord::RecordNotFound)
+        -> { @membership.reload }.should_not raise_error
       end
 
       it "should allow the owner to delete other admins" do
