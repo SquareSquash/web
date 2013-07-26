@@ -1,4 +1,4 @@
-# Copyright 2012 Square Inc.
+# Copyright 2013 Square Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -181,7 +181,7 @@ describe OccurrencesWorker do
 
       it "should remove the SQL query from a SQL error message" do
         msg = <<-ERR.strip
-          Duplicate entry 'foo@bar.com' for key 'index_users_on_email': UPDATE `users` SET `name` = 'Sancho Sample', `crypted_password` = 'sughwgiuwgbajgw', `updated_at` = '2012-09-23 21:18:37', `email` = 'foo@bar.com' WHERE `id` = 26819622 -- app/controllers/api/v1/user_controller.rb:35
+          Duplicate entry 'foo@bar.com' for key 'index_users_on_email': UPDATE `users` SET `name` = 'Sancho Sample', `crypted_password` = 'sughwgiuwgbajgw', `updated_at` = '2013-09-23 21:18:37', `email` = 'foo@bar.com' WHERE `id` = 26819622 -- app/controllers/api/v1/user_controller.rb:35
         ERR
         occ = OccurrencesWorker.new(@params.merge('class_name' => 'Mysql::Error', 'message' => msg)).perform
         JSON.parse(occ.metadata)['message'].should eql("Duplicate entry '[EMAIL?]' for key 'index_users_on_email'")

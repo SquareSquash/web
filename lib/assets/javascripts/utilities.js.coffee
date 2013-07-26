@@ -1,4 +1,4 @@
-# Copyright 2012 Square Inc.
+# Copyright 2013 Square Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ root.distanceOfTimeInWords = (from_time, to_time, include_seconds=false) ->
 # Returns whether or not the given year is a leap year.
 #
 # @example
-#   isLeapYear(2012) #=> true
+#   isLeapYear(2013) #=> true
 #
 # @param [Integer] year The year.
 # @return [true, false] Whether it was a leap year.
