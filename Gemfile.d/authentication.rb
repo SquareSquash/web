@@ -13,5 +13,5 @@
 #    limitations under the License.
 
 conditionally('authentication.strategy', 'ldap') do
-  gem 'net-ldap', github: 'RoryO/ruby-net-ldap', require: 'net/ldap'
+  gem 'net-ldap', github: 'ruby-ldap/ruby-net-ldap', require: 'net/ldap'
 end
