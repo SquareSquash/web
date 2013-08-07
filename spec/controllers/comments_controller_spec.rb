@@ -98,7 +98,7 @@ describe CommentsController do
       it "should render the errors with status 422 if invalid" do
         post :create, polymorphic_params(@bug, true, comment: {body: ''}, format: 'json')
         response.status.should eql(422)
-        response.body.should eql("{\"comment\":{\"body\":[\"can\\u2019t be blank\"]}}")
+        response.body.should eql("{\"comment\":{\"body\":[\"can’t be blank\"]}}")
       end
     end
   end

@@ -122,7 +122,7 @@ describe Project::MembershipsController do
       it "should render the errors with status 422 if invalid" do
         post :create, polymorphic_params(@project, true, membership: {}, format: 'json')
         response.status.should eql(422)
-        response.body.should eql("{\"membership\":{\"user\":[\"can\\u2019t be blank\"]}}")
+        response.body.should eql("{\"membership\":{\"user\":[\"can’t be blank\"]}}")
       end
     end
   end

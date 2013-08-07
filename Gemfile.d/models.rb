@@ -13,8 +13,6 @@
 #    limitations under the License.
 
 gem 'pg', platform: :mri
-# Version 1.2.6 introduces a bug relating to SQL binds
-gem 'activerecord-jdbc-adapter', '1.2.5', platform: :jruby
 gem 'activerecord-jdbcpostgresql-adapter', platform: :jruby
 gem 'has_metadata_column', github: 'RISCfuture/has_metadata_column', ref: 'b0ab7837884d78ec6da492d822d31f2da6682dc7'
 gem 'slugalicious'
