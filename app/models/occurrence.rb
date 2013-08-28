@@ -13,8 +13,11 @@
 #    limitations under the License.
 
 begin
-    require 'squash_ios_crash_log_symbolication'
-    @@SquashIosCrashLogSymbolicationAvailable = true;
+    if(SquashIosCrashLogSymbolication.osx?)
+      @@SquashIosCrashLogSymbolicationAvailable = true;
+    else
+      @@SquashIosCrashLogSymbolicationAvailable = false;
+    end
 rescue LoadError
     @@SquashIosCrashLogSymbolicationAvailable = false;
 end
