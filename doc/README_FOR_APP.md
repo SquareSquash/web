@@ -1,16 +1,6 @@
 Squash: A squarish bug spray
 ============================
 
-PLEASE NOTE: 
-This repo is a fork off SquareSquash/web and was originally submitted as a
-pull request off master branch to SquareSquash/web on Aug 27, 2013. It was
-designed to use squash_ios_crash_log_symbolication gem available at that 
-time on rubygems.org. That gem has since been removed but the full stack 
-iOS/OSX symbolication capability offered in the gem has been integrated
-into the master brank of this fork. The 
-use_gem_squash_ios_crash_log_symbolication branch was created to preserve
-the original design but should be considered historical only.
-
 **An open-source project from [Square](http://github.com/square)**
 
 Squash is a collection of tools that help engineers find and kill bugs in their
@@ -53,6 +43,7 @@ Additional configuration options can be found in the following locations:
 * `config/application.rb`
 * `config/environments/*.rb`
 * `config/environments/*/*.yml`
+* `config/symbolication_paths.yml`
 
 If you don't see what you're looking for in any of those files, you'll probably
 have to change the code to make it work. Don't be afraid -- the code is
@@ -67,6 +58,19 @@ Squash requires the following:
 * PostgreSQL 9.0 or newer
 * The Bundler gem
 * Git 1.7 or newer
+
+To realize full stack symbolication for iOS/OS X crashes, the following
+are additional requirements (either on the computer running Squash or
+on the computer where script/squash_symbolicate_ios_crash will be run):
+
+* OS X
+* Xcode
+* plcrashutil (part of PLCrashReporter)
+* iOS/OS X application .dSYM files
+
+In the latter form, the script/squash_symbolicate_ios_crash, config/databas.yml,
+config/symbolication_paths.yml, and the lib/squash_ios_crash_log_symbolication.rb
+files and folder structure are required.
 
 ### Notes on some of the gem and library choices
 
