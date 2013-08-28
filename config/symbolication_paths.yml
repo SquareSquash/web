@@ -1,0 +1,35 @@
+---
+# for each environment, provide paths used by the symbolication process
+development:
+
+  # PATH to PLCrashReporter's plcrashutil
+  plcrashutil: /usr/local/bin/plcrashutil
+
+  # PATH TO Xcode's symbolicatecrash script
+  symbolicationcrash: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/PrivateFrameworks/DTDeviceKit.framework/Versions/A/Resources/symbolicatecrash
+
+  # PATH TO Application symbols - Apple's spotlight will try to locate the Application symbols but give it a hint
+  symbolpath: /Library/
+
+test:
+
+  # PATH to PLCrashReporter's plcrashutil
+  plcrashutil: /usr/local/bin/plcrashutil
+
+  # PATH TO Xcode's symbolicatecrash script
+  symbolicationcrash: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/PrivateFrameworks/DTDeviceKit.framework/Versions/A/Resources/symbolicatecrash
+
+  # PATH TO Application symbols - Apple's spotlight will try to locate the Application symbols but give it a hint
+  symbolpath: /Library/
+
+production:
+
+  # PATH to PLCrashReporter's plcrashutil
+  plcrashutil: /usr/local/bin/plcrashutil
+
+  # PATH TO Xcode's symbolicatecrash script
+  symbolicationcrash: /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/PrivateFrameworks/DTDeviceKit.framework/Versions/A/Resources/symbolicatecrash
+
+  # PATH TO Application symbols - Apple's spotlight will try to locate the Application symbols but give it a hint
+  symbolpath: /Library/
+
