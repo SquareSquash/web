@@ -12,6 +12,13 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+begin
+    require 'squash_ios_crash_log_symbolication'
+    @@SquashIosCrashLogSymbolicationAvailable = true;
+rescue LoadError
+    @@SquashIosCrashLogSymbolicationAvailable = false;
+end
+
 # An individual occurrence of a {Bug}, or put another way, a single instance of
 # an exception occurring and being recorded. Occurrences record all relevant
 # information about the exception itself and the state of the program when the
@@ -383,6 +390,7 @@ class Occurrence < ActiveRecord::Base
       # Universal
       message:                {presence: true, length: {maximum: 1000}},
       backtraces:             {type: Array, presence: true},
+      crash_log:              {type: String, allow_nil: true},
       ivars:                  {type: Hash, allow_nil: true},
       user_data:              {type: Hash, allow_nil: true},
       parent_exceptions:      {type: Array, allow_nil: true},
@@ -566,6 +574,12 @@ class Occurrence < ActiveRecord::Base
     user_data.present? || extra_data.present? || ivars.present?
   end
 
+  # @return [true, false] Whether or not this Occurrence has a crash log attached
+
+  def crash_log?
+      crash_log.present?
+  end
+
   # @return [true, false] Whether or not this exception occurred as part of an
   #   XMLHttpRequest (Ajax) request.
 
@@ -691,6 +705,29 @@ class Occurrence < ActiveRecord::Base
       end
     end
     self.backtraces = bt # refresh the actual JSON
+
+    if (user_data.present? && @@SquashIosCrashLogSymbolicationAvailable )
+      begin
+        Rails.logger.debug "-- SquashIosCrashLogSymbolication.symbolicate_crash called... --"
+
+        self.crash_log = SquashIosCrashLogSymbolication.symbolicate_crash(user_data, SquashIosCrashLogSymbolication.env)
+
+        # if we have a symbolicated crash_log, remove the encoded plcrashlog
+        if(self.crash_log && self.crash_log.present?)
+          self.user_data = nil
+          Rails.logger.debug "-- SquashIosCrashLogSymbolication.symbolicate_crash complete. crash_log contains crash_log, user_data set to nil --"
+        end
+      rescue Object => err
+        # don't get into an infinite loop of notifying Squash
+        Rails.logger.error "-- ERROR IN symbolicate #{err.object_id} --"
+        Rails.logger.error "SquashIosCrashLogSymbolication.symbolicate(user_data, #{SquashIosCrashLogSymbolication.env})\n"
+        Rails.logger.error err
+        Rails.logger.error err.backtrace.join("\n")
+        Rails.logger.error @attrs.inspect
+        Rails.logger.error "-- END ERROR #{err.object_id} --"
+        raise if Rails.env.test?
+      end
+    end
   end
 
   # Like {#symbolicate}, but saves the record.
