@@ -1,6 +1,16 @@
 Squash: A squarish bug spray
 ============================
 
+PLEASE NOTE: 
+This branch is a fork off SquareSquash/web and was originally submitted as a
+pull request off master branch to SquareSquash/web on Aug 27, 2013. It was
+designed to use squash_ios_crash_log_symbolication gem available at that 
+time on rubygems.org. That gem has since been removed but the full stack 
+iOS/OSX symbolication capability is available in the master branch of this 
+repo. This branch was created to preserve the original design, but should
+be considered historical only.
+
+
 **An open-source project from [Square](http://github.com/square)**
 
 Squash is a collection of tools that help engineers find and kill bugs in their
