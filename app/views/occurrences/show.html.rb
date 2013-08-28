@@ -23,6 +23,7 @@ module Views
     # @private
     class Show < Views::Layouts::Application
       include BacktraceRendering
+      include CrashlogRendering
 
       needs :project, :environment, :bug, :occurrence
 
@@ -116,7 +117,13 @@ module Views
       end
 
       def backtrace_tab
-        render_backtraces @occurrence.backtraces, 'root'
+        if @occurrence.crash_log?
+            # do not convert \n to <br/> and \n\n to <p> using simple_format()
+            # instead use <pre></pre> tags in render_crash_log
+            render_crash_log @occurrence.crash_log
+        else
+          render_backtraces @occurrence.backtraces, 'root'
+        end
       end
 
       def parents_tab

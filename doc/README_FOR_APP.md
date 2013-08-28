@@ -43,6 +43,7 @@ Additional configuration options can be found in the following locations:
 * `config/application.rb`
 * `config/environments/*.rb`
 * `config/environments/*/*.yml`
+* `config/symbolication_paths.yml`
 
 If you don't see what you're looking for in any of those files, you'll probably
 have to change the code to make it work. Don't be afraid -- the code is
@@ -57,6 +58,19 @@ Squash requires the following:
 * PostgreSQL 9.0 or newer
 * The Bundler gem
 * Git 1.7 or newer
+
+To realize full stack symbolication for iOS/OS X crashes, the following
+are additional requirements (either on the computer running Squash or
+on the computer where script/squash_symbolicate_ios_crash will be run):
+
+* OS X
+* Xcode
+* plcrashutil (part of PLCrashReporter)
+* iOS/OS X application .dSYM files
+
+In the latter form, the script/squash_symbolicate_ios_crash, config/databas.yml,
+config/symbolication_paths.yml, and the lib/squash_ios_crash_log_symbolication.rb
+files and folder structure are required.
 
 ### Notes on some of the gem and library choices
 

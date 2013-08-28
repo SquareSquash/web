@@ -1,0 +1,152 @@
+#!/usr/bin/env ruby
+#
+#
+# Copyright 2013 Cerner Corporation.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+#
+# Used in conjunction with SquareSquash using the modified SquareSquash Cocoa library.
+# This script can be used to convert and symbolicate user_info values from metadata 
+# column of occurrences table into crash_log metadata value of metadata column in a 
+# postgres database.
+#
+# Note: this script requires config/symbolication_paths.yml and config/database.yml
+#
+
+require 'pg'
+require 'json'
+require 'Logger'
+require_relative '../lib/squash_ios_crash_log_symbolication.rb'
+
+# load our symbolicationpaths and database config files
+#SquashIosCrashLogSymbolication
+
+# variables
+
+# TODO: config option for logging to a specified file
+@logger = Logger.new(STDOUT)
+@id = nil
+@metadata = nil
+
+# load database config 
+db_config = SquashIosCrashLogSymbolication.symbolication_database_config
+
+# database name, host, user, password
+db_host = db_config['hostname']
+
+if (db_host.nil?)
+  puts 'using db_host = localhost'
+  db_host = 'localhost'
+end
+
+db_user = db_config['username']
+db_name = db_config['database']
+db_pw   = db_config['password']
+
+# connect to postgres
+@select_conn = PG.connect(
+    dbname: db_name,
+    host: db_host,
+    user: db_user,
+    password: db_pw
+)
+
+# separate update connection
+@update_conn = PG.connect(
+    dbname: db_name,
+    host: db_host,
+    user: db_user,
+    password: db_pw
+)
+
+
+def symbolicate_crash_log(data)
+    user_data = data['user_data']
+    crash_log = nil
+
+    begin
+        crash_log = SquashIosCrashLogSymbolication.symbolicate_crash(user_data, nil)
+    rescue Exception => ex
+        @logger.info "symbolicate Exception:\n #{ex.to_s}"
+        @logger.error ex.message
+        @logger.error ex.backtrace.join("\n")
+    end
+
+    if(crash_log)
+
+        # add crash_log field to metadata
+        data['crash_log'] = crash_log
+
+        # remove 'user_data' - no longer needed
+        data.delete('user_data')
+
+        # update metadata column
+        @metadata = data
+
+        begin
+            # update database
+            @logger.info "update occurrences set metadata = xxxx where id = #{@id}..."
+            @update_conn.exec("UPDATE OCCURRENCES SET METADATA = $1 where id = $2", [@metadata.to_json.to_s, @id])
+            @logger.info "update occurrences set metadata = xxxx where id = #{@id} committed"
+        rescue Exception => ex
+            @logger.info "update occurrences set metadata caught Exception:\n #{ex.to_s}"
+            @logger.error ex.message
+            @logger.error ex.backtrace.join("\n")
+        end
+    else
+        @logger.error 'symbolicate_crash: crash_log == nil'
+    end
+end
+
+
+# for each cocoa crash occurrence, try to symbolicate it
+#
+# TODO: add a column with a flag to indicate symbolication is complete so QUERY will run fast
+#
+begin
+  result = @select_conn.exec( "SELECT id, metadata FROM occurrences where client = 'cocoa'" )
+
+  result.each do |row|
+    @id = row['id']
+    @metadata = row['metadata']
+    @logger.info "processing occurrence id=#{@id}"
+
+    data = JSON.parse(@metadata)
+    user_data = data['user_data']
+    crash_log = data['crash_log']
+    # until a boolean column is added, test if crash_log is already present
+    begin
+        if (crash_log && !crash_log.empty?)
+            @logger.info "skipping symbolicated occurrence id=#{@id}"
+        else
+            if(user_data && !user_data.empty?)
+                symbolicate_crash_log(data)
+            else
+                @logger.info "skipping (user_data == nil || empty) occurrence id=#{@id}"
+            end
+        end
+    rescue Exception => ex
+        @logger.info "select loop Exception:\n #{ex.to_s}"
+        @logger.error ex.message
+        @logger.error ex.backtrace.join("\n")
+    end
+  end
+
+rescue Exception => ex
+    @logger.info "begin block Exception:\n #{ex.to_s}"
+    @logger.error ex.message
+    @logger.error ex.backtrace.join("\n")
+    raise ex  # reraise
+end
+
