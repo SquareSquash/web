@@ -66,7 +66,7 @@ class Environment < ActiveRecord::Base
             presence:   true,
             length:     {maximum: 100},
             uniqueness: {case_sensitive: false, scope: :project_id},
-            format:     {with: /\A[a-z0-9\-_]+\z/}
+            format:     {with: /\A[a-zA-Z0-9\-_]+\z/}
 
   scope :with_name, ->(name) { where("LOWER(name) = ?", name.downcase) }
 
