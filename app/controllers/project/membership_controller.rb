@@ -120,7 +120,7 @@ class Project::MembershipController < ApplicationController
   private
 
   def find_membership
-    @membership = @current_user.memberships.find_by_project_id!(@project.id)
+    @membership = current_user.memberships.find_by_project_id!(@project.id)
   end
 
   def must_not_be_owner
