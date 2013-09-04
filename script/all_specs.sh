@@ -114,7 +114,8 @@ function check_clean() {
 ##### MRI (password auth)
 function run_password() {
     reset_config
-    rvm 2.0.0@squash --create exec ${BUNDLE} && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE}
+    rvm 2.0.0@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth ******"
@@ -128,10 +129,11 @@ function run_cursors() {
 ---
 cursors: true
 YAML
-    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE}
+    rvm 2.0.0@squash exec ${COMMAND}
 
     echo
-    echo "***** That was MRI with password auth w/registration disabled ******"
+    echo "***** That was MRI with password auth w/PostgreSQL cursors ******"
     echo
 }
 
@@ -146,7 +148,8 @@ password:
   salt: abc123
 registration_enabled: false
 YAML
-    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE}
+    rvm 2.0.0@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth w/registration disabled ******"
@@ -156,7 +159,8 @@ YAML
 ##### JRuby (password auth)
 function run_jruby() {
     reset_config
-    rvm jruby@squash --create exec ${BUNDLE} && ${COMMAND}
+    rvm jruby@squash exec ${BUNDLE}
+    rvm jruby@squash exec ${COMMAND}
 
     echo
     echo "***** That was JRuby with password auth ******"
@@ -176,7 +180,8 @@ ldap:
   tree_base: cn=users,dc=mycompany,dc=com
   search_key: uid
 YAML
-    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE}
+    rvm 2.0.0@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with LDAP auth, no bind DN ******"
@@ -198,7 +203,8 @@ ldap:
   bind_dn: cn=admins,ou=System,dc=mycompany,dc=com
   bind_password: password123
 YAML
-    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE}
+    rvm 2.0.0@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with LDAP auth + bind DN ******"
@@ -218,7 +224,8 @@ resque:
   pool:
     squash: 2
 YAML
-    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE}
+    rvm 2.0.0@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with Resque ******"
@@ -235,7 +242,8 @@ sidekiq:
   redis:
     queue: "localhost:6379"
 YAML
-    rvm 2.0.0@squash exec ${BUNDLE} && ${COMMAND}
+    rvm 2.0.0@squash exec ${BUNDLE}
+    rvm 2.0.0@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with Sidekiq ******"
@@ -245,7 +253,8 @@ YAML
 ##### MRI 1.9 (password auth)
 function run_mri19() {
     reset_config
-    rvm 1.9.3@squash --create exec ${BUNDLE} && ${COMMAND}
+    rvm 1.9.3@squash exec ${BUNDLE}
+    rvm 1.9.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI 1.9 with password auth ******"
@@ -254,11 +263,16 @@ function run_mri19() {
 
 ##### Reset configuration
 function restore() {
+    git checkout Gemfile.lock
     git checkout ${TESTDIR}
     git clean -df -- ${TESTDIR}
 }
 
 check_clean
+
+rvm 1.9.3 exec rvm gemset create squash
+rvm 2.0.0 exec rvm gemset create squash
+rvm jruby exec rvm gemset create squash
 
 run_password
 run_cursors
