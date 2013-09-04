@@ -16,7 +16,7 @@ FactoryGirl.define do
   factory :project do
     association :owner, factory: :user
     sequence(:name) { |i| "Project #{i}" }
-    repository_url "git://github.com/RISCfuture/better_caller.git"
+    repository_url "git@github.com:RISCfuture/better_caller.git"
     filter_paths %w( vendor/ config/initializers/mysql_connection_fix.rb )
     whitelist_paths %w( vendor/plugins/internal )
   end

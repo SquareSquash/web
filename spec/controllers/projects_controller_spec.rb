@@ -58,7 +58,7 @@ describe ProjectsController do
 
   describe "#create" do
     it "should require a logged-in user" do
-      -> { post :create, project: {name: 'New Project', repository_url: 'git://github.com/RISCfuture/better_caller.git'}, format: 'json' }.should_not change(Project, :count)
+      -> { post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/better_caller.git'}, format: 'json' }.should_not change(Project, :count)
       response.status.should eql(401)
     end
 
@@ -69,15 +69,15 @@ describe ProjectsController do
       end
 
       it "should create the new project" do
-        post :create, project: {name: 'New Project', repository_url: 'git://github.com/RISCfuture/better_caller.git'}, format: 'json'
+        post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/better_caller.git'}, format: 'json'
         response.status.should eql(201)
         json = JSON.parse(response.body)
         json['name'].should eql('New Project')
-        json['repository_url'].should eql('git://github.com/RISCfuture/better_caller.git')
+        json['repository_url'].should eql('git@github.com:RISCfuture/better_caller.git')
       end
 
       it "should validate project connectivity" do
-        post :create, project: {name: 'New Project', repository_url: 'git://github.com/RISCfuture/nonexistent.git'}, format: 'json'
+        post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/nonexistent.git'}, format: 'json'
         response.status.should eql(422)
         json = JSON.parse(response.body)
         json.should eql({'project' => {'repository_url' => ['is not accessible']}})
@@ -123,7 +123,7 @@ describe ProjectsController do
   describe "#update" do
     before :each do
       Project.delete_all
-      @project = FactoryGirl.create(:project, repository_url: 'git://github.com/RISCfuture/better_caller.git')
+      @project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
     end
 
     it "should require a logged-in user" do
@@ -258,8 +258,8 @@ describe ProjectsController do
 
   describe "#context" do
     before(:all) do
-      Project.where(repository_url: "https://github.com/RISCfuture/better_caller.git").delete_all
-      @project = FactoryGirl.create(:project, repository_url: "https://github.com/RISCfuture/better_caller.git")
+      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
+      @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
     end
     before(:each) { @valid_params = {id: @project.to_param, revision: '30e7c2ff8758f4f19bfbc0a57e26c19ab69d1d44', file: 'lib/better_caller/extensions.rb', line: 7, format: 'json'} }
 
@@ -272,7 +272,7 @@ describe ProjectsController do
       before(:each) { login_as @project.owner }
 
       it "should return an error if the project has no repository" do
-        project = FactoryGirl.create(:project, owner: @project.owner, repository_url: 'git://github.com/RISCfuture/doesnt-exist.git')
+        project = FactoryGirl.create(:project, owner: @project.owner, repository_url: 'git@github.com:RISCfuture/doesnt-exist.git')
         get :context, @valid_params.merge(id: project.to_param)
         response.status.should eql(422)
         JSON.parse(response.body)['error'].should include('repository')

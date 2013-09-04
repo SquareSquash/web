@@ -272,7 +272,7 @@ describe Occurrence do
     before(:each) do
       @occurrence = FactoryGirl.create(:rails_occurrence)
       # there's a uniqueness constraint on repo URLs, but we need a real repo with real commits
-      @occurrence.bug.environment.project.instance_variable_set :@repo, Project.new { |pp| pp.repository_url = 'git://github.com/RISCfuture/better_caller.git' }.repo
+      @occurrence.bug.environment.project.instance_variable_set :@repo, Project.new { |pp| pp.repository_url = 'git@github.com:RISCfuture/better_caller.git' }.repo
       @occurrence.bug.update_attribute :deploy, FactoryGirl.create(:deploy, environment: @occurrence.bug.environment)
     end
 
@@ -487,7 +487,7 @@ describe Occurrence do
     before(:each) do
       @occurrence = FactoryGirl.create(:rails_occurrence)
       # there's a uniqueness constraint on repo URLs, but we need a real repo with real commits
-      @occurrence.bug.environment.project.instance_variable_set :@repo, Project.new { |pp| pp.repository_url = 'git://github.com/RISCfuture/better_caller.git' }.repo
+      @occurrence.bug.environment.project.instance_variable_set :@repo, Project.new { |pp| pp.repository_url = 'git@github.com:RISCfuture/better_caller.git' }.repo
       @occurrence.bug.update_attribute :deploy, FactoryGirl.create(:deploy, environment: @occurrence.bug.environment)
     end
 
@@ -669,7 +669,7 @@ describe Occurrence do
     before(:each) do
       @occurrence = FactoryGirl.create(:rails_occurrence)
       # there's a uniqueness constraint on repo URLs, but we need a real repo with real commits
-      @occurrence.bug.environment.project.instance_variable_set :@repo, Project.new { |pp| pp.repository_url = 'git://github.com/RISCfuture/better_caller.git' }.repo
+      @occurrence.bug.environment.project.instance_variable_set :@repo, Project.new { |pp| pp.repository_url = 'git@github.com:RISCfuture/better_caller.git' }.repo
       @occurrence.bug.update_attribute :deploy, FactoryGirl.create(:deploy, environment: @occurrence.bug.environment)
     end
 

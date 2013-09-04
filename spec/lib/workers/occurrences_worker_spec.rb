@@ -18,8 +18,8 @@ THIS_FILE = Pathname.new(__FILE__).relative_path_from(Rails.root).to_s
 
 describe OccurrencesWorker do
   before :all do
-    Project.where(repository_url: "https://github.com/RISCfuture/better_caller.git").delete_all
-    @project   = FactoryGirl.create(:project, repository_url: "https://github.com/RISCfuture/better_caller.git")
+    Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
+    @project   = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
     @commit    = @project.repo.object('HEAD^')
 
     # this will be a valid exception but with a stack trace that doesn't make

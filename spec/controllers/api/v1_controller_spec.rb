@@ -20,8 +20,8 @@ describe Api::V1Controller do
 
   describe "#notify", fdoc: '/notify' do
     before :all do
-      Project.where(repository_url: "https://github.com/RISCfuture/better_caller.git").delete_all
-      @project   = FactoryGirl.create(:project, repository_url: "https://github.com/RISCfuture/better_caller.git")
+      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
+      @project   = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
       @commit    = @project.repo.object('HEAD^')
 
       # this will be a valid exception but with a stack trace that doesn't make
@@ -77,8 +77,8 @@ describe Api::V1Controller do
 
   describe "#deploy", fdoc: '/deploy' do
     before :all do
-      Project.where(repository_url: "https://github.com/RISCfuture/better_caller.git").delete_all
-      @project = FactoryGirl.create(:project, repository_url: "https://github.com/RISCfuture/better_caller.git")
+      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
+      @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
     end
 
     before :each do
@@ -155,8 +155,8 @@ describe Api::V1Controller do
 
   describe "#sourcemap", fdoc: '/sourcemap' do
     before :all do
-      Project.where(repository_url: "https://github.com/RISCfuture/better_caller.git").delete_all
-      @project = FactoryGirl.create(:project, repository_url: "https://github.com/RISCfuture/better_caller.git")
+      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
+      @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
     end
 
     before :each do
@@ -201,8 +201,8 @@ describe Api::V1Controller do
 
   describe "#deobfuscation", fdoc: '/deobfuscation' do
     before :all do
-      Project.where(repository_url: "https://github.com/RISCfuture/better_caller.git").delete_all
-      @project = FactoryGirl.create(:project, repository_url: "https://github.com/RISCfuture/better_caller.git")
+      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
+      @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
     end
 
     before :each do

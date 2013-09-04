@@ -21,8 +21,8 @@ describe Deploy do
         pending "This is done in an after_commit hook, and it can't be tested with transactional fixtures (which are always rolled back)"
       end
 
-      Project.where(repository_url: "https://github.com/RISCfuture/better_caller.git").delete_all
-      project     = FactoryGirl.create(:project, repository_url: "https://github.com/RISCfuture/better_caller.git")
+      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
+      project     = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
       environment = FactoryGirl.create(:environment, project: project)
       deploy      = FactoryGirl.build(:deploy, environment: environment)
 
