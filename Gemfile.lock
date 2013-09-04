@@ -8,12 +8,12 @@ GIT
 
 GIT
   remote: git://github.com/RISCfuture/has_metadata_column.git
-  revision: b0ab7837884d78ec6da492d822d31f2da6682dc7
-  ref: b0ab7837884d78ec6da492d822d31f2da6682dc7
+  revision: cf7f5ce9e121c7205ec6246b448d2f92afa5dc74
+  branch: rails3
   specs:
     has_metadata_column (1.0.3)
       boolean
-      rails (>= 3.0)
+      rails (~> 3.2)
 
 GIT
   remote: git://github.com/RISCfuture/ruby-git.git
@@ -121,8 +121,8 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
-    mime-types (1.23)
-    multi_json (1.7.8)
+    mime-types (1.25)
+    multi_json (1.7.9)
     pg (0.16.0)
     plist (3.1.0)
     polyglot (0.3.3)
@@ -213,7 +213,7 @@ GEM
     thor (0.18.1)
     tilt (1.4.1)
     timeliness (0.3.7)
-    treetop (1.4.14)
+    treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.37)
