@@ -12,17 +12,17 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+require 'fileutils'
+require 'socket'
+
 # A mutex that uses a lockfile to synchronize on. The presence of the lockfile
-# does not necessarily indicate that the resource is in use; synchronization is
-# done using flock, so the presence of an advisory lock is the only indicator
-# that the resource is in use.
-#
-# The {#lock} method is for creating _shared_ locks; the {#lock!} method for
-# creating _exclusive_ locks. Multiple threads/processes can open shared locks
-# on a resource simultaneously, but the presence of one exclusive lock denies
-# access to any other locks.
+# indicates that the resource is in use; the contents of the file identify the
+# owner of the lock.
 
 class FileMutex
+  # The default timeout to wait for an exclusive lock before raising
+  # `Timeout::Error`.
+  DEFAULT_TIMEOUT = 60.minutes
 
   # Creates a new file-based mutex.
   #
@@ -33,58 +33,46 @@ class FileMutex
     @path = path
   end
 
-  # @overload lock
-  #   Attempts to acquire a shared lock on the resource. Returns `false` if
-  #   the lock could not be acquired, `true` if it can. Returning `true` at one
-  #   instant is not a guarantee that the lock will be available at the next
-  #   instant.
-  #   @return [true, false] Whether a shared lock is currently available.
-  # @overload lock
-  #   Attempts to acquire a shared lock on the resource. Blocks until a lock is
-  #   available. Once a lock is available, acquires it, executes the provided
-  #   block, and then releases the lock.
-  #   @yield The code to run in the lock.
-  #   @return The result of the block.
+  # Attempts to acquire an exclusive lock on the resource. Blocks until a lock
+  # is available. Once a lock is available, acquires it, executes the provided
+  # block, and then releases the lock.
+  #
+  # @yield The code to run in the lock.
+  # @return The result of the block.
 
-  def lock
+  def lock!(timeout_duration = DEFAULT_TIMEOUT)
     result = nil
-    File.open(@path, File::RDONLY|File::CREAT) do |f|
-      if block_given?
-        f.flock File::LOCK_SH
-        result = yield
-      else
-        return f.flock File::LOCK_SH|File::LOCK_NB
+
+    File.open(@path, File::CREAT|File::EXCL|File::WRONLY, 0644) do |f|
+      f.puts contents
+      f.flush
+      Timeout.timeout(timeout_duration) do
+        begin
+          result = yield
+        ensure
+          unlock!
+        end
       end
     end
     return result
-  end
-  alias with_shared_lock lock
-
-  # @overload lock!
-  #   Attempts to acquire an exclusive lock on the resource. Returns `false` if
-  #   the lock could not be acquired, `true` if it can. Returning `true` at one
-  #   instant is not a guarantee that the lock will be available at the next
-  #   instant.
-  #   @return [true, false] Whether an exclusive lock is currently available.
-  # @overload lock!
-  #   Attempts to acquire an exclusive lock on the resource. Blocks until a lock
-  #   is available. Once a lock is available, acquires it, executes the provided
-  #   block, and then releases the lock.
-  #   @yield The code to run in the lock.
-  #   @return The result of the block.
-
-  def lock!
-    result = nil
-    File.open(@path, File::RDWR|File::CREAT, 0644) do |f|
-      if block_given?
-        f.flock File::LOCK_EX
-        result = yield
-      else
-        return f.flock File::LOCK_EX|File::LOCK_NB
-      end
-    end
-    return result
+  rescue Errno::EEXIST
+    sleep 1
+    retry
+  ensure
+    unlock!
   end
   alias synchronize lock!
-  alias with_exclusive_lock lock!
+
+  # Forces this lock to be unlocked. Does nothing if the lock is already
+  # unlocked.
+
+  def unlock!
+    FileUtils.rm_f @path
+  end
+
+  private
+
+  def contents
+    "created=#{Time.now.to_s}, pid=#{Process.pid}, thread=#{Thread.current.object_id}\n\n" + caller.join("\n")
+  end
 end
