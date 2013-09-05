@@ -90,7 +90,7 @@ multithread:
     CommentNotificationMailer: 80
     DeployFixMarker: 70
     DeployNotificationMailer: 80
-    JiraStatusUpdater: 20
+    JiraStatusWorker: 20
     ObfuscationMapWorker: 60
     OccurrenceNotificationMailer: 80
     OccurrencesWorker: 40

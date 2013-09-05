@@ -9,7 +9,7 @@ multithread:
     CommentNotificationMailer: 80
     DeployFixMarker: 70
     DeployNotificationMailer: 80
-    JiraStatusUpdater: 20
+    JiraStatusWorker: 20
     ObfuscationMapWorker: 60
     OccurrenceNotificationMailer: 80
     OccurrencesWorker: 40
@@ -30,7 +30,7 @@ resque:
     CommentNotificationMailer: squash
     DeployFixMarker: squash
     DeployNotificationMailer: squash
-    JiraStatusUpdater: squash
+    JiraStatusWorker: squash
     ObfuscationMapWorker: squash
     OccurrenceNotificationMailer: squash
     OccurrencesWorker: squash
@@ -60,7 +60,7 @@ sidekiq:
       queue: processing
     DeployNotificationMailer:
       queue: emails
-    JiraStatusUpdater:
+    JiraStatusWorker:
       queue: services
       retry: false
     ObfuscationMapWorker:
