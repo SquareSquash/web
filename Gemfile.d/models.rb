@@ -15,7 +15,7 @@
 gem 'pg', platform: :mri
 gem 'activerecord-jdbcpostgresql-adapter', platform: :jruby
 gem 'has_metadata_column', github: 'RISCfuture/has_metadata_column', branch: 'rails3'
-gem 'slugalicious'
+gem 'slugalicious', github: 'RISCfuture/slugalicious', ref: '60e9fea1a82949cca4bdf0eeb50506150e7ffe48'
 gem 'email_validation'
 gem 'url_validation'
 gem 'json_serialize'
