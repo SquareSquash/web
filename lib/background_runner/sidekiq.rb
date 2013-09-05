@@ -44,7 +44,7 @@ module BackgroundRunner
       mod.class_eval <<-RUBY
         class SidekiqAdapter
           include ::Sidekiq::Worker
-          sidekiq_options = {queue: Squash::Configuration.concurrency.sidekiq.queue[#{mod.to_s.inspect}]}
+          sidekiq_options Squash::Configuration.concurrency.sidekiq.worker_options[#{mod.to_s.inspect}].symbolize_keys
 
           def perform(*args)
             #{mod.to_s}.perform *args

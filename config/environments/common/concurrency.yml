@@ -53,17 +53,32 @@ sidekiq:
     - [occurrences, 1]
     - [processing, 3]
     - [services, 2]
-  queue:
-    CommentNotificationMailer: emails
-    DeployFixMarker: processing
-    DeployNotificationMailer: emails
-    JiraStatusUpdater: services
-    ObfuscationMapWorker: processing
-    OccurrenceNotificationMailer: emails
-    OccurrencesWorker: occurrences
-    PagerDutyAcknowledger: services
-    PagerDutyNotifier: services
-    PagerDutyResolver: services
-    ProjectRepoFetcher: git
-    SourceMapWorker: processing
-    SymbolicationWorker: processing
+  worker_options:
+    CommentNotificationMailer:
+      queue: emails
+    DeployFixMarker:
+      queue: processing
+    DeployNotificationMailer:
+      queue: emails
+    JiraStatusUpdater:
+      queue: services
+      retry: false
+    ObfuscationMapWorker:
+      queue: processing
+    OccurrenceNotificationMailer:
+      queue: emails
+    OccurrencesWorker:
+      queue: occurrences
+      retry: false
+    PagerDutyAcknowledger:
+      queue: services
+    PagerDutyNotifier:
+      queue: services
+    PagerDutyResolver:
+      queue: services
+    ProjectRepoFetcher:
+      queue: git
+    SourceMapWorker:
+      queue: processing
+    SymbolicationWorker:
+      queue: processing
