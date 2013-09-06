@@ -16,6 +16,20 @@ module BackgroundRunner
 
   # `BackgroundRunner` adapter for the Sidekiq job system. See the
   # `concurrency.yml` Configoro file for configuration options.
+  #
+  # If you are using Sidekiq, you will need to run `rake sidekiq:configure` as
+  # part of your deploy process in order to generate the `config/sidekiq.yml`
+  # file. To do this in Capistrano, add something like this to your
+  # `config/deploy.rb` file:
+  #
+  # ```` ruby
+  # namespace :sidekiq do
+  #   task :configure do
+  #     run "cd #{release_path} && rake sidekiq:configure RAILS_ENV=#{rails_env}"
+  #   end
+  # end
+  # before 'sidekiq:restart', 'sidekiq:configure'
+  # ````
 
   module Sidekiq
     def self.setup
