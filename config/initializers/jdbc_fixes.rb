@@ -22,7 +22,7 @@ class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
     unless pk
       # Extract the table from the insert sql. Yuck.
       table_ref = extract_table_ref_from_insert_sql(sql)
-      pk = primary_key(table_ref) if table_ref
+      pk        = primary_key(table_ref) if table_ref
     end
 
     # CPK
@@ -36,9 +36,11 @@ class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
   # so. No idea why, but this fixes it. This also fixes broken connections after
   # a failover.
 
-  [:execute, :begin_db_transaction, :commit_db_transaction,
-   :rollback_db_transaction, :jdbc_columns, :tables, :indexes,
-   :write_large_object, :primary_keys].each do |meth|
+  [:columns, :begin_db_transaction, :commit_db_transaction,
+   :rollback_db_transaction, :begin_isolated_db_transaction, :create_savepoint,
+   :rollback_to_savepoint, :release_savepoint, :exec_query, :exec_insert,
+   :exec_delete, :exec_update, :exec_query_raw, :_execute, :tables, :indexes,
+   :primary_keys, :write_large_object, :update_lob_value].each do |meth|
     define_method :"#{meth}_with_retry" do |*args, &block|
       begin
         send :"#{meth}_without_retry", *args, &block
