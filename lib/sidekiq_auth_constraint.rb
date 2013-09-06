@@ -15,16 +15,33 @@
 # Authorization constraint, used by the Sidekiq routes, that ensures that there
 # exists a current user session.
 
-class SidekiqAuthConstraint
+module SidekiqAuthConstraint
 
-  # Determines whether a user can access the Sidekiq admin page.
-  #
-  # @param [ActionDispatch::Request] request A request.
-  # @return [true, false] Whether the user can access the Sidekiq admin page.
+  # The default `authorized?` implementation if there is no refined
+  # implementation provided by the authentication strategy.
 
-  def self.authorized?(request)
-    return false unless request.session[:user_id]
-    user = User.find(request.session[:user_id])
-    !user.nil?
+  module Default
+    
+    # Determines whether a user can access the Sidekiq admin page.
+    #
+    # @param [ActionDispatch::Request] request A request.
+    # @return [true, false] Whether the user can access the Sidekiq admin page.
+
+    def authorized?(request)
+      return false unless request.session[:user_id]
+      user = User.find(request.session[:user_id])
+      !user.nil?
+    end
+  end
+
+  # first incorporate the default behavior
+  extend Default
+
+  # then, if available, incorporate the auth-specific behavior
+  begin
+    auth_module = "sidekiq_auth_constraint/#{Squash::Configuration.authentication.strategy}".camelize.constantize
+    extend auth_module
+  rescue NameError
+    # no auth module; ignore
   end
 end
