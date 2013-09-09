@@ -282,9 +282,8 @@ if step < 1
     say "Updating config/environments/production.rb..."
     prod_config = File.read('config/environments/production.rb')
     prod_config.sub! 'config.force_ssl = true', 'config.force_ssl = false'
-    prod_config.sub! 'require "rack/ssl"', 'require "rack/cache"'
-    prod_config.sub! 'config.middleware.insert_before ::Rack::SSL, Ping',
-                     'config.middleware.insert_after ::Rack::Cache, Ping'
+    prod_config.sub! 'config.middleware.insert_before ::ActionDispatch::SSL, Ping',
+                     'config.middleware.insert_before ::Rack::Runtime, Ping'
     File.open('config/environments/production.rb', 'w') do |f|
       f.puts prod_config
     end
