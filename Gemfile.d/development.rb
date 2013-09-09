@@ -20,4 +20,4 @@ group :development do
   gem 'fdoc'
 end
 
-gem 'sql_origin', groups: [:development, :test], github: 'RISCfuture/sql_origin', ref: '65ec5fe53958bb2e9af0d328b74a0767a7b89ea4'
+gem 'sql_origin', groups: [:development, :test]

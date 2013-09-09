@@ -8,7 +8,7 @@ library, and a Squash Rails client library that adds additional HTTP
 information to exception notifications.)
 
 A list of existing client libraries is kept up-to-date in the
-{file:doc/README_FOR_APP.md readme file}.
+{file:README.md readme file}.
 
 If your language or framework isn't in this list, you'll have to write your own
 client. Don't worry; it's easy.

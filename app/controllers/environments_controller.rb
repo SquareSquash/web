@@ -37,7 +37,7 @@ class EnvironmentsController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /projects/:project_id/environments/:id.json`
+  # * `PATCH /projects/:project_id/environments/:id.json`
   #
   # Path Parameters
   # ---------------
@@ -56,7 +56,7 @@ class EnvironmentsController < ApplicationController
   # | `environment` | Parameterized hash of Environment fields. |
 
   def update
-    @environment.update_attributes params[:environment], as: :admin
+    @environment.update_attributes environment_params
     respond_with @environment, location: project_url(@project)
   end
 
@@ -64,5 +64,9 @@ class EnvironmentsController < ApplicationController
 
   def find_environment
     @environment = @project.environments.find_by_name!(params[:id])
+  end
+
+  def environment_params
+    params.require(:environment).permit(:sends_emails, :notifies_pagerduty)
   end
 end

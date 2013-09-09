@@ -44,7 +44,6 @@ class Event < ActiveRecord::Base
   belongs_to :user, inverse_of: :events
   has_many :user_events, dependent: :delete_all, inverse_of: :event
 
-  attr_accessible :bug, :user, :kind, :data
   attr_readonly :bug, :user, :kind, :data
 
   include JsonSerialize
@@ -96,7 +95,7 @@ class Event < ActiveRecord::Base
     end
     events.select { |e| e.data['occurrence_id'].nil? }.each { |e| e.instance_variable_set :@occurrence, [nil] }
 
-    assignees = User.where(id: (events.map { |e| e.data['assignee_id'] } + events.map { |e| e.comment.try(:user_id)}).uniq.compact).includes(:emails)
+    assignees = User.where(id: (events.map { |e| e.data['assignee_id'] } + events.map { |e| e.comment.try!(:user_id)}).uniq.compact).includes(:emails)
     assignees.each do |user|
       events.select { |e| e.data['assignee_id'] == user.id }.each { |e| e.instance_variable_set :@assignee, [user] }
     end

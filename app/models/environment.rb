@@ -56,8 +56,6 @@ class Environment < ActiveRecord::Base
       notifies_pagerduty: {type: Boolean, default: true}
   )
 
-  attr_accessible :sends_emails, :notifies_pagerduty, as: :admin
-  attr_accessible :name, as: :worker
   attr_readonly :project, :name
 
   validates :project,

@@ -76,7 +76,7 @@ class CommentsController < ApplicationController
   # | `comment` | Parameterized hash of Comment fields. |
 
   def create
-    @comment      = @bug.comments.build(params[:comment], as: :creator)
+    @comment      = @bug.comments.build(comment_params)
     @comment.user = current_user
     @comment.save
 
@@ -88,7 +88,7 @@ class CommentsController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /projects/:project_id/environments/:environment_id/bugs/:bug_id/comments/:id.json`
+  # * `PATCH /projects/:project_id/environments/:environment_id/bugs/:bug_id/comments/:id.json`
   #
   # Path Parameters
   # ---------------
@@ -107,7 +107,7 @@ class CommentsController < ApplicationController
   # | `comment` | Parameterized hash of Comment fields. |
 
   def update
-    @comment.update_attributes params[:comment], as: current_user.role(@comment)
+    @comment.update_attributes comment_params
 
     respond_with @project, @environment, @bug, @comment
   end
@@ -157,5 +157,9 @@ class CommentsController < ApplicationController
           url: project_environment_bug_comment_url(@project, @environment, @bug, comment, format: 'json')
       )
     end
+  end
+
+  def comment_params
+    params.require(:comment).permit(:body)
   end
 end

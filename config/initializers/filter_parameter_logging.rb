@@ -12,19 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+# Be sure to restart your server when you modify this file.
 
-describe "/projects/:project_id/memberships" do
-  describe "/:id [PATCH]" do
-    it "should route to usernames with dots in them" do
-      expect(patch: '/projects/my-project/memberships/user.dot.json').
-          to route_to(
-                 controller: 'project/memberships',
-                 action:     'update',
-                 project_id: 'my-project',
-                 id:         'user.dot',
-                 format:     'json'
-             )
-    end
-  end
-end
+# Configure sensitive parameters which will be filtered from the log file.
+Rails.application.config.filter_parameters += [:password]

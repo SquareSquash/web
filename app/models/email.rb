@@ -71,15 +71,13 @@ class Email < ActiveRecord::Base
   after_save :one_primary_email_per_user
   after_save :delete_locally_redirected_emails, if: :global?
 
-  attr_accessible :email, :primary, as: :system
-  attr_accessible :email, as: :user
   attr_readonly :email
 
   scope :by_email, ->(email) { email ? where('LOWER(email) = ?', email.downcase) : where('FALSE') }
-  scope :global, where(project_id: nil)
-  scope :project_specific, where('project_id IS NOT NULL')
-  scope :primary, where(primary: true)
-  scope :redirected, where(primary: false)
+  scope :global, -> { where(project_id: nil) }
+  scope :project_specific, -> { where('project_id IS NOT NULL') }
+  scope :primary, -> { where(primary: true) }
+  scope :redirected, -> { where(primary: false) }
 
   # @return [User, nil] The User whose primary email is this email address, or
   #   `nil` if this is a primary email, or if no User has this email as his/her
@@ -87,7 +85,7 @@ class Email < ActiveRecord::Base
 
   def source
     return nil if primary?
-    return Email.primary.by_email(email).first.try(:user)
+    return Email.primary.by_email(email).first.try!(:user)
   end
 
   # @return [true, false] `true` if this is a global email redirection, or

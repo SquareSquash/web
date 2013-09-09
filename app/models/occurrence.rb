@@ -464,7 +464,6 @@ class Occurrence < ActiveRecord::Base
       color_depth:            {type: Integer, allow_nil: true}
   )
 
-  attr_accessible :revision, :occurred_at, :client, :crashed, *metadata_column_fields.keys
   attr_readonly :bug, :revision, :number, :occurred_at
 
   # Fields that cannot be used by the aggregation view. These are fields with a
@@ -796,7 +795,7 @@ class Occurrence < ActiveRecord::Base
         elem.replace(
             'file'   => klass.path,
             'line'   => elem['line'],
-            'symbol' => meth.try(:full_name) || elem['symbol']
+            'symbol' => meth.try!(:full_name) || elem['symbol']
         )
       end
     end
@@ -809,7 +808,7 @@ class Occurrence < ActiveRecord::Base
   #   linked Deploy's ObfuscationMap).
 
   def deobfuscate!(map=nil)
-    map ||= bug.deploy.try(:obfuscation_map)
+    map ||= bug.deploy.try!(:obfuscation_map)
 
     return unless map
     return if truncated?
@@ -839,8 +838,7 @@ class Occurrence < ActiveRecord::Base
     new_bug    = blamer.find_or_create_bug!
     if new_bug.id != bug_id
       copy = new_bug.occurrences.build
-      copy.assign_attributes attributes.except('number', 'id', 'bug_id'),
-                             without_protection: true
+      copy.assign_attributes attributes.except('number', 'id', 'bug_id')
       copy.save!
       blamer.reopen_bug_if_necessary! new_bug
       redirect_to! copy

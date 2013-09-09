@@ -12,6 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-gem 'erector'
+gem 'erector', github: 'RISCfuture/erector'
 gem 'jquery-rails'
 gem 'kramdown'
+gem 'font-awesome-rails'

@@ -123,13 +123,6 @@ class Bug < ActiveRecord::Base
   # @private
   attr_accessor :duplicate_of_number
 
-  attr_accessible :assigned_user, :resolution_revision, :fixed, :fix_deployed,
-                  :irrelevant, :duplicate_of, :duplicate_of_id, :jira_isssue,
-                  :jira_status_id, as: [:owner, :admin, :member]
-  attr_protected :number, :first_occurrence, :latest_occurrence,
-                 :occurrences_count, :comments_count, :assigned_user,
-                 :resolution_revision, :fixed, :irrelevant, :jira_issue,
-                 as: :worker
   attr_readonly :environment, :number, :first_occurrence, :latest_occurrence,
                 :occurrences_count, :comments_count, :class_name,
                 :message_template, :revision, :file, :line, :blamed_revision
@@ -289,15 +282,14 @@ class Bug < ActiveRecord::Base
 
     # second priority is matching a project member by commit author(s)
     emails = emails_from_commit_author.map do |em|
-      Email.primary.by_email(find_responsible_user(em)).first ||
-          Email.new({email: em}, as: :system)
+      Email.primary.by_email(find_responsible_user(em)).first || Email.new(email: em)
       # build a fake empty email object to stand in for emails not linked to known user accounts
     end if emails.empty?
 
     # third priority is unknown emails associated with the commit itself (if the project is so configured)
     if emails.empty? && environment.project.sends_emails_outside_team?
       # build a fake empty email object to stand in for emails not linked to known user accounts
-      emails = all_emails.map { |em| Email.new({email: em}, as: :system) }
+      emails = all_emails.map { |em| Email.new(email: em) }
       if environment.project.trusted_email_domain
         emails.select! { |em| em.email.split('@').last == environment.project.trusted_email_domain }
       end
@@ -365,9 +357,9 @@ class Bug < ActiveRecord::Base
     comment_text = comments.map(&:body).compact.join(' ')
     self.class.connection.execute <<-SQL
         UPDATE bugs
-          SET searchable_text = SETWEIGHT(TO_TSVECTOR(#{connection.quote(class_name || '')}), 'A') ||
-            SETWEIGHT(TO_TSVECTOR(#{connection.quote(message_text || '')}), 'B') ||
-            SETWEIGHT(TO_TSVECTOR(#{connection.quote(comment_text || '')}), 'C')
+          SET searchable_text = SETWEIGHT(TO_TSVECTOR(#{self.class.connection.quote(class_name || '')}), 'A') ||
+            SETWEIGHT(TO_TSVECTOR(#{self.class.connection.quote(message_text || '')}), 'B') ||
+            SETWEIGHT(TO_TSVECTOR(#{self.class.connection.quote(comment_text || '')}), 'C')
           WHERE id = #{id}
     SQL
   end
@@ -424,7 +416,7 @@ class Bug < ActiveRecord::Base
   end
 
   def cannot_be_duplicate_of_duplicate
-    errors.add(:duplicate_of_id, :is_a_duplicate) if duplicate_of.try(:duplicate?)
+    errors.add(:duplicate_of_id, :is_a_duplicate) if duplicate_of.try!(:duplicate?)
   end
 
   def cannot_change_original_to_duplicate

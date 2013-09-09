@@ -64,8 +64,6 @@ class Deploy < ActiveRecord::Base
   has_many :bugs, inverse_of: :deploy, dependent: :nullify
   has_one :obfuscation_map, inverse_of: :deploy, dependent: :destroy
 
-  attr_accessible :revision, :deployed_at, :hostname, :build, :version,
-                  as: :worker
   attr_readonly :environment, :revision, :build, :hostname, :deployed_at,
                 :version
 
@@ -93,8 +91,8 @@ class Deploy < ActiveRecord::Base
   end
   set_nil_if_blank :hostname, :build
 
-  scope :builds, where('build IS NOT NULL')
-  scope :by_time, order('deployed_at DESC')
+  scope :builds, -> { where('build IS NOT NULL') }
+  scope :by_time, -> { order('deployed_at DESC') }
 
   # @return [Git::Object::Commit] The Commit for this Deploy's `revision`.
   def commit() environment.project.repo.object revision end
@@ -112,6 +110,6 @@ class Deploy < ActiveRecord::Base
   end
 
   def devices_affected
-    DeviceBug.joins(:bug).where(bugs: {deploy_id: id}).count(:device_id, distinct: true)
+    DeviceBug.joins(:bug).where(bugs: {deploy_id: id}).distinct.count(:device_id)
   end
 end

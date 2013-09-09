@@ -35,7 +35,7 @@ describe BugsController do
                                          first_occurrence:  Time.now - rand*86400,
                                          latest_occurrence: Time.now - rand*86400
       end
-      @bugs = @env.bugs(true).all # reload to get those fields set by triggers
+      @bugs = @env.bugs(true).to_a # reload to get those fields set by triggers
     end
 
     before(:each) { stub_const 'BugsController::PER_PAGE', 5 } # speed it up
@@ -199,7 +199,7 @@ describe BugsController do
     before(:each) { @bug = FactoryGirl.create(:bug) }
 
     it "should require a logged-in user" do
-      put :update, polymorphic_params(@bug, false, bug: {fixed: 'true'})
+      patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true'})
       response.should redirect_to(login_url(next: request.fullpath))
       @bug.reload.should_not be_fixed
     end
@@ -207,22 +207,22 @@ describe BugsController do
     context '[authenticated]' do
       before(:each) { login_as @bug.environment.project.owner }
 
-      it_should_behave_like "action that 404s at appropriate times", :put, :update, 'polymorphic_params(@bug, false, bug: { fixed: true })'
-      it_should_behave_like "singleton action that 404s at appropriate times", :put, :update, 'polymorphic_params(@bug, false, bug: { fixed: true })'
+      it_should_behave_like "action that 404s at appropriate times", :patch, :update, 'polymorphic_params(@bug, false, bug: { fixed: true })'
+      it_should_behave_like "singleton action that 404s at appropriate times", :patch, :update, 'polymorphic_params(@bug, false, bug: { fixed: true })'
 
       it "should update the bug" do
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, format: 'json')
         @bug.reload.should be_fixed
         response.body.should eql(@bug.to_json)
       end
 
       it "should set the bug modifier" do
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, format: 'json')
         assigns(:bug).modifier.should eql(@bug.environment.project.owner)
       end
 
       it "should add a comment if in the params" do
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, comment: {body: 'hai!'}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, comment: {body: 'hai!'}, format: 'json')
         @bug.reload.should be_fixed
         @bug.comments.count.should eql(1)
         @bug.comments.first.body.should eql('hai!')
@@ -230,7 +230,7 @@ describe BugsController do
       end
 
       it "should not add a blank comment" do
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, comment: {body: '  '}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true'}, comment: {body: '  '}, format: 'json')
         @bug.reload.should be_fixed
         @bug.comments.count.should eql(0)
       end
@@ -249,7 +249,7 @@ describe BugsController do
 
       it "should set duplicate_of_id from duplicate_of_number" do
         other = FactoryGirl.create(:bug, environment: @bug.environment)
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: other.number}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: other.number}, format: 'json')
         @bug.reload.duplicate_of_id.should eql(other.id)
         @bug.should be_fixed
       end
@@ -257,25 +257,25 @@ describe BugsController do
       it "should copy errors of duplicate_of_id to duplicate_of_number" do
         FactoryGirl.create :bug, environment: @bug.environment, duplicate_of: @bug
         other = FactoryGirl.create(:bug, environment: @bug.environment)
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: other.number}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: other.number}, format: 'json')
         response.status.should eql(422)
         JSON.parse(response.body)['bug']['duplicate_of_number'].should eql(['cannot be marked as duplicate because other bugs have been marked as duplicates of this bug'])
       end
 
       it "should add an error and not save the record if the duplicate-of number does not exist" do
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: 0}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: 0}, format: 'json')
         response.status.should eql(422)
         JSON.parse(response.body)['bug']['duplicate_of_number'].should eql(['unknown bug number'])
       end
 
       it "... unless no duplicate-of number was entered" do
-        put :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: ' '}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {fixed: 'true', duplicate_of_number: ' '}, format: 'json')
         response.status.should eql(200)
       end
 
       it "should allow the JIRA status to be nullified" do
         @bug.update_attribute :jira_status_id, 6
-        put :update, polymorphic_params(@bug, false, bug: {jira_status_id: ''}, format: 'json')
+        patch :update, polymorphic_params(@bug, false, bug: {jira_status_id: ''}, format: 'json')
         response.status.should eql(200)
         @bug.reload.jira_status_id.should be_nil
       end
@@ -314,24 +314,24 @@ describe BugsController do
     before(:each) { @bug = FactoryGirl.create(:bug) }
 
     it "should require a logged-in user" do
-      post :watch, polymorphic_params(@bug, false)
-      response.should redirect_to(login_url(next: request.fullpath))
+      post :watch, polymorphic_params(@bug, false, format: 'json')
+      response.status.should eql(401)
     end
 
     context '[authenticated]' do
       before(:each) { login_as(@user = @bug.environment.project.owner) }
 
-      it_should_behave_like "action that 404s at appropriate times", :post, :watch, 'polymorphic_params(@bug, false)'
-      it_should_behave_like "singleton action that 404s at appropriate times", :post, :watch, 'polymorphic_params(@bug, false)'
+      it_should_behave_like "action that 404s at appropriate times", :post, :watch, 'polymorphic_params(@bug, false, format: "json")'
+      it_should_behave_like "singleton action that 404s at appropriate times", :post, :watch, 'polymorphic_params(@bug, false, format: "json")'
 
       it "should watch an unwatched bug" do
-        post :watch, polymorphic_params(@bug, false)
+        post :watch, polymorphic_params(@bug, false, format: 'json')
         @user.watches.where(bug_id: @bug.id).should_not be_empty
       end
 
       it "should unwatch a watched bug" do
         FactoryGirl.create :watch, user: @user, bug: @bug
-        post :watch, polymorphic_params(@bug, false)
+        post :watch, polymorphic_params(@bug, false, format: 'json')
         @user.watches.where(bug_id: @bug.id).should be_empty
       end
     end
@@ -341,25 +341,25 @@ describe BugsController do
     before(:each) { @bug = FactoryGirl.create(:bug) }
 
     it "should require a logged-in user" do
-      post :notify_deploy, polymorphic_params(@bug, false)
-      response.should redirect_to(login_url(next: request.fullpath))
+      post :notify_deploy, polymorphic_params(@bug, false, format: 'json')
+      response.status.should eql(401)
       -> { @bug.reload }.should_not change(@bug, :notify_on_deploy)
     end
 
     context '[authenticated]' do
       before(:each) { login_as(@user = @bug.environment.project.owner) }
 
-      it_should_behave_like "action that 404s at appropriate times", :post, :notify_deploy, 'polymorphic_params(@bug, false)'
-      it_should_behave_like "singleton action that 404s at appropriate times", :post, :notify_deploy, 'polymorphic_params(@bug, false)'
+      it_should_behave_like "action that 404s at appropriate times", :post, :notify_deploy, 'polymorphic_params(@bug, false, format: "json")'
+      it_should_behave_like "singleton action that 404s at appropriate times", :post, :notify_deploy, 'polymorphic_params(@bug, false, format: "json")'
 
       it "should add the current user to the deploy notifications list" do
-        post :notify_deploy, polymorphic_params(@bug, false)
+        post :notify_deploy, polymorphic_params(@bug, false, format: 'json')
         @bug.reload.notify_on_deploy.should include(@user.id)
       end
 
       it "should remove the current user from the deploy notifications list" do
         @bug.update_attribute :notify_on_deploy, [@user.id]
-        post :notify_deploy, polymorphic_params(@bug, false)
+        post :notify_deploy, polymorphic_params(@bug, false, format: 'json')
         @bug.reload.notify_on_deploy.should_not include(@user.id)
       end
     end
@@ -369,25 +369,25 @@ describe BugsController do
     before(:each) { @bug = FactoryGirl.create(:bug) }
 
     it "should require a logged-in user" do
-      post :notify_occurrence, polymorphic_params(@bug, false)
-      response.should redirect_to(login_url(next: request.fullpath))
+      post :notify_occurrence, polymorphic_params(@bug, false, format: 'json')
+      response.status.should eql(401)
       -> { @bug.reload }.should_not change(@bug, :notify_on_occurrence)
     end
 
     context '[authenticated]' do
       before(:each) { login_as(@user = @bug.environment.project.owner) }
 
-      it_should_behave_like "action that 404s at appropriate times", :post, :notify_occurrence, 'polymorphic_params(@bug, false)'
-      it_should_behave_like "singleton action that 404s at appropriate times", :post, :notify_occurrence, 'polymorphic_params(@bug, false)'
+      it_should_behave_like "action that 404s at appropriate times", :post, :notify_occurrence, 'polymorphic_params(@bug, false, format: "json")'
+      it_should_behave_like "singleton action that 404s at appropriate times", :post, :notify_occurrence, 'polymorphic_params(@bug, false, format: "json")'
 
       it "should add the current user to the occurrence notifications list" do
-        post :notify_occurrence, polymorphic_params(@bug, false)
+        post :notify_occurrence, polymorphic_params(@bug, false, format: 'json')
         @bug.reload.notify_on_occurrence.should include(@user.id)
       end
 
       it "should remove the current user from the occurrence notifications list" do
         @bug.update_attribute :notify_on_occurrence, [@user.id]
-        post :notify_occurrence, polymorphic_params(@bug, false)
+        post :notify_occurrence, polymorphic_params(@bug, false, format: 'json')
         @bug.reload.notify_on_occurrence.should_not include(@user.id)
       end
     end

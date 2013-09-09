@@ -99,7 +99,7 @@ function PageManager() {
             var form = $('<form/>').attr({ 'accept-charset': 'UTF-8', action: comment.url, method: 'post' }).appendTo(editDiv);
             var extras = $('<div/>').css({ margin: 0, padding: 0, display: 'inline' }).appendTo(form);
             $('<input/>').attr({ name: 'utf8', type: 'hidden', value: '✓' }).appendTo(extras);
-            $('<input/>').attr({ name: '_method', type: 'hidden', value: 'put' }).appendTo(extras);
+            $('<input/>').attr({ name: '_method', type: 'hidden', value: 'patch' }).appendTo(extras);
             $('<input/>').attr({ name: $('meta[name=csrf-param]').attr('content'), type: 'hidden', value: $('meta[name=csrf-token]').attr('content') }).appendTo(extras);
             $('<textarea/>').attr({ name: 'comment[body]', rows: 4 }).val(comment.body).appendTo(form);
             var buttons = $('<p/>').appendTo(form);

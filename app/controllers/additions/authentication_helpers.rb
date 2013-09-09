@@ -22,7 +22,7 @@
 #
 # All public and protected methods are available to all controllers. The
 # following methods are also available to all views: {#current_user},
-# {#logged_in?}, {#logged_out?}, and {#admin_logged_in?}.
+# {#logged_in?}, and {#logged_out?}.
 
 module AuthenticationHelpers
   extend ActiveSupport::Concern

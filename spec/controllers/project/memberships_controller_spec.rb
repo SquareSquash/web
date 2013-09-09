@@ -59,7 +59,7 @@ describe Project::MembershipsController do
     before :all do
       @project = FactoryGirl.create(:project)
       FactoryGirl.create_list :membership, 100, project: @project
-      @memberships = @project.memberships.all # get the owner's membership too
+      @memberships = @project.memberships.to_a # get the owner's membership too
     end
 
     before(:each) { @user = FactoryGirl.create(:user) }
@@ -120,7 +120,7 @@ describe Project::MembershipsController do
       end
 
       it "should render the errors with status 422 if invalid" do
-        post :create, polymorphic_params(@project, true, membership: {}, format: 'json')
+        post :create, polymorphic_params(@project, true, membership: {user_id: 'halp', admin: 'true'}, format: 'json')
         response.status.should eql(422)
         response.body.should eql("{\"membership\":{\"user\":[\"can’t be blank\"]}}")
       end
@@ -132,12 +132,12 @@ describe Project::MembershipsController do
     before(:each) { @membership = FactoryGirl.create(:membership, project: @project) }
 
     it "should require a logged-in administrator or owner" do
-      put :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
+      patch :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
       response.status.should eql(401)
       @membership.reload.should_not be_admin
 
       login_as FactoryGirl.create(:membership, project: @project).user
-      put :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
+      patch :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
       response.status.should eql(403)
       @membership.reload.should_not be_admin
     end
@@ -146,7 +146,7 @@ describe Project::MembershipsController do
       before(:each) { login_as @project.owner }
 
       it "should only allow projects that exist and the user has a membership for" do
-        put :update, project_id: 'not-found', id: @membership.user.to_param, membership: {admin: true}, format: 'json'
+        patch :update, project_id: 'not-found', id: @membership.user.to_param, membership: {admin: true}, format: 'json'
         response.status.should eql(404)
 
         post :create, project_id: FactoryGirl.create(:project).to_param, id: @membership.user.to_param, membership: {admin: true}, format: 'json'
@@ -154,12 +154,12 @@ describe Project::MembershipsController do
       end
 
       it "should allow owners to promote or demote admins" do
-        put :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
+        patch :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
         response.status.should eql(200)
         @membership.reload.should be_admin
         response.body.should eql(@membership.to_json)
 
-        put :update, polymorphic_params(@membership, false, membership: {admin: false}, format: 'json')
+        patch :update, polymorphic_params(@membership, false, membership: {admin: false}, format: 'json')
         response.status.should eql(200)
         @membership.reload.should_not be_admin
         response.body.should eql(@membership.to_json)
@@ -167,7 +167,7 @@ describe Project::MembershipsController do
 
       it "should not allow admins to promote or demote admins" do
         login_as FactoryGirl.create(:membership, project: @project, admin: true).user
-        put :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
+        patch :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
         response.status.should eql(400)
         @membership.reload.should_not be_admin
       end

@@ -15,7 +15,7 @@
 require 'spec_helper'
 
 describe NotificationThresholdsController do
-  {create: :post, update: :put}.each do |action, method|
+  {create: :post, update: :patch}.each do |action, method|
     before :all do
       @env    = FactoryGirl.create(:environment)
       @params = {notification_threshold: {period: 3600, threshold: 500}}
@@ -24,8 +24,8 @@ describe NotificationThresholdsController do
 
     describe "##{action}" do
       it "should require a logged-in user" do
-        send method, action, polymorphic_params(@bug, true, @params)
-        response.should redirect_to(login_url(next: request.fullpath))
+        send method, action, polymorphic_params(@bug, true, @params.merge(format: 'json'))
+        response.status.should eql(401)
         @bug.notification_thresholds.count.should eql(0)
       end
 
@@ -36,7 +36,7 @@ describe NotificationThresholdsController do
 
         it "should create a new notification" do
           @bug.notification_thresholds.delete_all
-          send method, action, polymorphic_params(@bug, true, @params)
+          send method, action, polymorphic_params(@bug, true, @params.merge(format: 'json'))
 
           @bug.notification_thresholds.count.should eql(1)
           @bug.notification_thresholds(true).first.period.should eql(3600)
@@ -47,7 +47,7 @@ describe NotificationThresholdsController do
         it "should update an existing notification" do
           @bug.notification_thresholds.delete_all
           FactoryGirl.create :notification_threshold, user: @bug.environment.project.owner, bug: @bug, period: 36, threshold: 5
-          send method, action, polymorphic_params(@bug, true, @params)
+          send method, action, polymorphic_params(@bug, true, @params.merge(format: 'json'))
 
           @bug.notification_thresholds.count.should eql(1)
           @bug.notification_thresholds(true).first.period.should eql(3600)

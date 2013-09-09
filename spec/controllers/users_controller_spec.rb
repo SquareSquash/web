@@ -97,7 +97,7 @@ describe UsersController do
       it "should render the login page for invalid attributes" do
         post :create, user: @attrs.merge('password_confirmation' => 'whoops'), next: account_url
         response.should render_template('sessions/new')
-        assigns(:user).errors[:password].should eql(['didn’t match'])
+        assigns(:user).errors[:password_confirmation].should eql(['doesn’t match'])
       end
     else
       it "should not be possible to create a new user" do

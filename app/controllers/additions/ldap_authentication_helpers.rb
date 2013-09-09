@@ -95,11 +95,7 @@ module LdapAuthenticationHelpers
   end
 
   def find_or_create_user_from_ldap_entry(entry, username)
-    User.where(username: username).create_or_update!({
-                                                         first_name: entry[:givenname].first,
-                                                         last_name:  entry[:sn].first
-                                                     },
-                                                     as: :system
-    )
+    User.where(username: username).create_or_update!(first_name: entry[:givenname].first,
+                                                     last_name:  entry[:sn].first)
   end
 end

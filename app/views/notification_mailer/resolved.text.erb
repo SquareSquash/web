@@ -1,4 +1,4 @@
-<%= @resolver.try(:name) || "Someone" %> has <%= @bug.fixed? ? "resolved a bug" : "marked a bug as irrelevant" %>
+<%= @resolver.try!(:name) || "Someone" %> has <%= @bug.fixed? ? "resolved a bug" : "marked a bug as irrelevant" %>
 that you were assigned to:
 
 <%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug %>

@@ -47,8 +47,8 @@ class Slug < ActiveRecord::Base
   scope :from_slug, ->(klass, scope, slug) {
     where(sluggable_type: klass.to_s, slug: slug, scope: scope)
   }
-  scope :active, where(active: true)
-  scope :inactive, where(active: false)
+  scope :active, -> { where(active: true) }
+  scope :inactive, -> { where(active: false) }
 
   validates :sluggable_type,
             presence: true
@@ -67,8 +67,6 @@ class Slug < ActiveRecord::Base
   after_save :invalidate_cache
   after_destroy :invalidate_cache
   set_nil_if_blank :scope
-
-  attr_accessible :sluggable, :slug, :active, :scope
 
   # Marks a slug as active and deactivates all other slugs assigned to the
   # record.

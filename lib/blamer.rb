@@ -89,8 +89,8 @@
 # --------------
 #
 # After linking and saving the Bug returned from {#find_or_create_bug!}, you
-# should call {#reopen_if_necessary!} to potentially reopen the Bug. This should
-# only be done after the Occurrence and Bug are both linked and saved.
+# should call {#reopen_bug_if_necessary!} to potentially reopen the Bug. This
+# should only be done after the Occurrence and Bug are both linked and saved.
 
 class Blamer
   # The amount of time after a bug is fixed _without_ being deployed after which
@@ -113,7 +113,7 @@ class Blamer
   #   new one.
 
   def find_or_create_bug!
-    commit = occurrence.commit || deploy.try(:commit)
+    commit = occurrence.commit || deploy.try!(:commit)
     raise "Need a resolvable commit" unless commit
 
     criteria = bug_search_criteria(commit)
@@ -128,7 +128,7 @@ class Blamer
                  b        = Bug.transaction do
                    environment.bugs.where(criteria.merge(deploy_id: deploy.id)).first ||
                        environment.bugs.where(criteria.merge(fixed: false)).
-                           find_or_create!(bug_attributes, as: :worker)
+                           find_or_create!(bug_attributes)
                  end
                  b.deploy = deploy
                  b
@@ -136,7 +136,7 @@ class Blamer
                  # for hosted projects, we search for any bug matching the criteria under
                  # our current environment
                  environment.bugs.where(criteria).
-                     find_or_create!(bug_attributes, as: :worker)
+                     find_or_create!(bug_attributes)
                end
 
     # If this code works as it should, there should only be one open record of
@@ -171,7 +171,7 @@ class Blamer
     # this is so the occurrence has an id we can write into the reopen event
     occurrence_deploy = bug.environment.deploys.where(revision: occurrence.revision).order('deployed_at DESC').first
     latest_deploy     = bug.environment.deploys.order('deployed_at DESC').first
-    if bug.fix_deployed? && occurrence_deploy.try(:id) == latest_deploy.try(:id)
+    if bug.fix_deployed? && occurrence_deploy.try!(:id) == latest_deploy.try!(:id)
       # reopen the bug if it was purportedly fixed and deployed, and the occurrence
       # we're seeing is on the latest deploy -- or if we don't have any deploy
       # information
@@ -197,7 +197,7 @@ class Blamer
         class_name:      occurrence.bug.class_name,
         file:            file,
         line:            line,
-        blamed_revision: commit.try(:sha)
+        blamed_revision: commit.try!(:sha)
     }
   end
 

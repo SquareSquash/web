@@ -91,7 +91,7 @@ describe CommentsController do
 
       it "should discard fields not accessible to creators" do
         @bug.comments.delete_all
-        post :create, polymorphic_params(@bug, true, comment: {user_id: FactoryGirl.create(:membership, project: @env.project).user_id, body: 'Hello, world!'})
+        post :create, polymorphic_params(@bug, true, comment: {user_id: FactoryGirl.create(:membership, project: @env.project).user_id, body: 'Hello, world!'}, format: 'json')
         @bug.comments(true).should be_empty
       end
 
@@ -107,7 +107,7 @@ describe CommentsController do
     before(:each) { @comment = FactoryGirl.create(:comment) }
 
     it "should require a logged-in user" do
-      put :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
+      patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
       response.status.should eql(401)
       @comment.reload.body.should_not eql('Hello, world!')
     end
@@ -116,10 +116,10 @@ describe CommentsController do
       before(:each) { login_as @comment.user }
 
       it_should_behave_like "action that 404s at appropriate times", :get, :index, 'polymorphic_params(@comment, false)'
-      it_should_behave_like "singleton action that 404s at appropriate times", :put, :update, 'polymorphic_params(@comment, false, bug: { fixed: true })'
+      it_should_behave_like "singleton action that 404s at appropriate times", :patch, :update, 'polymorphic_params(@comment, false, bug: { fixed: true })'
 
       it "should update the comment" do
-        put :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
+        patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
         response.status.should eql(200)
         @comment.reload.body.should eql('Hello, world!')
         response.body.should eql(@comment.to_json)
@@ -127,27 +127,27 @@ describe CommentsController do
 
       it "should allow admins to update any comment" do
         login_as FactoryGirl.create(:membership, project: @comment.bug.environment.project, admin: true).user
-        put :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
+        patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
         response.status.should eql(200)
         @comment.reload.body.should eql('Hello, world!')
       end
 
       it "should allow owners to update any comment" do
         login_as @comment.bug.environment.project.owner
-        put :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
+        patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
         response.status.should eql(200)
         @comment.reload.body.should eql('Hello, world!')
       end
 
       it "should not allow other members to update any comment" do
         login_as FactoryGirl.create(:membership, project: @comment.bug.environment.project, admin: false).user
-        put :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
+        patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
         response.status.should eql(403)
         @comment.reload.body.should_not eql('Hello, world!')
       end
 
       it "should not allow inaccessible fields to be updated" do
-        put :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!', number: 123})
+        patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!', number: 123}, format: 'json')
         @comment.reload.number.should_not eql(123)
       end
     end
@@ -165,8 +165,8 @@ describe CommentsController do
     context '[authenticated]' do
       before(:each) { login_as @comment.user }
 
-      it_should_behave_like "action that 404s at appropriate times", :delete, :destroy, 'polymorphic_params(@comment, false)'
-      it_should_behave_like "singleton action that 404s at appropriate times", :delete, :destroy, 'polymorphic_params(@comment, false, bug: { fixed: true })'
+      it_should_behave_like "action that 404s at appropriate times", :delete, :destroy, 'polymorphic_params(@comment, false, format: "json")'
+      it_should_behave_like "singleton action that 404s at appropriate times", :delete, :destroy, 'polymorphic_params(@comment, false, bug: { fixed: true }, format: "json")'
 
       it "should destroy the comment" do
         delete :destroy, polymorphic_params(@comment, false)

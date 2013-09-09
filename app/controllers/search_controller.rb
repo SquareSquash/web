@@ -59,20 +59,20 @@ class SearchController < ApplicationController
           user = find_users(words.first[1..-1]).only
           url = user_url(user) if user
         else
-          project = find_projects(words[0]).only.try(:sluggable)
+          project = find_projects(words[0]).only.try!(:sluggable)
           url = project_url(project) if project
         end
       when 2
-        project = find_projects(words[0]).only.try(:sluggable)
+        project = find_projects(words[0]).only.try!(:sluggable)
         env = find_environments(project, words[1]).only if project
         url = project_environment_bugs_url(project, env) if env
       when 3
-        project = find_projects(words[0]).only.try(:sluggable)
+        project = find_projects(words[0]).only.try!(:sluggable)
         env = find_environments(project, words[1]).only if project
         bug = env.bugs.find_by_number(words[2].to_i) if env
         url = project_environment_bug_url(project, env, bug) if bug
       when 4
-        project = find_projects(words[0]).only.try(:sluggable)
+        project = find_projects(words[0]).only.try!(:sluggable)
         env = find_environments(project, words[1]).only if project
         bug = env.bugs.find_by_number(words[2].to_i) if env
         occurrence = bug.occurrences.find_by_number(words[3].to_i) if bug
@@ -139,7 +139,7 @@ class SearchController < ApplicationController
                         end
                       end
                     when 2
-                      project = find_projects(words[0]).only.try(:sluggable)
+                      project = find_projects(words[0]).only.try!(:sluggable)
                       envs = find_environments(project, words[1]).limit(10) if project
                       envs.map do |env|
                         {
@@ -152,7 +152,7 @@ class SearchController < ApplicationController
                         }
                       end if project
                     when 3
-                      project = find_projects(words[0]).only.try(:sluggable)
+                      project = find_projects(words[0]).only.try!(:sluggable)
                       env = find_environments(project, words[1]).only if project
                       bug = env.bugs.find_by_number(words[2].to_i) if env
                       [{
@@ -163,7 +163,7 @@ class SearchController < ApplicationController
                            bug:         bug.as_json
                        }] if bug
                     when 4
-                      project = find_projects(words[0]).only.try(:sluggable)
+                      project = find_projects(words[0]).only.try!(:sluggable)
                       env = find_environments(project, words[1]).only if project
                       bug = env.bugs.find_by_number(words[2].to_i) if env
                       occurrence = bug.occurrences.find_by_number(words[3].to_i) if bug

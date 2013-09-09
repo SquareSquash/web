@@ -57,7 +57,6 @@ class ObfuscationMap < ActiveRecord::Base
     BackgroundRunner.run ObfuscationMapWorker, map.id
   end
 
-  attr_accessible :namespace, as: :api
   attr_readonly :namespace
 
   # @private

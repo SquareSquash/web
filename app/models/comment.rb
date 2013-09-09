@@ -49,7 +49,6 @@ class Comment < ActiveRecord::Base
   belongs_to :user, inverse_of: :comments
   belongs_to :bug, inverse_of: :comments
 
-  attr_accessible :body, as: [:creator, :owner, :admin]
   attr_readonly :user, :bug, :number
 
   include HasMetadataColumn

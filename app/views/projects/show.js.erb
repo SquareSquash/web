@@ -41,7 +41,7 @@ function PageManager() {
     var self = this;
     $('a.make-default').click(function(e) {
       $.ajax("<%= project_url @project, format: 'json' %>", {
-        type: 'PUT',
+        type: 'PATCH',
         data: $.param({
                         'project[default_environment_id]': $(e.currentTarget).data('id'),
                         '<%= request_forgery_protection_token %>': '<%= form_authenticity_token %>'

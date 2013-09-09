@@ -74,10 +74,10 @@ class Project::MembershipsController < ApplicationController
 
   def create
     if params[:membership][:user_username]
-      params[:membership][:user_id] = User.find_by_username(params[:membership].delete('user_username')).try(:id)
+      params[:membership][:user_id] = User.find_by_username(params[:membership].delete('user_username')).try!(:id)
     end
 
-    @membership = @project.memberships.create(params[:membership], as: current_user.role(@project))
+    @membership = @project.memberships.create(membership_params)
     respond_with @project, @membership
   end
 
@@ -86,7 +86,7 @@ class Project::MembershipsController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /projects/:project_id/memberships/:id.json`
+  # * `PATCH /projects/:project_id/memberships/:id.json`
   #
   # Path Parameters
   # ---------------
@@ -105,7 +105,7 @@ class Project::MembershipsController < ApplicationController
   # | `membership` | Parameterized hash of Membership fields. |
 
   def update
-    @membership.update_attributes params[:membership], as: current_user.role(@project)
+    @membership.update_attributes membership_params
 
     respond_with @project, @membership
   end
@@ -154,5 +154,16 @@ class Project::MembershipsController < ApplicationController
           role:           membership.role
       )
     end
+  end
+
+  def membership_params
+    params.require(:membership).permit(*(
+        case current_user.role(@project)
+          when :admin
+            [:user_id]
+          when :owner
+            [:user_id, :admin]
+        end
+    ))
   end
 end

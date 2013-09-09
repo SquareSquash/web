@@ -19,7 +19,7 @@ describe EnvironmentsController do
     before(:each) { @environment = FactoryGirl.create(:environment, sends_emails: true) }
 
     it "should require a logged-in user" do
-      put :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
+      patch :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
       response.status.should eql(401)
       @environment.reload.sends_emails?.should be_true
     end
@@ -31,27 +31,27 @@ describe EnvironmentsController do
         user = FactoryGirl.create(:membership, project: @environment.project, admin: true).user
         login_as user
 
-        put :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
+        patch :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
         response.status.should eql(200)
         @environment.reload.sends_emails?.should be_false
       end
 
       it "should not allow members to alter the environment" do
         login_as FactoryGirl.create(:membership, project: @environment.project, admin: false).user
-        put :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
+        patch :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
         response.status.should eql(403)
         @environment.reload.sends_emails?.should be_true
       end
 
       it "should allow owners to alter the environment" do
-        put :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
+        patch :update, polymorphic_params(@environment, false, environment: {sends_emails: false}, format: 'json')
         response.status.should eql(200)
         @environment.reload.sends_emails?.should be_false
         response.body.should eql(@environment.to_json)
       end
 
       it "should not allow protected fields to be set" do
-        -> { put :update, polymorphic_params(@environment, false, environment: {bugs_count: 128}, format: 'json') }.should_not change(@environment, :bugs_count)
+        -> { patch :update, polymorphic_params(@environment, false, environment: {bugs_count: 128}, format: 'json') }.should_not change(@environment, :bugs_count)
         response.status.should eql(400)
       end
     end

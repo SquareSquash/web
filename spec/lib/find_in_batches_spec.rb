@@ -57,7 +57,7 @@ describe "ActiveRecord::Base.find_in_batches" do
       Membership.delete_all
       project = FactoryGirl.create(:project)
       FactoryGirl.create_list(:membership, 47, project: project)
-      @memberships = Membership.order(Membership.scoped.send(:batch_order)).in_groups_of(10, false) # get project owner membership
+      @memberships = Membership.order(Membership.all.send(:batch_order)).in_groups_of(10, false) # get project owner membership
     end
 
     before(:each) { @batches = [] }

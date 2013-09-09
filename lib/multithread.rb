@@ -137,7 +137,7 @@ module Multithread
         push Job.new(block, -1, name)
         escalate size - 1, priority
         begin
-          @waiting.shift.try(:wakeup)
+          @waiting.shift.try!(:wakeup)
         rescue ThreadError
           retry
         end

@@ -107,23 +107,6 @@ class Project < ActiveRecord::Base
   has_many :members, through: :memberships, source: :user
   has_many :emails, inverse_of: :project, dependent: :delete_all
 
-  attr_accessible :name, :repository_url, :default_environment,
-                  :default_environment_id, :filter_paths, :whitelist_paths,
-                  :commit_url_format, :critical_mailing_list, :all_mailing_list,
-                  :critical_threshold, :sender, :locale,
-                  :sends_emails_outside_team, :trusted_email_domain,
-                  :pagerduty_enabled, :pagerduty_service_key,
-                  :always_notify_pagerduty, :uses_releases,
-                  :disable_message_filtering, as: :admin
-  attr_accessible :name, :repository_url, :default_environment,
-                  :default_environment_id, :filter_paths, :whitelist_paths,
-                  :commit_url_format, :critical_mailing_list, :all_mailing_list,
-                  :critical_threshold, :sender, :locale, :owner, :owner_id,
-                  :validate_repo_connectivity, :sends_emails_outside_team,
-                  :trusted_email_domain, :pagerduty_enabled,
-                  :pagerduty_service_key, :always_notify_pagerduty,
-                  :uses_releases, :disable_message_filtering, as: :owner
-
   include Slugalicious
   slugged :name
 
@@ -173,8 +156,8 @@ class Project < ActiveRecord::Base
                    :pagerduty_service_key
 
   after_save do |obj|
-    obj.memberships.where(user_id: obj.owner_id).create_or_update!({admin: true}, as: :system) if owner_id_changed?
-    obj.memberships.where(user_id: obj.owner_id_was).create_or_update!({admin: true}, as: :system) if owner_id_was
+    obj.memberships.where(user_id: obj.owner_id).create_or_update!(admin: true) if owner_id_changed?
+    obj.memberships.where(user_id: obj.owner_id_was).create_or_update!(admin: true) if owner_id_was
   end
   before_validation :set_commit_url_format
 

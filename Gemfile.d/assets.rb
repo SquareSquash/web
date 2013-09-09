@@ -21,6 +21,4 @@ group :assets do
 
   gem 'coffee-rails'
   gem 'uglifier'
-
-  gem 'font-awesome-rails'
 end

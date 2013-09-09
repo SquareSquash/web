@@ -45,7 +45,7 @@ class EmailsController < ApplicationController
 
   def index
     @emails = current_user.emails.redirected.
-        where(project_id: @project.try(:id)).
+        where(project_id: @project.try!(:id)).
         order('email ASC').
         limit(10).
         includes(:user)
@@ -80,7 +80,7 @@ class EmailsController < ApplicationController
   # | `email` | Parameterized hash of new Email attribute values. |
 
   def create
-    @email = current_user.emails.build(params[:email], as: :user)
+    @email = current_user.emails.build(email_params)
     @email.project = @project
     @email.save
     respond_with @email, location: nil
@@ -121,5 +121,9 @@ class EmailsController < ApplicationController
           url: account_email_url(email)
       )
     end
+  end
+
+  def email_params
+    params.require(:email).permit(:email)
   end
 end

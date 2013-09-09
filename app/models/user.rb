@@ -61,7 +61,7 @@ class User < ActiveRecord::Base
   has_many :events, dependent: :nullify, inverse_of: :user
   has_many :memberships, dependent: :delete_all, inverse_of: :user
   has_many :member_projects, through: :memberships, source: :project
-  has_many :owned_projects, class_name: 'Project', foreign_key: 'owner_id', dependent: :restrict, inverse_of: :owner
+  has_many :owned_projects, class_name: 'Project', foreign_key: 'owner_id', dependent: :restrict_with_exception, inverse_of: :owner
   has_many :watches, dependent: :delete_all, inverse_of: :user
   has_many :user_events, dependent: :delete_all, inverse_of: :user
   has_many :emails, dependent: :delete_all, inverse_of: :user
@@ -111,7 +111,7 @@ class User < ActiveRecord::Base
   end
 
   # Returns a symbol describing a user's role in relation to a model object;
-  # used for `attr_accessible` roles.
+  # used for strong attribute roles.
   #
   # @param [ActiveRecord::Base] object A model instance.
   # @return [Symbol, nil] The user's role, or `nil` if the user has no
@@ -132,7 +132,7 @@ class User < ActiveRecord::Base
         return :creator if object.user_id == id
         return :owner if object.bug.environment.project.owner_id == id
         membership = memberships.where(project_id: object.bug.environment.project_id).first
-        return :admin if membership.try(:admin?)
+        return :admin if membership.try!(:admin?)
         return nil
       else
         return nil

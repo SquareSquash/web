@@ -389,7 +389,7 @@ describe Blamer do
     end
 
     it "should reopen a fixed and deployed bug" do
-      @bug.update_attributes({fixed: true, fix_deployed: true}, as: :admin)
+      @bug.update_attributes fixed: true, fix_deployed: true
       @occurrence = FactoryGirl.build(:rails_occurrence,
                                       bug:        @shell_bug,
                                       backtraces: [{"name"      => "Thread 0",
@@ -427,7 +427,7 @@ describe Blamer do
 
     it "should not reopen a distributed project's bug" do
       deploy = FactoryGirl.create(:deploy, environment: @env)
-      @bug.update_attributes({fixed: true, fix_deployed: true}, as: :admin)
+      @bug.update_attributes fixed: true, fix_deployed: true
       @bug.update_attribute :deploy, deploy
       @shell_bug.deploy = deploy
       @occurrence       = FactoryGirl.build(:rails_occurrence,

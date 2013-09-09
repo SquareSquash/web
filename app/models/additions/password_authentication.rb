@@ -27,14 +27,10 @@ module PasswordAuthentication
     # @return [String] Virtual attribute containing the unencrypted password on
     #   signup.
     attr_accessor :password
-    # @return [String] Confirmation of {#password} (virtual attribute).
-    attr_accessor :password_confirmation
     # @return [String] Virtual attribute containing the User's primary email
     #   address.
     attr_accessor :email_address
 
-    attr_accessible :username, :password, :password_confirmation,
-                    :email_address, :first_name, :last_name, as: :user
     attr_readonly :username
 
     has_metadata_column(
@@ -83,7 +79,7 @@ module PasswordAuthentication
   end
 
   def create_primary_email
-    emails.create!({email: email_address, primary: true}, as: :system)
+    emails.create!(email: email_address, primary: true)
   end
 
   def email_address_unique

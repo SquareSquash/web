@@ -81,7 +81,7 @@ class UsersController < ApplicationController
       return redirect_to(login_url, alert: t('controllers.users.create.disabled'))
     end
 
-    @user = User.create(params[:user], as: :user)
+    @user = User.create(user_params)
     respond_with @user do |format|
       format.html do
         if @user.valid?
@@ -105,5 +105,10 @@ class UsersController < ApplicationController
     users.map do |user|
       user.as_json.merge(is_member: project ? user.memberships.where(project_id: project.id).exists? : nil)
     end
+  end
+
+  def user_params
+    params.require(:user).permit(:username, :password, :password_confirmation,
+                                 :email_address, :first_name, :last_name)
   end
 end

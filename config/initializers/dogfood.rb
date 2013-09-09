@@ -32,7 +32,7 @@ unless defined?(IRB)
     # the course of processing a request without having to be concurrent.
 
     #TODO this is a pretty hacky way of discovering the port
-    $own_port = ARGV.join(' ').scan(/(?:-p|--port)(?:=|\s+)(\d+)/).first.try(:first).try(:to_i) || 3000
+    $own_port = ARGV.join(' ').scan(/(?:-p|--port)(?:=|\s+)(\d+)/).first.try!(:first).try!(:to_i) || 3000
     $self_notify_port = $own_port + 1
 
     Thread.new do
@@ -43,7 +43,7 @@ unless defined?(IRB)
           while (line = from.gets).present?
             request << line.chomp
           end
-          length = request.detect { |l| l.start_with?('Content-Length: ') }.try(:gsub, /[^0-9]/, '').try(:to_i)
+          length = request.detect { |l| l.start_with?('Content-Length: ') }.try!(:gsub, /[^0-9]/, '').try!(:to_i)
           if length && length > 0
             request << ''
             request << from.read(length)

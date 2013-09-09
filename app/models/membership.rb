@@ -50,10 +50,6 @@ class Membership < ActiveRecord::Base
   belongs_to :user, inverse_of: :memberships
   belongs_to :project, inverse_of: :memberships
 
-  attr_accessible :user, :user_id, as: :admin
-  attr_accessible :user, :user_id, :admin, as: [:owner, :system]
-  attr_accessible :send_assignment_emails, :send_comment_emails,
-                  :send_resolution_emails, as: :user
   attr_readonly :user, :project
 
   include HasMetadataColumn

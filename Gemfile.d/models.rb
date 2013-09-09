@@ -14,14 +14,15 @@
 
 gem 'pg', platform: :mri
 gem 'activerecord-jdbcpostgresql-adapter', platform: :jruby
-gem 'has_metadata_column', github: 'RISCfuture/has_metadata_column', branch: 'rails3'
-gem 'slugalicious', github: 'RISCfuture/slugalicious', ref: '60e9fea1a82949cca4bdf0eeb50506150e7ffe48'
+gem 'has_metadata_column', github: 'RISCfuture/has_metadata_column'
+gem 'slugalicious'
 gem 'email_validation'
 gem 'url_validation'
 gem 'json_serialize'
 gem 'validates_timeliness'
 gem 'find_or_create_on_scopes', '>= 1.2.1'
-gem 'composite_primary_keys', github: 'RISCfuture/composite_primary_keys', ref: '94059068169ff1c0735329d600a80eed99ecd58c'
+gem 'composite_primary_keys', github: 'RISCfuture/composite_primary_keys', branch: 'rebase'
+gem 'rails-observers'
 
 conditionally('activerecord.cursors', true) do
   gem 'activerecord-postgresql-cursors'

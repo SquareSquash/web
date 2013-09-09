@@ -86,23 +86,23 @@ class root.MemberPanel
       error: -> new Flash('alert').text("Couldn’t load search results.")
 
   changeUser: (username, new_role, search_query) ->
-    if new_role == 'member' # put to membership, admin=false
+    if new_role == 'member' # patch to membership, admin=false
       $.ajax @membership_endpoint.replace('USERID', username),
-        type: 'PUT'
+        type: 'PATCH'
         data: $.param({'membership[admin]': 'false'})
         error: => Flash('alert').text("Couldn’t demote #{username} from administrator.")
         complete: => @processFilterSearchResults(search_query)
 
-    else if new_role == 'admin' # put to membership, admin=true
+    else if new_role == 'admin' # patch to membership, admin=true
       $.ajax @membership_endpoint.replace('USERID', username),
-        type: 'PUT'
+        type: 'PATCH'
         data: $.param({'membership[admin]': 'true'})
         error: => Flash('alert').text("Couldn’t promote #{username} to administrator.")
         complete: => @processFilterSearchResults(search_query)
 
-    else if new_role == 'owner' # put to project, owner_id=123
+    else if new_role == 'owner' # patch to project, owner_id=123
       $.ajax @project_endpoint,
-        type: 'PUT'
+        type: 'PATCH'
         data: $.param({'project[owner_username]': username})
         error: => Flash('alert').text("Couldn’t assign ownership to #{username}.")
         success: -> window.location.reload()

@@ -187,7 +187,7 @@ module Views
           victims = @bug.blamed_users
           p do
             text "According to the VCS blame function, fault seems to lie with "
-            text! victims.map { |v| capture { mail_to v.email, (v.user.try(:name) || v.email) } }.to_sentence
+            text! victims.map { |v| capture { mail_to v.email, (v.user.try!(:name) || v.email) } }.to_sentence
             text ".*"
           end if victims.any?
 

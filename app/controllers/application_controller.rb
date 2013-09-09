@@ -142,10 +142,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_from(ActiveModel::MassAssignmentSecurity::Error) do
+  rescue_from(ActionController::UnpermittedParameters) do |error|
     respond_to do |format|
-      format.html { redirect_to root_url, alert: t('controllers.application.mass_assignment_security') }
-      format.json { head :bad_request }
+      format.html { render file: File.join(Rails.public_path, '400'), format: :html, status: :bad_request }
+      format.json do
+        render json: {error: "The following parameters cannot be modified: #{error.params.join(', ')}" }, status: :bad_request
+      end
       format.atom { head :bad_request }
     end
   end

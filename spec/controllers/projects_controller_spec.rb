@@ -127,7 +127,7 @@ describe ProjectsController do
     end
 
     it "should require a logged-in user" do
-      put :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
+      patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
       response.status.should eql(401)
       @project.reload.name.should_not eql('New Name')
     end
@@ -139,32 +139,32 @@ describe ProjectsController do
         user = FactoryGirl.create(:membership, project: @project, admin: true).user
         login_as user
 
-        put :update, id: @project.to_param, project: {owner_id: user.id}, format: 'json'
+        patch :update, id: @project.to_param, project: {owner_id: user.id}, format: 'json'
         response.status.should eql(400)
         @project.reload.owner.should_not eql(user)
       end
 
       it "should not allow members to alter the project" do
         login_as FactoryGirl.create(:membership, project: @project, admin: false).user
-        put :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
+        patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
         response.status.should eql(403)
         @project.reload.name.should_not eql('New Name')
       end
 
       it "should allow owners to alter the project" do
-        put :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
+        patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
         response.status.should eql(200)
         @project.reload.name.should eql('New Name')
         response.body.should eql(@project.to_json)
       end
 
       it "should convert filter_paths_string into filter_paths" do
-        put :update, id: @project.to_param, project: {filter_paths_string: "a\nb\n"}, format: 'json'
+        patch :update, id: @project.to_param, project: {filter_paths_string: "a\nb\n"}, format: 'json'
         @project.reload.filter_paths.should eql(%w( a b ))
       end
 
       it "should convert whitelist_paths_string into whitelist_paths" do
-        put :update, id: @project.to_param, project: {whitelist_paths_string: "a\nb\n"}, format: 'json'
+        patch :update, id: @project.to_param, project: {whitelist_paths_string: "a\nb\n"}, format: 'json'
         @project.reload.whitelist_paths.should eql(%w( a b ))
       end
 
@@ -174,13 +174,13 @@ describe ProjectsController do
 
       it "should set Project#uses_releases_override if uses_releases is changed" do
         @project.update_attribute :uses_releases, true
-        put :update, id: @project.to_param, project: {uses_releases: false}, format: 'json'
+        patch :update, id: @project.to_param, project: {uses_releases: false}, format: 'json'
         @project.reload.uses_releases?.should be_false
         @project.reload.uses_releases_override?.should be_true
       end
 
       it "should not set Project#uses_releases_override if uses_releases is not changed" do
-        put :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
+        patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
         @project.reload.uses_releases_override?.should be_false
       end
     end
@@ -190,7 +190,7 @@ describe ProjectsController do
       before(:each) { @project = FactoryGirl.create(:project) }
 
       it "should require a logged-in user" do
-        put :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
+        patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
         response.status.should eql(401)
         @project.reload.name.should_not eql('New Name')
       end
@@ -200,20 +200,20 @@ describe ProjectsController do
 
         it "should not allow members to generate an API key" do
           login_as FactoryGirl.create(:membership, project: @project, admin: false).user
-          put :rekey, id: @project.to_param, format: 'json'
+          patch :rekey, id: @project.to_param, format: 'json'
           response.status.should eql(403)
           -> { @project.reload }.should_not change(@project, :api_key)
         end
 
         it "should allow admins to generate an API key" do
-          put :rekey, id: @project.to_param, format: 'json'
+          patch :rekey, id: @project.to_param, format: 'json'
           response.status.should redirect_to(edit_project_url(@project))
           -> { @project.reload }.should change(@project, :api_key)
           flash[:success].should include(@project.api_key)
         end
 
         it "should allow owners to generate an API key" do
-          put :rekey, id: @project.to_param, format: 'json'
+          patch :rekey, id: @project.to_param, format: 'json'
           response.status.should redirect_to(edit_project_url(@project))
           -> { @project.reload }.should change(@project, :api_key)
           flash[:success].should include(@project.api_key)

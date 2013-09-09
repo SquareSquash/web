@@ -162,7 +162,7 @@ describe User do
       FactoryGirl.create :user, email_address: 'taken@example.com'
       user = FactoryGirl.build(:user, email_address: 'taken@example.com')
       user.should_not be_valid
-      user.errors[:email_address].should eql(['has already been taken'])
+      user.errors[:email_address].should eql(['already taken'])
     end if Squash::Configuration.authentication.strategy == 'password'
   end
 

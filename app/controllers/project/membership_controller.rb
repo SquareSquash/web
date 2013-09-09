@@ -66,7 +66,7 @@ class Project::MembershipController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /projects/:project_id/membership`
+  # * `PATCH /projects/:project_id/membership`
   #
   # Path Parameters
   # ---------------
@@ -83,7 +83,7 @@ class Project::MembershipController < ApplicationController
   # | `membership` | Parameterized hash of new Membership attribute values. |
 
   def update
-    @membership.update_attributes params[:membership], as: :user
+    @membership.update_attributes membership_params
     respond_with @membership, location: edit_project_my_membership_url(@project)
   end
 
@@ -132,5 +132,11 @@ class Project::MembershipController < ApplicationController
     else
       return true
     end
+  end
+
+  def membership_params
+    params.require(:membership).permit(:send_assignment_emails,
+                                       :send_comment_emails,
+                                       :send_resolution_emails)
   end
 end

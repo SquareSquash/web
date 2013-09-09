@@ -33,7 +33,7 @@ class AccountsController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /account`
+  # * `PATCH /account`
   #
   # Body Parameters
   # ---------------
@@ -48,7 +48,7 @@ class AccountsController < ApplicationController
       params[:user].delete 'password_confirmation'
     end
 
-    current_user.update_attributes params[:user], as: :user
+    current_user.update_attributes user_params
     respond_with current_user do |format|
       format.html do
         if current_user.valid?
@@ -60,4 +60,11 @@ class AccountsController < ApplicationController
       end
     end
   end if Squash::Configuration.authentication.strategy == 'password'
+
+  private
+
+  def user_params
+    params.require(:user).permit(:username, :password, :password_confirmation,
+                                 :email_address, :first_name, :last_name)
+  end
 end

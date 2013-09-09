@@ -56,7 +56,7 @@ require 'base64'
 
 class Symbolication < ActiveRecord::Base
   # internal use only
-  has_many :occurrences, inverse_of: :symbolication, primary_key: 'uuid', dependent: :restrict
+  has_many :occurrences, inverse_of: :symbolication, primary_key: 'uuid', dependent: :restrict_with_exception
 
   self.primary_key = 'uuid'
 
@@ -69,7 +69,6 @@ class Symbolication < ActiveRecord::Base
     BackgroundRunner.run SymbolicationWorker, sym.id
   end
 
-  attr_accessible :uuid, :symbols, :lines, as: :api
   attr_readonly :uuid
 
   # @private

@@ -22,7 +22,7 @@ describe AccountsController do
     end
 
     it "should require a logged-in user" do
-      put :update, user: @attrs
+      patch :update, user: @attrs
       response.should redirect_to(login_url(next: request.fullpath))
       -> { @user.reload }.should_not change(@user, :first_name)
     end
@@ -31,7 +31,7 @@ describe AccountsController do
       before(:each) { login_as @user }
 
       it "should update the user and redirect to the account page" do
-        put :update, user: @attrs
+        patch :update, user: @attrs
         response.should redirect_to(account_url)
 
         @user.reload.first_name.should eql('NewFN')
@@ -40,13 +40,13 @@ describe AccountsController do
       end
 
       it "should render the account page on failure" do
-        put :update, user: @attrs.merge(password_confirmation: 'oops')
+        patch :update, user: @attrs.merge(password_confirmation: 'oops')
         response.should render_template('show')
       end
 
       it "should not update the password if it's not provided" do
         @user.reload
-        put :update, user: @attrs.merge('password' => '')
+        patch :update, user: @attrs.merge('password' => '')
         response.should redirect_to(account_url)
 
         -> { @user.reload }.should_not change(@user, :crypted_password)

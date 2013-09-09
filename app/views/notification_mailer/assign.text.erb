@@ -1,4 +1,4 @@
-<%= @assigner.try(:name) || "Someone" %> has assigned bug #<%= @bug.number %> on <%= @bug.environment.project.name %>
+<%= @assigner.try!(:name) || "Someone" %> has assigned bug #<%= @bug.number %> on <%= @bug.environment.project.name %>
 to you:
 
 <%= project_environment_bug_url @bug.environment.project, @bug.environment, @bug %>

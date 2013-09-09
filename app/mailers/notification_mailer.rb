@@ -87,7 +87,7 @@ class NotificationMailer < ActionMailer::Base
   def reopened(bug)
     @bug = bug
 
-    emails = bug.assigned_user.try(:email) || bug.blamed_email
+    emails = bug.assigned_user.try!(:email) || bug.blamed_email
     return nil unless should_send?(bug, emails)
 
     mail to:      emails,

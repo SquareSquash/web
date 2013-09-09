@@ -54,8 +54,6 @@ class NotificationThreshold < ActiveRecord::Base
             presence:     true,
             numericality: {greater_than: 0, only_integer: true}
 
-  attr_accessible :threshold, :period, as: :user
-
   # @return [true, false] Whether or not this Bug has occurred `threshold` times
   #   in the past `period` seconds.
 

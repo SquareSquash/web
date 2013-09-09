@@ -81,7 +81,7 @@ class BugObserver < ActiveRecord::Observer
 
   def create_deploy_event(bug)
     if bug.fixed? && bug.fix_deployed? && !bug.fix_deployed_was
-      Event.create! bug: bug, kind: 'deploy', data: {'revision' => bug.fixing_deploy.try(:revision)}
+      Event.create! bug: bug, kind: 'deploy', data: {'revision' => bug.fixing_deploy.try!(:revision)}
     end
   end
 

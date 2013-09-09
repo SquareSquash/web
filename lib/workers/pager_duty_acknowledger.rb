@@ -66,7 +66,7 @@ class PagerDutyAcknowledger
 
   def details
     {
-        'assigned_user' => @bug.assigned_user.try(:name)
+        'assigned_user' => @bug.assigned_user.try!(:name)
     }
   end
 end

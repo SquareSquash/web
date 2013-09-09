@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 # Copyright 2013 Square Inc.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +14,5 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
-
-describe "/projects/:project_id/memberships" do
-  describe "/:id [PATCH]" do
-    it "should route to usernames with dots in them" do
-      expect(patch: '/projects/my-project/memberships/user.dot.json').
-          to route_to(
-                 controller: 'project/memberships',
-                 action:     'update',
-                 project_id: 'my-project',
-                 id:         'user.dot',
-                 format:     'json'
-             )
-    end
-  end
-end
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
+load Gem.bin_path('bundler', 'bundle')

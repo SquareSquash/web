@@ -64,7 +64,7 @@ class OccurrencesWorker
     end
 
     env_name     = @attrs.delete('environment')
-    @environment = project.environments.with_name(env_name).find_or_create!({name: env_name}, as: :worker)
+    @environment = project.environments.with_name(env_name).find_or_create!(name: env_name)
   rescue ActiveRecord::RecordInvalid => err
     raise API::InvalidAttributesError, err.to_s
   end
@@ -172,7 +172,8 @@ class OccurrencesWorker
       raise "Unknown revision" unless commit
 
       @deploy = @environment.deploys.where(build: @attrs['build']).find_or_create!(
-          {deployed_at: Time.now, revision: commit.sha}, as: :worker
+          deployed_at: Time.now,
+          revision:    commit.sha
       )
     elsif @attrs['revision'].present?
       # If we get only a revision, the Bug won't have a Deploy, but we still

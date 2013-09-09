@@ -42,7 +42,7 @@ module CompositePrimaryKeys::ActiveRecord::Batches
 
     pkey                     = Array.wrap(primary_key)
     id_constraints, key_vals = build_id_constraints(pkey.dup, start.dup)
-    records                  = relation.where(id_constraints, *key_vals).all
+    records                  = relation.where(id_constraints, *key_vals).to_a
 
     while records.any?
       records_size = records.size
@@ -57,7 +57,7 @@ module CompositePrimaryKeys::ActiveRecord::Batches
 
       pkey.each_with_index { |key, index| start[index] = records.last.send(key) } if records.any?
       id_constraints, key_vals = build_id_constraints(pkey.dup, start.dup)
-      records                  = relation.where(id_constraints, *key_vals).all
+      records                  = relation.where(id_constraints, *key_vals).to_a
     end
   end
 

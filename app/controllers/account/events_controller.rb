@@ -43,7 +43,7 @@ class Account::EventsController < ApplicationController
     last      = params[:last].present? ? current_user.user_events.find_by_event_id(params[:last]) : nil
     event_ids = event_ids.where(infinite_scroll_clause('created_at', 'DESC', last, 'event_id')) if last
     @events = Event.where(id: event_ids.pluck(:event_id)).order('created_at DESC').includes({user: :emails}, bug: {environment: {project: :slugs}})
-    Event.preload @events.all
+    Event.preload @events.to_a
 
     respond_with decorate(@events)
   end

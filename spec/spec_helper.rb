@@ -23,6 +23,7 @@ require 'rspec/autorun'
 Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
 
 # Clear out the database to avoid duplicate key conflicts
+Dir[Rails.root.join('app', 'models', '**', '*.rb')].each { |f| require f }
 ActiveRecord::Base.subclasses.each do |model|
   model.connection.execute "TRUNCATE #{model.table_name} CASCADE"
 end

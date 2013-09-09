@@ -12,16 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-if defined?(Squash::Configuration) && Squash::Configuration.concurrency.background_runner == 'Multithread'
-  gem 'rails', github: 'rails/rails', branch: '3-2-stable'
-  # We need to use this branch of Rails because it includes fixes for
-  # ActiveRecord and concurrency that we need for our thread-spawning background
-  # job paradigm to work
-else
-  # Rails 3.2.14 introduces ActiveRecord::Result, which is incompatible with
-  # the JDBC adapters right now
-  gem 'rails', '< 3.2.14'
-end
+gem 'rails', '>= 4.0.0'
 
 gem 'configoro', '>= 1.2.4'
 gem 'rack-cors', require: 'rack/cors'

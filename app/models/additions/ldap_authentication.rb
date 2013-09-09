@@ -18,10 +18,6 @@
 module LdapAuthentication
   extend ActiveSupport::Concern
 
-  included do
-    attr_accessible :first_name, :last_name, as: :system
-  end
-
   # @return [String] This user's LDAP distinguished name (DN).
 
   def distinguished_name
@@ -31,7 +27,7 @@ module LdapAuthentication
   private
 
   def create_primary_email
-    emails.create!({email: "#{username}@#{Squash::Configuration.mailer.domain}", primary: true}, as: :system)
+    emails.create!(email: "#{username}@#{Squash::Configuration.mailer.domain}", primary: true)
   end
 end
 

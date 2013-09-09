@@ -62,7 +62,6 @@ class SourceMap < ActiveRecord::Base
     BackgroundRunner.run SourceMapWorker, map.id
   end
 
-  attr_accessible :revision, :map, as: :api
   attr_readonly :revision
 
   # @private

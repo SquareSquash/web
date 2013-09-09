@@ -88,7 +88,7 @@ class OccurrencesController < ApplicationController
     respond_to do |format|
       format.json do
         dir = params[:dir]
-        dir = 'DESC' unless SORT_DIRECTIONS.include?(dir.try(:upcase))
+        dir = 'DESC' unless SORT_DIRECTIONS.include?(dir.try!(:upcase))
 
         @occurrences = @bug.occurrences.order("occurred_at #{dir}").limit(50)
 
@@ -207,10 +207,10 @@ class OccurrencesController < ApplicationController
 
   def histogram
     occurrences = @bug.occurrences.
-        where("occurred_at >= ?", 30.days.ago).
+        where('occurred_at >= ?', 30.days.ago).
         group("date_trunc('hour', occurred_at)").
-        count.map do |date_str, count|
-      [Time.parse(date_str + " UTC").to_i * 1000, count]
+        count.map do |date, count|
+      [date.to_i * 1000, count]
     end
     occurrences.sort_by!(&:first)
     if occurrences.empty?

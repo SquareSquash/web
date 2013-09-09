@@ -38,7 +38,7 @@ class Account::BugsController < ApplicationController
   # | `last` | The ID (`type` is `watched`) or number (`type` is not `watched`) of the last Bug of the previous page; used to determine the start of the next page (optional). |
 
   def index
-    if params[:type].try(:downcase) == 'watched'
+    if params[:type].try!(:downcase) == 'watched'
       watches = current_user.watches.order('created_at DESC').includes(bug: [{environment: :project}, :assigned_user]).limit(PER_PAGE)
       last = params[:last].present? ? current_user.watches.joins(:bug).where(bug_id: params[:last]).first : nil
       watches = watches.where(infinite_scroll_clause('created_at', 'DESC', last, 'watches.bug_id')) if last

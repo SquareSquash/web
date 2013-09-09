@@ -86,7 +86,7 @@ module Views
         def email_settings
           form_for(@membership,
                    url:    {controller: 'project/membership', action: 'update', project_id: @project.to_param},
-                   method: :put,
+                   method: :patch,
                    html:   {class: 'labeled'}) do |f|
 
             fieldset do

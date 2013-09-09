@@ -37,7 +37,7 @@ class JsonDetailResponder < ActionController::Responder
       display resource
     elsif post?
       display resource, status: :created, location: api_location
-    elsif put?
+    elsif put? || patch?
       display resource, location: api_location
     else
       head :no_content

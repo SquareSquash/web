@@ -165,7 +165,7 @@ class BugsController < ApplicationController
 
     # We use `duplicate_of_number` on the view and `duplicate_of_id` in the
     # backend, so we need to copy between those values.
-    @bug.duplicate_of_number = @bug.duplicate_of.try(:number)
+    @bug.duplicate_of_number = @bug.duplicate_of.try!(:number)
 
     @new_issue_url = Service::JIRA.new_issue_link(summary:     t('controllers.bugs.show.jira_link.summary',
                                                                  class_name: @bug.class_name,
@@ -191,7 +191,7 @@ class BugsController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /projects/:project_id/environments/:environment_id/bugs/:id.json`
+  # * `PATCH /projects/:project_id/environments/:environment_id/bugs/:id.json`
   #
   # Path Parameters
   # ---------------
@@ -214,7 +214,7 @@ class BugsController < ApplicationController
     # We use `duplicate_of_number` on the view and `duplicate_of_id` in the
     # backend, so we need to copy between those values.
     add_error = false
-    if (number = params[:bug][:duplicate_of_number]).present?
+    if (number = params[:bug].delete('duplicate_of_number')).present?
       original_bug = @environment.bugs.where(number: number).first
       if original_bug
         @bug.duplicate_of_id = original_bug.id
@@ -228,9 +228,9 @@ class BugsController < ApplicationController
     # hacky fix for the JIRA status dropdown
     params[:bug][:jira_status_id] = params[:bug][:jira_status_id].presence
 
-    if !add_error && @bug.update_attributes(params[:bug], as: current_user.role(@bug))
+    if !add_error && @bug.update_attributes(bug_params)
       if params[:comment].kind_of?(Hash) && params[:comment][:body].present?
-        @comment      = @bug.comments.build(params[:comment], as: :creator)
+        @comment      = @bug.comments.build(comment_params)
         @comment.user = current_user
         @comment.save
       end
@@ -238,7 +238,7 @@ class BugsController < ApplicationController
         if params[:notification_threshold][:threshold].blank? && params[:notification_threshold][:period].blank?
           current_user.notification_thresholds.where(bug_id: @bug.id).delete_all
         else
-          @notification_threshold = current_user.notification_thresholds.where(bug_id: @bug.id).create_or_update(params[:notification_threshold], as: :user)
+          @notification_threshold = current_user.notification_thresholds.where(bug_id: @bug.id).create_or_update(notification_threshold_params)
         end
       end
     else
@@ -389,5 +389,19 @@ class BugsController < ApplicationController
         notify_on_deploy:     bug.notify_on_deploy.include?(current_user.id),
         notify_on_occurrence: bug.notify_on_occurrence.include?(current_user.id)
     )
+  end
+
+  def bug_params
+    params.require(:bug).permit(:assigned_user, :resolution_revision, :fixed,
+                                :fix_deployed, :irrelevant, :duplicate_of,
+                                :duplicate_of_id, :jira_isssue, :jira_status_id)
+  end
+
+  def comment_params
+    params.require(:comment).permit(:body)
+  end
+
+  def notification_threshold_params
+    params.require(:notification_threshold).permit(:threshold, :period)
   end
 end

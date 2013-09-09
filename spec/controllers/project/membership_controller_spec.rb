@@ -52,7 +52,7 @@ describe Project::MembershipController do
     before(:each) { @membership = FactoryGirl.create(:membership) }
 
     it "should require a logged-in user" do
-      put :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
+      patch :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
       response.should redirect_to(login_url(next: request.fullpath))
       @membership.reload.send_comment_emails.should be_false
     end
@@ -61,14 +61,14 @@ describe Project::MembershipController do
       before(:each) { login_as @membership.user }
 
       it "should modify the membership" do
-        put :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
+        patch :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
         response.status.should redirect_to(edit_project_my_membership_url(@membership.project))
         @membership.reload.send_comment_emails.should be_true
       end
 
       it "should not allow protected attributes to be updated" do
-        put :update, project_id: @membership.project.to_param, membership: {project_id: 123}
-        response.status.should redirect_to(root_url)
+        patch :update, project_id: @membership.project.to_param, membership: {project_id: 123}
+        response.status.should eql(400)
         -> { @membership.reload }.should_not change(@membership, :project_id)
       end
     end

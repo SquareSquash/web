@@ -113,8 +113,8 @@ class ProjectsController < ApplicationController
   # | `project` | Parameterized hash of Project fields. |
 
   def create
-    project_attrs = params[:project].merge(validate_repo_connectivity: true)
-    @project      = current_user.owned_projects.create(project_attrs, as: :owner)
+    project_attrs = project_params_for_creation.merge(validate_repo_connectivity: true)
+    @project      = current_user.owned_projects.create(project_attrs)
     respond_with @project do |format|
       format.json do
         if @project.valid?
@@ -143,11 +143,6 @@ class ProjectsController < ApplicationController
   # | `id` | The Project's slug. |
 
   def edit
-    class << @project
-      def filter_paths_string() filter_paths.join("\n") end
-      def whitelist_paths_string() whitelist_paths.join("\n") end
-    end
-
     respond_with @project
   end
 
@@ -156,7 +151,7 @@ class ProjectsController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /projects/:id.json`
+  # * `PATCH /projects/:id.json`
   #
   # Path Parameters
   # ---------------
@@ -175,26 +170,9 @@ class ProjectsController < ApplicationController
   # | `project` | Parameterized hash of Project fields. |
 
   def update
-    if params[:project][:owner_username]
-      params[:project][:owner_id] = User.find_by_username(params[:project].delete('owner_username')).try(:id)
-    end
-
-    if (fps = params[:project].delete(:filter_paths_string))
-      params[:project][:filter_paths] = fps.split(/[\r\n]+/).reject(&:blank?)
-    end
-
-    if (wps = params[:project].delete(:whitelist_paths_string))
-      params[:project][:whitelist_paths] = wps.split(/[\r\n]+/).reject(&:blank?)
-    end
-
-    @project.assign_attributes params[:project].merge(validate_repo_connectivity: true), as: current_user.role(@project)
+    @project.assign_attributes project_params_for_update.merge(validate_repo_connectivity: true)
     @project.uses_releases_override = true if @project.uses_releases_changed?
     @project.save
-
-    class << @project
-      def filter_paths_string() filter_paths.join("\n") end
-      def whitelist_paths_string() whitelist_paths.join("\n") end
-    end
 
     respond_with @project
   end
@@ -205,7 +183,7 @@ class ProjectsController < ApplicationController
   # Routes
   # ------
   #
-  # * `PUT /projects/:id/rekey`
+  # * `PATCH /projects/:id/rekey`
   #
   # Path Parameters
   # ---------------
@@ -350,6 +328,9 @@ class ProjectsController < ApplicationController
 
   def find_project
     @project = Project.find_from_slug!(params[:id])
+    class << @project
+      include ProjectAdditions
+    end
   end
 
   def brush_from_filename(name)
@@ -371,5 +352,39 @@ class ProjectsController < ApplicationController
     else
       decorate_block.(projects)
     end
+  end
+
+  def admin_permitted_parameters
+    [:name, :repository_url, :default_environment, :default_environment_id,
+     :filter_paths, :filter_paths_string, :whitelist_paths,
+     :whitelist_paths_string, :commit_url_format, :critical_mailing_list,
+     :all_mailing_list, :critical_threshold, :sender, :locale,
+     :sends_emails_outside_team, :trusted_email_domain, :pagerduty_enabled,
+     :pagerduty_service_key, :always_notify_pagerduty, :uses_releases,
+     :disable_message_filtering]
+  end
+
+  def project_params_for_creation
+    params.require(:project).permit(*admin_permitted_parameters)
+  end
+
+  def project_params_for_update
+    case current_user.role(@project)
+      when :owner
+        params.require(:project).permit(*(admin_permitted_parameters + [:owner_id]))
+      when :admin
+        project_params_for_creation
+    end
+  end
+
+  module ProjectAdditions
+    def filter_paths_string() filter_paths.join("\n") end
+    def whitelist_paths_string() whitelist_paths.join("\n") end
+
+    def filter_paths_string=(str) self.filter_paths = (str || '').split("\n") end
+    def whitelist_paths_string=(str) self.whitelist_paths = (str || '').split("\n") end
+
+    def owner_username() owner.username end
+    def owner_username=(name) self.owner = User.find_by_username(name) end
   end
 end
