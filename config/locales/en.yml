@@ -192,6 +192,7 @@ en:
 
   blamer:
     recency: Recency-based blamer
+    simple: Git-free blamer
 
   date:
     formats:
