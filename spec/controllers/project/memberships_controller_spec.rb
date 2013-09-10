@@ -23,7 +23,7 @@ describe Project::MembershipsController do
       User.where("username LIKE 'filter-%'").delete_all
       @filter_memberships = 11.times.map { |i| FactoryGirl.create(:membership, project: @project, created_at: Time.now - 1.month, user: FactoryGirl.create(:user, username: "filter-#{i}")) }
       FactoryGirl.create_list :membership, 11, project: @project
-      @memberships = @project.memberships.all # get the owner's membership too
+      @memberships = @project.memberships.to_a # get the owner's membership too
     end
 
     it "should require a logged-in user" do
