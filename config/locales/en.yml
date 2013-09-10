@@ -190,6 +190,9 @@ en:
         password_confirmation: confirm password
         username: username
 
+  blamer:
+    recency: Recency-based blamer
+
   date:
     formats:
       short: "%b %d, %Y"

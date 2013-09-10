@@ -57,6 +57,7 @@ require 'securerandom'
 # | `uses_releases`             | If `true`, bug views will be segregated by release, and release data will be displayed. Automatically set to true if any Deploys with release data are received. |
 # | `uses_releases_override`    | `uses_releases` is set automatically. If the user has set the value at least once manually, this is `true`, and automatic updates are suppressed.                |
 # | `disable_message_filtering` | If `true`, Bug messages are not filtered for potentially sensitive information.                                                                                  |
+# | `blamer_type`               | The name of a subclass of {Blamer::Base} that will be used to perform the blame operation.                                                                       |
 #
 # Code configuration
 # ------------------
@@ -131,7 +132,8 @@ class Project < ActiveRecord::Base
       uses_releases:             {type: Boolean, default: false},
       uses_releases_override:    {type: Boolean, default: false},
 
-      disable_message_filtering: {type: Boolean, default: false}
+      disable_message_filtering: {type: Boolean, default: false},
+      blamer_type:               {presence: true, default: 'Blamer::Recency'}
   )
 
   validates :owner,
@@ -253,6 +255,13 @@ class Project < ActiveRecord::Base
 
   def pagerduty
     @pagerduty ||= (pagerduty_service_key? ? Service::PagerDuty.new(pagerduty_service_key) : nil)
+  end
+
+  # @return [Class] The subclass of {Blamer::Base} that will be used to perform
+  #   the blame operation for this Project's Occurrences.
+
+  def blamer
+    blamer_type.constantize
   end
 
   # @private

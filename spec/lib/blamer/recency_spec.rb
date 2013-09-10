@@ -14,7 +14,7 @@
 
 require 'spec_helper'
 
-describe Blamer do
+describe Blamer::Recency do
   before :each do
     Project.delete_all
     @project   = FactoryGirl.create(:project)
@@ -36,7 +36,7 @@ describe Blamer do
                                                                    "line"   => 2,
                                                                    "symbol" => "foo"}]}],
                                     revision:   'abcdef')
-    -> { Blamer.new(@occurrence).find_or_create_bug! }.should raise_error('Need a resolvable commit')
+    -> { Blamer::Recency.new(@occurrence).find_or_create_bug! }.should raise_error('Need a resolvable commit')
   end
 
   it "should resolve duplicate bugs" do
@@ -50,7 +50,7 @@ describe Blamer do
                                                                    "line"   => 2,
                                                                    "symbol" => "foo"}]}],
                                     revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-    bug         = Blamer.new(@occurrence).find_or_create_bug!
+    bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
     bug.should eql(original)
   end
 
@@ -64,7 +64,7 @@ describe Blamer do
                                                                      "line"   => 2,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
     end
 
@@ -78,7 +78,7 @@ describe Blamer do
                                                                      "line"   => 2,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
     end
 
@@ -91,7 +91,7 @@ describe Blamer do
                                                                      "line"   => 3,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
       bug.file.should eql('lib/better_caller/extensions.rb')
       bug.line.should eql(3)
@@ -107,7 +107,7 @@ describe Blamer do
                                                                                 "line"   => 2,
                                                                                 "symbol" => "foo"}]}],
                                                  revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug                    = Blamer.new(@occurrence).find_or_create_bug!
+      bug                    = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
       bug.environment.should eql(@shell_bug.environment)
     end
@@ -122,7 +122,7 @@ describe Blamer do
                                                                                "line"   => 2,
                                                                                "symbol" => "foo"}]}],
                                                 revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug                   = Blamer.new(@occurrence).find_or_create_bug!
+      bug                   = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
       bug.class_name.should eql('SomeOtherError')
     end
@@ -145,7 +145,7 @@ describe Blamer do
                                                                            "line"   => 2,
                                                                            "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug               = Blamer.new(@occurrence).find_or_create_bug!
+      bug               = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
       bug.deploy.should eql(@shell_bug.deploy)
     end
@@ -161,7 +161,7 @@ describe Blamer do
                                                                            "line"   => 2,
                                                                            "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug               = Blamer.new(@occurrence).find_or_create_bug!
+      bug               = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
     end
 
@@ -175,7 +175,7 @@ describe Blamer do
                                                                            "line"   => 2,
                                                                            "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug               = Blamer.new(@occurrence).find_or_create_bug!
+      bug               = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should eql(@bug)
       bug.deploy.should eql(@shell_bug.deploy)
     end
@@ -191,7 +191,7 @@ describe Blamer do
                                                                      "line"   => 2,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.should_not eql(@bug)
       bug.deploy.should eql(@shell_bug.deploy)
     end
@@ -219,7 +219,7 @@ describe Blamer do
                                                                      "line"   => 27,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.file.should eql('ext/better_caller.c')
       bug.line.should eql(50)
       bug.blamed_revision.should eql('7f9ef6977510b3487483cf834ea02d3e6d7f6f13')
@@ -240,7 +240,7 @@ describe Blamer do
                                                                      "line"   => 5,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.file.should eql('/library/file')
       bug.line.should eql(27)
       bug.special_file?.should be_false
@@ -262,7 +262,7 @@ describe Blamer do
                                                                      "line"   => 5,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.file.should eql('fake/project/file')
       bug.line.should eql(11)
       bug.special_file?.should be_false
@@ -281,7 +281,7 @@ describe Blamer do
                                                                     {"type"    => "address",
                                                                      "address" => 5}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.file.should eql('0x0000001B')
       bug.line.should eql(1)
       bug.special_file?.should be_true
@@ -298,7 +298,7 @@ describe Blamer do
                                                                      "symbol"     => "b",
                                                                      "class_name" => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')
       bug.line.should eql(15)
       bug.special_file?.should be_true
@@ -315,7 +315,7 @@ describe Blamer do
                                                                      "symbol"     => "b",
                                                                      "class_name" => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.file.should eql('A.java')
       bug.line.should eql(15)
     end
@@ -332,7 +332,7 @@ describe Blamer do
                                                                      "line"   => 3,
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug         = Blamer.new(@occurrence).find_or_create_bug!
+      bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.message_template.should eql('Undefined [NUMBER] for #<Object:[ADDRESS]>')
     end
 
@@ -347,7 +347,7 @@ describe Blamer do
                                                                                "line"   => 3,
                                                                                "symbol" => "foo"}]}],
                                                 revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
-      bug                   = Blamer.new(@occurrence).find_or_create_bug!
+      bug                   = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.message_template.should eql("Cannot drop index '[STRING]': needed in a foreign key")
     end
 
@@ -362,7 +362,7 @@ describe Blamer do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       @shell_bug.environment.project.update_attribute :disable_message_filtering, true
-      bug = Blamer.new(@occurrence).find_or_create_bug!
+      bug = Blamer::Recency.new(@occurrence).find_or_create_bug!
       bug.message_template.should eql('Undefined 123 for #<Object:0x007fedfa0aa920>')
     end
   end
@@ -380,7 +380,7 @@ describe Blamer do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
-      blamer = Blamer.new(@occurrence)
+      blamer = Blamer::Recency.new(@occurrence)
       bug    = blamer.find_or_create_bug!
       blamer.reopen_bug_if_necessary! bug
 
@@ -399,7 +399,7 @@ describe Blamer do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
-      blamer = Blamer.new(@occurrence)
+      blamer = Blamer::Recency.new(@occurrence)
       bug    = blamer.find_or_create_bug!
       blamer.reopen_bug_if_necessary! bug
 
@@ -418,7 +418,7 @@ describe Blamer do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
-      blamer = Blamer.new(@occurrence)
+      blamer = Blamer::Recency.new(@occurrence)
       bug    = blamer.find_or_create_bug!
       blamer.reopen_bug_if_necessary! bug
 
@@ -439,7 +439,7 @@ describe Blamer do
                                                                            "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
 
-      blamer = Blamer.new(@occurrence)
+      blamer = Blamer::Recency.new(@occurrence)
       bug    = blamer.find_or_create_bug!
       blamer.reopen_bug_if_necessary! bug
 
@@ -448,85 +448,3 @@ describe Blamer do
   end
 end
 
-describe Blamer::Cache do
-  describe "#blame" do
-    before(:all) { @project = FactoryGirl.create(:project) }
-    before(:each) { Blame.delete_all }
-
-    it "should return a cached blame result if available" do
-      blame = FactoryGirl.create(:blame, repository_hash: @project.repository_hash, file: 'myfile.rb', line: 100)
-      @project.repo.should_not_receive(:blame)
-      commit = double('Git::Object::Commit')
-      @project.repo.should_receive(:object).once.with(blame.blamed_revision).and_return(commit)
-      Blamer::Cache.instance.blame(@project, blame.revision, 'myfile.rb', 100).should eql(commit)
-    end
-
-    it "should fall back to a Git blame operation otherwise" do
-      @project.repo.should_receive(:blame).once.with(
-          'file.rb',
-          hash_including(
-              revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
-              start:    3,
-              end:      3
-          )
-      ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
-      commit = double('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
-      @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
-
-      Blamer::Cache.instance.blame(@project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3).
-          should eql(commit)
-    end
-
-    it "should write the result of the operation for a cache miss" do
-      Blame.delete_all
-      @project.repo.should_receive(:blame).once.with(
-          'file.rb',
-          hash_including(
-              revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
-              start:    3,
-              end:      3
-          )
-      ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
-      commit = double('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
-      @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
-
-      Blamer::Cache.instance.blame @project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3
-
-      Blame.for_project(@project).where(
-          revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
-          file:     'file.rb',
-          line:     3
-      ).first.blamed_revision.should eql('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
-    end
-
-    it "should update a Blame's updated_at for a cache hit" do
-      blame  = FactoryGirl.create(:blame, repository_hash: @project.repository_hash, file: 'myfile.rb', line: 100, updated_at: Time.now - 1.day)
-      commit = double('Git::Object::Commit')
-      @project.repo.should_receive(:object).once.with(blame.blamed_revision).and_return(commit)
-      Blamer::Cache.instance.blame @project, blame.revision, 'myfile.rb', 100
-      -> { blame.reload }.should change(blame, :updated_at)
-    end
-
-    it "should drop the least recently used Blame when the cache is full" do
-      stub_const 'Blamer::Cache::MAX_ENTRIES', 3
-
-      FactoryGirl.create_list :blame, 4
-      doomed = FactoryGirl.create :blame, updated_at: Time.now - 1.day
-
-      @project.repo.should_receive(:blame).once.with(
-          'file.rb',
-          hash_including(
-              revision: 'f19641fd13d396fa1b11c595912323cc1c30571d',
-              start:    3,
-              end:      3
-          )
-      ).and_return([nil, 'bad', 'bad', 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47'])
-      commit = double('Git::Object::Commit', sha: 'd1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47')
-      @project.repo.should_receive(:object).once.with('d1500ebf6cd84775f4cd56b73e81aaa1b3fd9c47').and_return(commit)
-      Blamer::Cache.instance.blame(@project, 'f19641fd13d396fa1b11c595912323cc1c30571d', 'file.rb', 3)
-
-      -> { doomed.reload }.should raise_error(ActiveRecord::RecordNotFound)
-      Blame.count.should eql(3)
-    end
-  end
-end
