@@ -392,9 +392,10 @@ class BugsController < ApplicationController
   end
 
   def bug_params
-    params.require(:bug).permit(:assigned_user, :resolution_revision, :fixed,
-                                :fix_deployed, :irrelevant, :duplicate_of,
-                                :duplicate_of_id, :jira_isssue, :jira_status_id)
+    params.require(:bug).permit(:assigned_user, :assigned_user_id,
+                                :resolution_revision, :fixed, :fix_deployed,
+                                :irrelevant, :duplicate_of, :duplicate_of_id,
+                                :jira_isssue, :jira_status_id)
   end
 
   def comment_params
