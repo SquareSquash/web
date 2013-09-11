@@ -880,8 +880,8 @@ describe Occurrence do
       bug2 = FactoryGirl.create(:bug, environment: bug1.environment)
       occ  = FactoryGirl.create(:rails_occurrence, bug: bug1)
 
-      blamer = Blamer.new(occ)
-      Blamer.stub(:new).and_return(blamer)
+      blamer = bug1.environment.project.blamer.new(occ)
+      blamer.class.stub(:new).and_return(blamer)
       blamer.should_receive(:find_or_create_bug!).once.and_return(bug2)
 
       message     = occ.message
@@ -905,8 +905,8 @@ describe Occurrence do
       bug2 = FactoryGirl.create(:bug, environment: bug1.environment, fixed: true, fix_deployed: true)
       occ  = FactoryGirl.create(:rails_occurrence, bug: bug1)
 
-      blamer = Blamer.new(occ)
-      Blamer.stub(:new).and_return(blamer)
+      blamer = bug1.environment.project.blamer.new(occ)
+      blamer.class.stub(:new).and_return(blamer)
       blamer.should_receive(:find_or_create_bug!).once.and_return(bug2)
 
       message     = occ.message

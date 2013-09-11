@@ -84,7 +84,7 @@ class OccurrencesWorker
     # saved. If however no matching bug is found, a new bug is created, saved,
     # and returned. In no case is the bug we create below saved.
     occurrence.bug = build_temporary_bug(class_name)
-    blamer         = Blamer.new(occurrence)
+    blamer         = project.blamer.new(occurrence)
     bug            = blamer.find_or_create_bug!
 
     # these must be done after Blamer runs

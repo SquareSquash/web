@@ -308,6 +308,10 @@ end
               samp "[EMAIL?]"
               text "."
             end
+
+            f.label :blamer_type
+            f.select :blamer_type, Blamer::Base.subclasses.map { |c| [c.human_name, c.to_s] }
+            p "If you would like to avoid making potentially slow requests to the Git repository, at the expense of less intelligent code analysis, choose the Git-free blamer.", class: 'help-block'
           end
 
           fieldset do

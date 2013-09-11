@@ -329,7 +329,7 @@ When an Occurrence is grouped into a Bug, its message is stripped of any
 non-relevant or situational information. (Note that since the message is not
 used as a dimension in grouping Occurrences, two Occurrences of the same Bug
 could have completely different messages. A Bug gets its message from its first
-Occurrence.) This is done by the {Blamer}.
+Occurrence.) This is done by subclasses of {Blamer::Base}.
 
 For most messages, this is done using simple regex subsitution. Squash can also
 normalize an exception's message using a list of known message templates. Such

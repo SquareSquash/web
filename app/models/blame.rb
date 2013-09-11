@@ -12,8 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# The cached result of a `git-blame` operation. The {Blamer} uses this table as
-# a write-through cache of these results by means of {Blamer::Cache}.
+# The cached result of a `git-blame` operation. Some blamers use this table as a
+# write-through cache of these results by means of {Blamer::Cache}.
 #
 # Properties
 # ----------
