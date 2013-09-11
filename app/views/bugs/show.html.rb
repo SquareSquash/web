@@ -109,7 +109,10 @@ module Views
       def bug_location
         p(id: 'location') do
           if @bug.special_file?
-            text "#{@bug.file} "
+            case @bug.file # TODO don't guess, record this information
+              when /^\[S\] / then text("<simple blamer> ")
+              else text("#{@bug.file} ")
+            end
           else
             text "#{@bug.file}, line #{number_with_delimiter @bug.line} "
           end

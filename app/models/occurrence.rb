@@ -834,7 +834,7 @@ class Occurrence < ActiveRecord::Base
   # Saves the record.
 
   def recategorize!
-    blamer = Blamer.new(self)
+    blamer = bug.environment.project.blamer.new(self)
     new_bug    = blamer.find_or_create_bug!
     if new_bug.id != bug_id
       copy = new_bug.occurrences.build

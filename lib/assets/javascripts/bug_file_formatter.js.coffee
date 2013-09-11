@@ -20,5 +20,9 @@ root = exports ? this
 # @return [String] The abbreviated file name.
 #
 root.formatBugFile = (bug) ->
-  parts = bug.file.split('/')
-  parts[parts.length  - 1]
+  #TODO don't guess, record this information
+  if bug.file =~ /^\[S\] /
+    "<simple blamer>"
+  else
+    parts = bug.file.split('/')
+    parts[parts.length  - 1]
