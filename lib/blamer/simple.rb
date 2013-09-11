@@ -26,7 +26,7 @@ module Blamer
 
     def bug_search_criteria
       @special = true
-      file     = Digest::SHA2.hexdigest(occurrence.faulted_backtrace.to_json)
+      file     = '[S] ' + Digest::SHA2.hexdigest(occurrence.faulted_backtrace.to_json)
 
       {
           class_name:      occurrence.bug.class_name,
