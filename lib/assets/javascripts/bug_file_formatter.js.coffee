@@ -21,7 +21,7 @@ root = exports ? this
 #
 root.formatBugFile = (bug) ->
   #TODO don't guess, record this information
-  if bug.file =~ /^\[S\] /
+  if bug.file.match(/^\[S\] /)
     "<simple blamer>"
   else
     parts = bug.file.split('/')
