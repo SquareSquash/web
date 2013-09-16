@@ -363,7 +363,7 @@ module Views
               th "Value"
             end
           end
-          if values.empty?
+          if values.blank?
             td "No values", colspan: 3, class: 'no-results'
           else
             values.sort.each do |(name, value)|
