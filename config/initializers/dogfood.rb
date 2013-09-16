@@ -19,7 +19,7 @@ Squash::Ruby.configure Squash::Configuration.dogfood
 
 # Auto-configure development dogfood
 
-unless defined?(IRB)
+if defined?(Rails::Server)
   run_server = begin
     Rails.env.development? && (project = Project.find_from_slug('squash'))
   rescue ActiveRecord::StatementInvalid
