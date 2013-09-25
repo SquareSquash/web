@@ -47,4 +47,31 @@ describe Blamer::Simple do
     bug.line.should eql(1)
     bug.blamed_revision.should be_nil
   end
+
+  it "should not touch the Git repo at all when processing an occurrence" do
+    Project.where(repository_url: 'git@github.com:RISCfuture/better_caller.git').delete_all
+    @project   = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
+    @commit    = @project.repo.object('HEAD^')
+
+    # this will be a valid exception but with a stack trace that doesn't make
+    # sense in the context of the project (the files don't actually exist in the
+    # repo). this will test the scenarios where no blamed commits can be found.
+    @exception = nil
+    begin
+      raise ArgumentError, "Well crap"
+    rescue
+      @exception = $!
+    end
+    @line        = @exception.backtrace.first.split(':')[1].to_i # get the line number of the first line of the backtrace
+
+    Bug.delete_all
+    @params = Squash::Ruby.send(:exception_info_hash, @exception, Time.now, {}, nil)
+    @params.merge!('api_key'     => @project.api_key,
+                   'environment' => 'production',
+                   'revision'    => @commit.sha,
+                   'user_data'   => {'foo' => 'bar'})
+
+    @project.should_not_receive :repo
+    OccurrencesWorker.new(@params).perform
+  end
 end

@@ -74,9 +74,9 @@ class OccurrencesWorker
 
   def perform
     # First make an occurrence to perform a blame on
-    commit     = set_deploy_and_commit
-    class_name = @attrs.delete('class_name')
-    occurrence = build_occurrence(commit)
+    commit         = set_deploy_and_commit
+    class_name     = @attrs.delete('class_name')
+    occurrence     = build_occurrence(commit)
 
     # In order to use Blamer, we need to create a new, unsaved bug with the
     # class name and environment specified in @attrs. If blamer finds a matching
@@ -92,7 +92,7 @@ class OccurrencesWorker
     occurrence.message = pii_filter(MessageTemplateMatcher.instance.matched_substring(class_name, occurrence.message)) unless project.disable_message_filtering?
     occurrence.message = occurrence.message.truncate(1000)
     occurrence.message ||= occurrence.class_name # hack for Java
-    
+
     # hook things up and save
     occurrence.bug     = bug
     bug.save!
@@ -133,7 +133,7 @@ class OccurrencesWorker
     return bug
   end
 
-  def build_occurrence(commit)
+  def build_occurrence(sha)
     # extract top-level attributes and metadata; stick the rest in user_data
 
     occurrence_attrs = Hash.new
@@ -146,7 +146,7 @@ class OccurrencesWorker
       end
     end
     occurrence_attrs['query'] = occurrence_attrs['query'][0, 255] if occurrence_attrs['query']
-    occurrence_attrs['revision'] = commit.sha
+    occurrence_attrs['revision'] = sha
 
     occurrence          = Occurrence.new(occurrence_attrs)
     occurrence.metadata = JSON.parse(occurrence.metadata).reverse_merge(other_data).to_json
@@ -164,28 +164,17 @@ class OccurrencesWorker
       # create one if it doesn't exist, and use that.
 
       revision = @attrs['revision']
-      commit   = project.repo.object(revision)
-      if commit.nil?
-        project.repo(&:fetch)
-        commit = project.repo.object(revision)
-      end
-      raise "Unknown revision" unless commit
-
-      @deploy = @environment.deploys.where(build: @attrs['build']).find_or_create!(
+      sha      = project.blamer.resolve_revision(project, revision)
+      @deploy  = @environment.deploys.where(build: @attrs['build']).find_or_create!(
           deployed_at: Time.now,
-          revision:    commit.sha
+          revision:    sha
       )
     elsif @attrs['revision'].present?
       # If we get only a revision, the Bug won't have a Deploy, but we still
       # have a revision to do blaming with.
 
       revision = @attrs['revision']
-      commit   = project.repo.object(revision)
-      if commit.nil?
-        project.repo(&:fetch)
-        commit = project.repo.object(revision)
-      end
-      raise "Unknown revision" unless commit
+      sha      = project.blamer.resolve_revision(project, revision)
     elsif @attrs['build'].present?
       # If we get only a build, we can find the Deploy with that build number
       # and use it to get the revision.
@@ -193,14 +182,13 @@ class OccurrencesWorker
       begin
         @deploy = environment.deploys.find_by_build(@attrs['build'])
         raise API::InvalidAttributesError, "Unknown build number" unless deploy
-        commit = deploy.commit
-        raise "Unknown revision" unless commit
+        sha = deploy.revision
       end
     else
       # If we get nothing, we can't do anything.
       raise API::InvalidAttributesError, "Missing required keys"
     end
-    commit
+    sha
   end
 
   def add_user_agent_data(occurrence)

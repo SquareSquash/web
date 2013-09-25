@@ -76,6 +76,15 @@ module Blamer
       I18n.t("blamer.#{to_s.demodulize.underscore}")
     end
 
+    # Converts a ref-ish (like "HEAD") into a Git SHA. The default
+    # implementation simply returns the given revision; subclasses can actually
+    # use Git to resolve the SHA.
+    #
+    # @param [Project] project A project whose repository will be used.
+    # @param [String] revision A git ref-ish.
+    # @return [String] The 40-character Git SHA.
+    def self.resolve_revision(project, revision) revision end
+
     # Creates a new instance suitable for placing a given Occurrence.
     #
     # @param [Occurrence] occurrence The Occurrence to find a Bug for.

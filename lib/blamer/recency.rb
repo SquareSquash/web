@@ -57,6 +57,16 @@ module Blamer
 
   class Recency < Base
 
+    def self.resolve_revision(project, revision)
+      commit   = project.repo.object(revision)
+      if commit.nil?
+        project.repo(&:fetch)
+        commit = project.repo.object(revision)
+      end
+      raise "Unknown revision" unless commit
+      commit.sha
+    end
+
     protected
 
     def bug_search_criteria
