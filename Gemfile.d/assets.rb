@@ -12,13 +12,14 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-group :assets do
-  gem 'sass-rails'
-  gem 'libv8', platform: :mri
-  gem 'therubyracer', '>= 0.11.1', platform: :mri
-  gem 'therubyrhino', platform: :jruby
-  gem 'less-rails'
+gem 'sass-rails'
+gem 'libv8', platform: :mri
+gem 'therubyracer', '>= 0.11.1', platform: :mri
+gem 'therubyrhino', platform: :jruby
+gem 'less-rails'
 
-  gem 'coffee-rails'
-  gem 'uglifier'
-end
+gem 'font-awesome-rails'
+
+gem 'coffee-rails'
+gem 'uglifier'
+gem 'jquery-rails'

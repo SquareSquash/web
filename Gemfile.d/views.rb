@@ -13,6 +13,4 @@
 #    limitations under the License.
 
 gem 'erector', github: 'RISCfuture/erector'
-gem 'jquery-rails'
 gem 'kramdown'
-gem 'font-awesome-rails'
