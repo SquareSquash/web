@@ -14,9 +14,9 @@
 
 Squash::Application.routes.draw do
   resources :projects, except: [:new] do
-    member do
-      get :context
-      patch :rekey
+    member { patch :rekey }
+    resources :commits do
+      member { get :context }
     end
     resources :environments, only: [:update] do
       resources :bugs, except: [:new, :create, :edit] do

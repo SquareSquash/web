@@ -297,6 +297,12 @@ en:
             First occurred in revision %{revision}. More information: %{url}
           not_applicable: N/A
           summary: "%{class_name} on %{file_name}:%{line}"
+    commits:
+      context:
+        commit_not_found: Couldn’t find that commit or file.
+        line_out_of_bounds: Line number is out of range.
+        missing_param: Missing required parameter.
+        repo_nil: Couldn’t load project repository.
     project:
       membership:
         destroy:
@@ -305,11 +311,6 @@ en:
     projects:
       destroy:
         deleted: Project %{name} was deleted.
-      context:
-        commit_not_found: Couldn’t find that commit or file.
-        line_out_of_bounds: Line number is out of range.
-        missing_param: Missing required parameter.
-        repo_nil: Couldn’t load project repository.
       rekey:
         success: The API key for %{name} is now %{api_key}.
     sessions:

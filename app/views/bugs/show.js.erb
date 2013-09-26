@@ -57,19 +57,23 @@ function PageManager() {
   };
 
   this.setupCommitDropdown = function() {
-    var commits = JSON.parse("<%= escape_javascript @project.repo.log(10).to_json %>");
-    $('#bug_resolution_revision').autocomplete({
-      suggestions: commits,
-      elementBuilder: function(li, commit) {
-        li.append($('<div/>').text(commit.message));
-        $('<tt/>').text(commit.sha.slice(0, 6)).appendTo(li);
-      },
-      filterSuggestions: function(string, suggestions) {
-        return suggestions.filter(function(commit) {
-          return commit.sha.indexOf(string.toLowerCase()) == 0 || commit.message.toLowerCase().indexOf(string.toLowerCase()) == 0;
+    $.ajax("<%= project_commits_url(@project, format: 'json') %>", {
+      type: 'GET',
+      success: function(commits) {
+        $('#bug_resolution_revision').autocomplete({
+            suggestions: commits,
+            elementBuilder: function(li, commit) {
+              li.append($('<div/>').text(commit.message));
+              $('<tt/>').text(commit.sha.slice(0, 6)).appendTo(li);
+            },
+            filterSuggestions: function(string, suggestions) {
+              return suggestions.filter(function(commit) {
+                return commit.sha.indexOf(string.toLowerCase()) == 0 || commit.message.toLowerCase().indexOf(string.toLowerCase()) == 0;
+              });
+            },
+            fieldValue: function(suggestion) { return suggestion.sha; }
         });
-      },
-      fieldValue: function(suggestion) { return suggestion.sha; }
+      }
     });
   };
 
