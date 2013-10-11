@@ -47,10 +47,20 @@ class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
       rescue ActiveRecord::StatementInvalid, ActiveRecord::JDBCError => err
         if err.to_s =~ /This connection has been closed/ # If the connection was somehow pulled out from underneath us...
           reconnect! # reconnect...
-          retry # and try again
+          if @_retried_connection
+            raise
+          else
+            @_retried_connection = true
+            retry # ... and try again
+          end
         elsif err.to_s =~ /Connection reset/ # if, because of that, we bork up any other threads using the same connection...
           # try again; the connection should be fine now
-          retry
+          if @_retried_connection
+            raise
+          else
+            @_retried_connection = true
+            retry
+          end
         else
           raise
         end
