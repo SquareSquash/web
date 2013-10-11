@@ -95,8 +95,10 @@ class OccurrencesWorker
 
     # hook things up and save
     occurrence.bug     = bug
-    bug.save!
-    occurrence.save!
+    Bug.transaction do
+      bug.save!
+      occurrence.save!
+    end
 
     blamer.reopen_bug_if_necessary! bug
     occurrence
