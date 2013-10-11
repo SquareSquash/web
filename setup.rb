@@ -353,18 +353,18 @@ if step < 3
   say "If you don't know the answer to a question, give a best guess. You can always",
       "change your database.yml file later."
 
-  dev_host = query("What is the hostname of the development PostgreSQL server?", '')
+  dev_host = query("What is the hostname of the development PostgreSQL server?", 'localhost')
   dev_user = query("What PostgreSQL user will Squash use in development?", 'squash')
   dev_pw   = query("What is #{dev_user}@#{dev_host}'s password?", '')
   dev_local = dev_host.nil? || dev_host == 'localhost' || dev_host == '0.0.0.0' || dev_host == '127.0.0.1'
   dev_db   = query("What is the name of your PostgreSQL development database?#{" (It doesn't have to exist yet.)" if dev_local}", 'squash_development')
 
-  test_host = query("What is the hostname of the test PostgreSQL server?", '')
+  test_host = query("What is the hostname of the test PostgreSQL server?", 'localhost')
   test_user = query("What PostgreSQL user will Squash use in test?", dev_user)
   test_pw   = query("What is #{test_user}@#{test_host}'s password?", '')
   test_db   = query("What is the name of your PostgreSQL test database?", 'squash_test')
 
-  prod_host = query("What is the hostname of the production PostgreSQL server?", '')
+  prod_host = query("What is the hostname of the production PostgreSQL server?", 'localhost')
   prod_user = query("What PostgreSQL user will Squash use in production?", dev_user)
   prod_pw   = query("What is #{prod_user}@#{prod_host}'s password?", '')
   prod_db   = query("What is the name of your PostgreSQL production database?", 'squash_production')

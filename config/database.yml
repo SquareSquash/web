@@ -1,7 +1,7 @@
 development:
   adapter: postgresql
   encoding: utf8
-  hostname:
+  host: localhost
   username: squash
   password:
   database: squash_development
@@ -9,7 +9,7 @@ development:
 test:
   adapter: postgresql
   encoding: utf8
-  hostname:
+  host: localhost
   username: squash
   password:
   database: squash_test
@@ -17,7 +17,7 @@ test:
 production:
   adapter: postgresql
   encoding: utf8
-  hostname:
+  host: localhost
   username: squash
   password:
   database: squash_production
