@@ -298,7 +298,7 @@ class Project < ActiveRecord::Base
   end
 
   def can_clone_repo
-    unless system('git', 'ls-remote', repository_url)
+    unless system('git', 'ls-remote', repository_url, out: '/dev/null', err: '/dev/null')
       errors.add :repository_url, :unreachable
     end
   end
