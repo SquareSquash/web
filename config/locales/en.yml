@@ -51,6 +51,8 @@ en:
             repository_url:
               unreachable: is not accessible
               taken: already has a Squash project
+              invalid_protocol: Provide HTTPS or SSH URL
+              invalid_extension: Provide HTTPS or SSH URL (shoud end in '.git')
         user:
           attributes:
             password:
