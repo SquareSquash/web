@@ -61,7 +61,7 @@ class PagerDutyNotifier
     I18n.t 'workers.pagerduty.incident.description',
            class_name: @occurrence.bug.class_name,
            file_name:  File.basename(@occurrence.bug.file),
-           line:       @occurrence.bug.special_file? ? t('workers.pagerduty.not_applicable') : @occurrence.bug.line,
+           line:       @occurrence.bug.special_file? ? I18n.t('workers.pagerduty.not_applicable') : @occurrence.bug.line,
            message:    @occurrence.message,
            locale:     @occurrence.bug.environment.project.locale
   end
