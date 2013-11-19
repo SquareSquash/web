@@ -56,6 +56,13 @@ describe OccurrencesController do
           response.status.should eql(200)
           JSON.parse(response.body).map { |r| r['number'] }.should eql(@occurrences.map(&:number)[50, 50])
         end
+
+        it "should load single occurrences" do
+          occurrence = @occurrences[49]
+          get :show, polymorphic_params(occurrence, false, format: 'json')
+          response.status.should eql(200)
+          response.body.should == occurrence.to_json
+        end
       end
     end
   end
