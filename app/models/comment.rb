@@ -69,7 +69,7 @@ class Comment < ActiveRecord::Base
   after_save { |comment| comment.bug.index_for_search! }
 
   # @private
-  def to_param() number end
+  def to_param() number.to_s end
 
   # @private
   def as_json(options=nil)

@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-gem 'rails', '>= 4.0.0'
+gem 'rails', '4.0.2'
 
 gem 'configoro', '>= 1.2.4'
 gem 'rack-cors', require: 'rack/cors'
