@@ -18,7 +18,7 @@ gem 'therubyracer', '>= 0.11.1', platform: :mri
 gem 'therubyrhino', platform: :jruby
 gem 'less-rails'
 
-gem 'font-awesome-rails'
+gem 'font-awesome-rails', '< 4.0'
 
 gem 'coffee-rails'
 gem 'uglifier'
