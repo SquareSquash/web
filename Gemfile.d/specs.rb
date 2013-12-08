@@ -14,6 +14,7 @@
 
 group :test do
   gem 'rspec-rails'
+  gem 'test-unit', require: false, platform: :rbx
   gem 'factory_girl_rails'
   gem 'fakeweb'
 end

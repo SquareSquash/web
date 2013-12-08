@@ -13,8 +13,8 @@
 #    limitations under the License.
 
 gem 'sass-rails'
-gem 'libv8', platform: :mri
-gem 'therubyracer', '>= 0.11.1', platform: :mri
+gem 'libv8', platform: [:mri, :rbx]
+gem 'therubyracer', '>= 0.11.1', platforms: [:mri, :rbx]
 gem 'therubyrhino', platform: :jruby
 gem 'less-rails'
 

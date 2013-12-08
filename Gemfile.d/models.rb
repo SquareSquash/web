@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-gem 'pg', platform: :mri
+gem 'pg', platform: [:mri, :rbx]
 gem 'activerecord-jdbcpostgresql-adapter', platform: :jruby
 gem 'has_metadata_column', github: 'RISCfuture/has_metadata_column'
 gem 'slugalicious'

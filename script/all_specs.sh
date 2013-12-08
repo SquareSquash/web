@@ -261,6 +261,18 @@ function run_mri19() {
     echo
 }
 
+##### Rubinius (password auth)
+function run_rbx() {
+    reset_config
+    rvm rbx@squash exec ${BUNDLE}
+    rvm rbx@squash exec ${COMMAND}
+
+    echo
+    echo "***** That was Rubinius with password auth ******"
+    echo
+}
+
+
 ##### Reset configuration
 function restore() {
     git checkout Gemfile.lock
@@ -273,6 +285,7 @@ check_clean
 rvm 1.9.3 exec rvm gemset create squash
 rvm 2.0.0 exec rvm gemset create squash
 rvm jruby exec rvm gemset create squash
+rvm rbx exec rvm gemset create squash
 
 run_password
 run_cursors
@@ -283,5 +296,6 @@ run_ldap_bind_dn
 run_resque
 run_sidekiq
 run_mri19
+run_rbx
 
 restore

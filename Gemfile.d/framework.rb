@@ -16,3 +16,8 @@ gem 'rails', '4.0.2'
 
 gem 'configoro', '>= 1.2.4'
 gem 'rack-cors', require: 'rack/cors'
+
+platform :rbx do
+  gem 'rubysl'
+  gem 'racc'
+end
