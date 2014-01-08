@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: git://github.com/RISCfuture/ruby-git.git
-  revision: 2da2ed301fc5d2f9cb3125bd78db0522b322ed84
+  revision: 14d05318c3c22352564dfb3acf45ee1a29a09864
   specs:
     git (1.2.6)
 
