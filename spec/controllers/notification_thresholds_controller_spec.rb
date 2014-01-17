@@ -25,8 +25,8 @@ describe NotificationThresholdsController do
     describe "##{action}" do
       it "should require a logged-in user" do
         send method, action, polymorphic_params(@bug, true, @params.merge(format: 'json'))
-        response.status.should eql(401)
-        @bug.notification_thresholds.count.should eql(0)
+        expect(response.status).to eql(401)
+        expect(@bug.notification_thresholds.count).to eql(0)
       end
 
       context '[authenticated]' do
@@ -38,10 +38,10 @@ describe NotificationThresholdsController do
           @bug.notification_thresholds.delete_all
           send method, action, polymorphic_params(@bug, true, @params.merge(format: 'json'))
 
-          @bug.notification_thresholds.count.should eql(1)
-          @bug.notification_thresholds(true).first.period.should eql(3600)
-          @bug.notification_thresholds.first.threshold.should eql(500)
-          @bug.notification_thresholds.first.user_id.should eql(@bug.environment.project.owner_id)
+          expect(@bug.notification_thresholds.count).to eql(1)
+          expect(@bug.notification_thresholds(true).first.period).to eql(3600)
+          expect(@bug.notification_thresholds.first.threshold).to eql(500)
+          expect(@bug.notification_thresholds.first.user_id).to eql(@bug.environment.project.owner_id)
         end
 
         it "should update an existing notification" do
@@ -49,17 +49,17 @@ describe NotificationThresholdsController do
           FactoryGirl.create :notification_threshold, user: @bug.environment.project.owner, bug: @bug, period: 36, threshold: 5
           send method, action, polymorphic_params(@bug, true, @params.merge(format: 'json'))
 
-          @bug.notification_thresholds.count.should eql(1)
-          @bug.notification_thresholds(true).first.period.should eql(3600)
-          @bug.notification_thresholds.first.threshold.should eql(500)
-          @bug.notification_thresholds.first.user_id.should eql(@bug.environment.project.owner_id)
+          expect(@bug.notification_thresholds.count).to eql(1)
+          expect(@bug.notification_thresholds(true).first.period).to eql(3600)
+          expect(@bug.notification_thresholds.first.threshold).to eql(500)
+          expect(@bug.notification_thresholds.first.user_id).to eql(@bug.environment.project.owner_id)
         end
 
         it "should not allow user or bug ID to be changed" do
           @bug.notification_thresholds.delete_all
           send method, action, polymorphic_params(@bug, true, notification_threshold: {user_id: 1, bug_id: 1, period: 1, threshold: 2}, format: 'json')
-          response.status.should eql(400)
-          @bug.notification_thresholds.count.should eql(0)
+          expect(response.status).to eql(400)
+          expect(@bug.notification_thresholds.count).to eql(0)
         end
       end
     end
@@ -71,8 +71,8 @@ describe NotificationThresholdsController do
 
     it "should require a logged-in user" do
       delete :destroy, polymorphic_params(@bug, true)
-      response.should redirect_to(login_url(next: request.fullpath))
-      @bug.reload.should_not be_fixed
+      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(@bug.reload).not_to be_fixed
     end
 
     context '[authenticated]' do
@@ -81,14 +81,14 @@ describe NotificationThresholdsController do
       it "should delete a notification threshold" do
         FactoryGirl.create :notification_threshold, user: @bug.environment.project.owner, bug: @bug, period: 36, threshold: 5
         delete :destroy, polymorphic_params(@bug, true)
-        response.should redirect_to(project_environment_bug_url(@bug.environment.project, @bug.environment, @bug, anchor: 'notifications'))
-        @bug.notification_thresholds.count.should eql(0)
+        expect(response).to redirect_to(project_environment_bug_url(@bug.environment.project, @bug.environment, @bug, anchor: 'notifications'))
+        expect(@bug.notification_thresholds.count).to eql(0)
       end
 
       it "should do nothing if no notification threshold exists" do
         delete :destroy, polymorphic_params(@bug, true)
-        response.should redirect_to(project_environment_bug_url(@bug.environment.project, @bug.environment, @bug, anchor: 'notifications'))
-        @bug.notification_thresholds.count.should eql(0)
+        expect(response).to redirect_to(project_environment_bug_url(@bug.environment.project, @bug.environment, @bug, anchor: 'notifications'))
+        expect(@bug.notification_thresholds.count).to eql(0)
       end
     end
   end

@@ -30,7 +30,7 @@ if Squash::Configuration.authentication.strategy == 'ldap'
       before :each do
         @controller = FakeController.new
         @ldap       = double('Net::LDAP')
-        @controller.stub(:build_ldap_interface).and_return(@ldap)
+        allow(@controller).to receive(:build_ldap_interface).and_return(@ldap)
       end
 
       it "should return true if the LDAP entry exists and can bind" do
@@ -39,25 +39,25 @@ if Squash::Configuration.authentication.strategy == 'ldap'
             sn:        'Bar',
             dn:        "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username},#{Squash::Configuration.authentication.ldap.tree_base}"
         }
-        entry.stub(:dn).and_return(entry[:dn])
+        allow(entry).to receive(:dn).and_return(entry[:dn])
 
-        @ldap.should_receive(:search).once do |hsh|
+        expect(@ldap).to receive(:search).once { |hsh|
           hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username}"
-        end.and_yield(entry)
+        }.and_yield(entry)
 
-        @ldap.should_receive(:auth).once.with(
+        expect(@ldap).to receive(:auth).once.with(
             /#{Regexp.escape Squash::Configuration.authentication.ldap.search_key}=#{Regexp.escape @user.username},/,
             'password'
         )
 
         if Squash::Configuration.authentication.ldap[:bind_dn]
-          @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
+          expect(@ldap).to receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
         end
 
-        @ldap.stub(:bind).and_return(true)
+        allow(@ldap).to receive(:bind).and_return(true)
 
-        @controller.should_receive(:log_in_user).once.with(@user)
-        @controller.log_in(@user.username, 'password').should be_true
+        expect(@controller).to receive(:log_in_user).once.with(@user)
+        expect(@controller.log_in(@user.username, 'password')).to be_true
       end
 
       it "should extract the username from an email address login" do
@@ -66,45 +66,45 @@ if Squash::Configuration.authentication.strategy == 'ldap'
             sn:        'Bar',
             dn:        "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username},#{Squash::Configuration.authentication.ldap.tree_base}"
         }
-        entry.stub(:dn).and_return(entry[:dn])
+        allow(entry).to receive(:dn).and_return(entry[:dn])
 
-        @ldap.should_receive(:search).once do |hsh|
+        expect(@ldap).to receive(:search).once { |hsh|
           hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username}"
-        end.and_yield(entry)
+        }.and_yield(entry)
 
-        @ldap.should_receive(:auth).once.with(
+        expect(@ldap).to receive(:auth).once.with(
             /#{Regexp.escape Squash::Configuration.authentication.ldap.search_key}=#{Regexp.escape @user.username},/,
             'password'
         )
 
         if Squash::Configuration.authentication.ldap[:bind_dn]
-          @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
+          expect(@ldap).to receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
         end
 
-        @ldap.stub(:bind).and_return(true)
+        allow(@ldap).to receive(:bind).and_return(true)
 
-        @controller.should_receive(:log_in_user).once.with(@user)
-        @controller.log_in("#{@user.username}@#{Squash::Configuration.mailer.domain}", 'password').should be_true
+        expect(@controller).to receive(:log_in_user).once.with(@user)
+        expect(@controller.log_in("#{@user.username}@#{Squash::Configuration.mailer.domain}", 'password')).to be_true
       end
 
       it "should return false if the LDAP entry does not exist" do
-        @ldap.should_receive(:search).once do |hsh|
+        expect(@ldap).to receive(:search).once do |hsh|
           hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username}"
         end
 
         if Squash::Configuration.authentication.ldap[:bind_dn]
-          @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
+          expect(@ldap).to receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
         else
-          @ldap.should_receive(:auth).once.with(
+          expect(@ldap).to receive(:auth).once.with(
               /#{Regexp.escape Squash::Configuration.authentication.ldap.search_key}=#{Regexp.escape @user.username},/,
               'password'
           )
         end
 
-        @ldap.stub(:bind).and_return(true)
+        allow(@ldap).to receive(:bind).and_return(true)
 
-        @controller.should_not_receive :log_in_user
-        @controller.log_in(@user.username, 'password').should be_false
+        expect(@controller).not_to receive :log_in_user
+        expect(@controller.log_in(@user.username, 'password')).to be_false
       end
 
       if Squash::Configuration.authentication.ldap[:bind_dn]
@@ -114,43 +114,43 @@ if Squash::Configuration.authentication.strategy == 'ldap'
               sn:        'Bar',
               dn:        "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username},#{Squash::Configuration.authentication.ldap.tree_base}"
           }
-          entry.stub(:dn).and_return(entry[:dn])
+          allow(entry).to receive(:dn).and_return(entry[:dn])
 
-          @ldap.should_receive(:search).once do |hsh|
+          expect(@ldap).to receive(:search).once { |hsh|
             hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=#{@user.username}"
-          end.and_yield(entry)
+          }.and_yield(entry)
 
-          @ldap.should_receive(:auth).once.with(
+          expect(@ldap).to receive(:auth).once.with(
               /#{Regexp.escape Squash::Configuration.authentication.ldap.search_key}=#{Regexp.escape @user.username},/,
               'password'
           )
-          @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
-          @ldap.should_receive(:bind).twice.and_return(true, false)
+          expect(@ldap).to receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
+          expect(@ldap).to receive(:bind).twice.and_return(true, false)
 
-          @controller.should_not_receive :log_in_user
-          @controller.log_in(@user.username, 'password').should be_false
+          expect(@controller).not_to receive :log_in_user
+          expect(@controller.log_in(@user.username, 'password')).to be_false
         end
 
         it "should return false if the LDAP authenticator cannot bind" do
-          @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
-          @ldap.stub(:bind).once.and_return(false)
+          expect(@ldap).to receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
+          allow(@ldap).to receive(:bind).once.and_return(false)
 
-          @controller.should_not_receive :log_in_user
-          @controller.log_in(@user.username, 'password').should be_false
+          expect(@controller).not_to receive :log_in_user
+          expect(@controller.log_in(@user.username, 'password')).to be_false
         end
       else
         it "should return false if the user cannot bind" do
-          @ldap.should_not_receive :search
+          expect(@ldap).not_to receive :search
 
-          @ldap.should_receive(:auth).once.with(
+          expect(@ldap).to receive(:auth).once.with(
               /#{Regexp.escape Squash::Configuration.authentication.ldap.search_key}=#{Regexp.escape @user.username},/,
               'password'
           )
 
-          @ldap.should_receive(:bind).once.and_return(false)
+          expect(@ldap).to receive(:bind).once.and_return(false)
 
-          @controller.should_not_receive :log_in_user
-          @controller.log_in(@user.username, 'password').should be_false
+          expect(@controller).not_to receive :log_in_user
+          expect(@controller.log_in(@user.username, 'password')).to be_false
         end
       end
 
@@ -160,29 +160,29 @@ if Squash::Configuration.authentication.strategy == 'ldap'
             sn:        'User',
             dn:        "#{Squash::Configuration.authentication.ldap.search_key}=newuser,#{Squash::Configuration.authentication.ldap.tree_base}"
         }
-        entry.stub(:dn).and_return(entry[:dn])
+        allow(entry).to receive(:dn).and_return(entry[:dn])
 
-        @ldap.should_receive(:search).once do |hsh|
+        expect(@ldap).to receive(:search).once { |hsh|
           hsh[:filter].to_raw_rfc2254 == "#{Squash::Configuration.authentication.ldap.search_key}=newuser"
-        end.and_yield(entry)
+        }.and_yield(entry)
 
-        @ldap.should_receive(:auth).once.with(
+        expect(@ldap).to receive(:auth).once.with(
             /#{Regexp.escape Squash::Configuration.authentication.ldap.search_key}=newuser,/,
             'password'
         )
 
         if Squash::Configuration.authentication.ldap[:bind_dn]
-          @ldap.should_receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
+          expect(@ldap).to receive(:auth).once.with(Squash::Configuration.authentication.ldap.bind_dn, Squash::Configuration.authentication.ldap.bind_password)
         end
 
-        @ldap.stub(:bind).and_return(true)
+        allow(@ldap).to receive(:bind).and_return(true)
 
-        @controller.should_receive(:log_in_user).once do |user|
+        expect(@controller).to receive(:log_in_user).once do |user|
           user.username == 'newuser' &&
               user.first_name == 'New' &&
               user.last_name == 'User'
         end
-        @controller.log_in('newuser', 'password').should be_true
+        expect(@controller.log_in('newuser', 'password')).to be_true
       end
     end
   end

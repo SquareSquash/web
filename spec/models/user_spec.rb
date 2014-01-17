@@ -19,47 +19,47 @@ describe User do
     it "should return the correct Gravatar URL" do
       user = FactoryGirl.create(:user, username: 'gravatar-test')
       Email.where(id: user.emails.first.id).update_all email: 'gravatar-test@example.com'
-      user.reload.gravatar.should eql('http://www.gravatar.com/avatar/db77ada176df02f0a82b5655c95a2705')
+      expect(user.reload.gravatar).to eql('http://www.gravatar.com/avatar/db77ada176df02f0a82b5655c95a2705')
     end if Squash::Configuration.authentication.strategy == 'ldap'
 
     it "should return the correct Gravatar URL" do
-      FactoryGirl.create(:user, email_address: 'gravatar@example.com').gravatar.
-          should eql('http://www.gravatar.com/avatar/0cef130e32e054dd516c99e5181d30c4')
+      expect(FactoryGirl.create(:user, email_address: 'gravatar@example.com').gravatar).
+          to eql('http://www.gravatar.com/avatar/0cef130e32e054dd516c99e5181d30c4')
     end if Squash::Configuration.authentication.strategy == 'password'
   end
 
   describe "#name" do
     it "should return a user's full name" do
-      FactoryGirl.create(:user).name.should eql("Sancho Sample")
+      expect(FactoryGirl.create(:user).name).to eql("Sancho Sample")
     end
 
     it "should handle just a first name" do
-      FactoryGirl.create(:user, last_name: nil).name.should eql("Sancho")
+      expect(FactoryGirl.create(:user, last_name: nil).name).to eql("Sancho")
     end
 
     it "should handle just a last name" do
-      FactoryGirl.create(:user, first_name: nil).name.should eql("Sample")
+      expect(FactoryGirl.create(:user, first_name: nil).name).to eql("Sample")
     end
 
     it "should return the username if no name is given" do
       user = FactoryGirl.create(:user, first_name: nil, last_name: nil)
-      user.name.should eql(user.username)
+      expect(user.name).to eql(user.username)
     end
   end
 
   describe "#email" do
     it "should return the user's corporate email address" do
-      FactoryGirl.create(:user, username: 'email-test').email.should eql("email-test@#{Squash::Configuration.mailer.domain}")
+      expect(FactoryGirl.create(:user, username: 'email-test').email).to eql("email-test@#{Squash::Configuration.mailer.domain}")
     end if Squash::Configuration.authentication.strategy == 'ldap'
 
     it "should return the user's corporate email address" do
-      FactoryGirl.create(:user, email_address: 'email-test@example.com').email.should eql("email-test@example.com")
+      expect(FactoryGirl.create(:user, email_address: 'email-test@example.com').email).to eql("email-test@example.com")
     end if Squash::Configuration.authentication.strategy == 'password'
   end
 
   describe "#distinguished_name" do
     it "should return a user's LDAP DN" do
-      FactoryGirl.create(:user, username: 'dn-test').distinguished_name.should eql("uid=dn-test,#{Squash::Configuration.authentication.ldap.tree_base}")
+      expect(FactoryGirl.create(:user, username: 'dn-test').distinguished_name).to eql("uid=dn-test,#{Squash::Configuration.authentication.ldap.tree_base}")
     end
   end if Squash::Configuration.authentication.strategy == 'ldap'
 
@@ -70,21 +70,21 @@ describe User do
 
       it "should return :owner for a project owner" do
         @project.update_attribute :owner, @user
-        @user.role(@project).should eql(:owner)
+        expect(@user.role(@project)).to eql(:owner)
       end
 
       it "should return :admin for a project admin" do
         FactoryGirl.create :membership, user: @user, project: @project, admin: true
-        @user.role(@project).should eql(:admin)
+        expect(@user.role(@project)).to eql(:admin)
       end
 
       it "should return :member for a project member" do
         FactoryGirl.create :membership, user: @user, project: @project, admin: false
-        @user.role(@project).should eql(:member)
+        expect(@user.role(@project)).to eql(:member)
       end
 
       it "should return nil otherwise" do
-        @user.role(@project).should be_nil
+        expect(@user.role(@project)).to be_nil
       end
     end
 
@@ -92,43 +92,43 @@ describe User do
       before(:all) { @comment = FactoryGirl.create(:comment) }
 
       it "should return :creator for the comment creator" do
-        @comment.user.role(@comment).should eql(:creator)
+        expect(@comment.user.role(@comment)).to eql(:creator)
       end
 
       it "should return :owner for a project owner" do
-        @comment.bug.environment.project.owner.role(@comment).should eql(:owner)
+        expect(@comment.bug.environment.project.owner.role(@comment)).to eql(:owner)
       end
 
       it "should return :admin for a project admin" do
         membership = FactoryGirl.create(:membership, project: @comment.bug.environment.project, admin: true)
-        membership.user.role(@comment).should eql(:admin)
+        expect(membership.user.role(@comment)).to eql(:admin)
       end
 
       it "should return nil for a project member" do
         membership = FactoryGirl.create(:membership, project: @comment.bug.environment.project, admin: false)
-        membership.user.role(@comment).should be_nil
+        expect(membership.user.role(@comment)).to be_nil
       end
 
       it "should return nil otherwise" do
-        FactoryGirl.create(:user).role(@comment).should be_nil
+        expect(FactoryGirl.create(:user).role(@comment)).to be_nil
       end
     end
   end
 
   context '[hooks]' do
     it "should downcase the username" do
-      FactoryGirl.create(:user, username: 'TestCase').username.should eql('testcase')
+      expect(FactoryGirl.create(:user, username: 'TestCase').username).to eql('testcase')
     end
   end
 
   describe "#watches?" do
     it "should return a Watch for a watched bug" do
       watch = FactoryGirl.create(:watch)
-      watch.user.watches?(watch.bug).should eql(watch)
+      expect(watch.user.watches?(watch.bug)).to eql(watch)
     end
 
     it "should return nil for an unwatched bug" do
-      FactoryGirl.create(:user).watches?(FactoryGirl.create(:bug)).should be_nil
+      expect(FactoryGirl.create(:user).watches?(FactoryGirl.create(:bug))).to be_nil
     end
   end
 
@@ -139,43 +139,43 @@ describe User do
     end
 
     it "should return the primary email" do
-      @user.email.should eql(@user.emails.where(primary: true).first.email)
+      expect(@user.email).to eql(@user.emails.where(primary: true).first.email)
     end
   end
 
   describe "[primary email]" do
     it "should automatically create one" do
       user = FactoryGirl.create(:user, username: 'primary_email_test')
-      user.emails.size.should eql(1)
-      user.emails.first.email.should eql("primary_email_test@#{Squash::Configuration.mailer.domain}")
-      user.emails.first.should be_primary
+      expect(user.emails.size).to eql(1)
+      expect(user.emails.first.email).to eql("primary_email_test@#{Squash::Configuration.mailer.domain}")
+      expect(user.emails.first).to be_primary
     end if Squash::Configuration.authentication.strategy == 'ldap'
 
     it "should automatically create one" do
       user = FactoryGirl.create(:user, username: 'primary_email_test', email_address: 'primary@example.com')
-      user.emails.size.should eql(1)
-      user.emails.first.email.should eql("primary@example.com")
-      user.emails.first.should be_primary
+      expect(user.emails.size).to eql(1)
+      expect(user.emails.first.email).to eql("primary@example.com")
+      expect(user.emails.first).to be_primary
     end if Squash::Configuration.authentication.strategy == 'password'
 
     it "should require a unique email" do
       FactoryGirl.create :user, email_address: 'taken@example.com'
       user = FactoryGirl.build(:user, email_address: 'taken@example.com')
-      user.should_not be_valid
-      user.errors[:email_address].should eql(['already taken'])
+      expect(user).not_to be_valid
+      expect(user.errors[:email_address]).to eql(['already taken'])
     end if Squash::Configuration.authentication.strategy == 'password'
   end
 
   context "[password-based authentication]" do
     it "should encrypt the user's password on save" do
-      FactoryGirl.create(:user).crypted_password.should_not be_nil
+      expect(FactoryGirl.create(:user).crypted_password).not_to be_nil
     end
 
     describe "#authentic?" do
       it "should return true for valid credentials and false for invalid credentials" do
         user = FactoryGirl.create(:user, password: 'developers developers developers developers')
-        user.authentic?('developers developers developers').should be_false
-        user.authentic?('developers developers developers developers').should be_true
+        expect(user.authentic?('developers developers developers')).to be_false
+        expect(user.authentic?('developers developers developers developers')).to be_true
       end
     end
   end if Squash::Configuration.authentication.strategy == 'password'

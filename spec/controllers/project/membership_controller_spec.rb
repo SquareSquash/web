@@ -23,8 +23,8 @@ describe Project::MembershipController do
 
     it "should require a logged-in user" do
       post :join, project_id: @project.to_param
-      response.should redirect_to(login_url(next: request.fullpath))
-      @project.memberships.count.should eql(1)
+      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(@project.memberships.count).to eql(1)
     end
 
     context "[authenticated]" do
@@ -34,16 +34,16 @@ describe Project::MembershipController do
         FactoryGirl.create :membership, project: @project, user: @user
         post :join, project_id: @project.to_param
 
-        response.should redirect_to(project_url(@project))
-        @project.memberships.count.should eql(2)
+        expect(response).to redirect_to(project_url(@project))
+        expect(@project.memberships.count).to eql(2)
       end
 
       it "should create a new membership" do
         post :join, project_id: @project.to_param
 
-        response.should redirect_to(project_url(@project))
-        @project.memberships.count.should eql(2)
-        @user.role(@project).should eql(:member)
+        expect(response).to redirect_to(project_url(@project))
+        expect(@project.memberships.count).to eql(2)
+        expect(@user.role(@project)).to eql(:member)
       end
     end
   end
@@ -53,8 +53,8 @@ describe Project::MembershipController do
 
     it "should require a logged-in user" do
       patch :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
-      response.should redirect_to(login_url(next: request.fullpath))
-      @membership.reload.send_comment_emails.should be_false
+      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(@membership.reload.send_comment_emails).to be_false
     end
 
     context "[authenticated]" do
@@ -62,14 +62,14 @@ describe Project::MembershipController do
 
       it "should modify the membership" do
         patch :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
-        response.status.should redirect_to(edit_project_my_membership_url(@membership.project))
-        @membership.reload.send_comment_emails.should be_true
+        expect(response.status).to redirect_to(edit_project_my_membership_url(@membership.project))
+        expect(@membership.reload.send_comment_emails).to be_true
       end
 
       it "should not allow protected attributes to be updated" do
         patch :update, project_id: @membership.project.to_param, membership: {project_id: 123}
-        response.status.should eql(400)
-        -> { @membership.reload }.should_not change(@membership, :project_id)
+        expect(response.status).to eql(400)
+        expect { @membership.reload }.not_to change(@membership, :project_id)
       end
     end
   end
@@ -79,13 +79,13 @@ describe Project::MembershipController do
 
     it "should require a logged-in user" do
       delete :destroy, project_id: @membership.project.to_param
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     it "should not allow the owner to delete his/her project" do
       login_as @membership.project.owner
       delete :destroy, project_id: @membership.project.to_param
-      response.should redirect_to(account_url)
+      expect(response).to redirect_to(account_url)
     end
 
     context "[authenticated]" do
@@ -93,8 +93,8 @@ describe Project::MembershipController do
 
       it "should delete the membership" do
         delete :destroy, project_id: @membership.project.to_param
-        response.should redirect_to(account_url)
-        -> { @membership.reload }.should raise_error(ActiveRecord::RecordNotFound)
+        expect(response).to redirect_to(account_url)
+        expect { @membership.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

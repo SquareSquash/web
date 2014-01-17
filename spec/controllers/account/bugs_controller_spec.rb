@@ -24,7 +24,7 @@ describe Account::BugsController do
 
     it "should require a logged-in user" do
       get :index
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -53,19 +53,19 @@ describe Account::BugsController do
 
           it "should load 50 of the most recently watched bugs by default" do
             get :index, format: 'json', type: 'watched'
-            response.status.should eql(200)
-            JSON.parse(response.body).map { |r| r['number'] }.should eql(@watches.map(&:bug).map(&:number)[0, 5])
+            expect(response.status).to eql(200)
+            expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@watches.map(&:bug).map(&:number)[0, 5])
           end
 
           it "should return the next 50 bugs when given a last parameter" do
             get :index, last: @watches[4].bug.id, format: 'json', type: 'watched'
-            response.status.should eql(200)
-            JSON.parse(response.body).map { |r| r['number'] }.should eql(@watches.map(&:bug).map(&:number)[5, 5])
+            expect(response.status).to eql(200)
+            expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@watches.map(&:bug).map(&:number)[5, 5])
           end
 
           it "should decorate the bug JSON" do
             get :index, format: 'json', type: 'watched'
-            JSON.parse(response.body).each { |bug| bug['href'].should =~ /\/projects\/.+?\/environments\/.+?\/bugs\/#{bug['number']}/ }
+            JSON.parse(response.body).each { |bug| expect(bug['href']).to match(/\/projects\/.+?\/environments\/.+?\/bugs\/#{bug['number']}/) }
           end
         end
 
@@ -91,19 +91,19 @@ describe Account::BugsController do
 
           it "should load 50 of the newest assigned bugs by default" do
             get :index, format: 'json'
-            response.status.should eql(200)
-            JSON.parse(response.body).map { |r| r['number'] }.should eql(@bugs.map(&:number)[0, 5])
+            expect(response.status).to eql(200)
+            expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@bugs.map(&:number)[0, 5])
           end
 
           it "should return the next 50 bugs when given a last parameter" do
             get :index, last: @bugs[4].number, format: 'json'
-            response.status.should eql(200)
-            JSON.parse(response.body).map { |r| r['number'] }.should eql(@bugs.map(&:number)[5, 5])
+            expect(response.status).to eql(200)
+            expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@bugs.map(&:number)[5, 5])
           end
 
           it "should decorate the bug JSON" do
             get :index, format: 'json'
-            JSON.parse(response.body).each { |bug| bug['href'].should =~ /\/projects\/.+?\/environments\/.+?\/bugs\/#{bug['number']}/ }
+            JSON.parse(response.body).each { |bug| expect(bug['href']).to match(/\/projects\/.+?\/environments\/.+?\/bugs\/#{bug['number']}/) }
           end
         end
       end

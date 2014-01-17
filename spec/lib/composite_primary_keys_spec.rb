@@ -18,12 +18,12 @@ describe ActiveRecord::Base do
   describe "#touch" do
     it "should update a single-key record" do
       user = FactoryGirl.create(:user, created_at: 1.day.ago, updated_at: 1.day.ago)
-      -> { user.touch.should be_true }.should change(user, :updated_at)
+      expect { expect(user.touch).to be_true }.to change(user, :updated_at)
     end
 
     it "should update a multi-key record" do
       nt = FactoryGirl.create(:notification_threshold, last_tripped_at: 1.day.ago)
-      -> { nt.touch(:last_tripped_at).should be_true }.should change(nt, :last_tripped_at)
+      expect { expect(nt.touch(:last_tripped_at)).to be_true }.to change(nt, :last_tripped_at)
     end
   end
 end

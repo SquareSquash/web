@@ -29,7 +29,7 @@ describe OccurrencesController do
 
     it "should require a logged-in user" do
       get :index, polymorphic_params(@bug, true)
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -40,21 +40,21 @@ describe OccurrencesController do
       context '[JSON]' do
         it "should load the first 50 occurrences" do
           get :index, polymorphic_params(@bug, true, format: 'json')
-          response.status.should eql(200)
-          JSON.parse(response.body).map { |r| r['number'] }.should eql(sort(@occurrences, true).map(&:number)[0, 50])
+          expect(response.status).to eql(200)
+          expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(sort(@occurrences, true).map(&:number)[0, 50])
         end
 
         it "should load the first 50 occurrences ascending" do
           get :index, polymorphic_params(@bug, true, format: 'json', dir: 'asc')
-          response.status.should eql(200)
-          JSON.parse(response.body).map { |r| r['number'] }.should eql(sort(@occurrences).map(&:number)[0, 50])
+          expect(response.status).to eql(200)
+          expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(sort(@occurrences).map(&:number)[0, 50])
         end
 
         it "should load the next 50 occurrences" do
           sort @occurrences, true
           get :index, polymorphic_params(@bug, true, format: 'json', last: @occurrences[49].number)
-          response.status.should eql(200)
-          JSON.parse(response.body).map { |r| r['number'] }.should eql(@occurrences.map(&:number)[50, 50])
+          expect(response.status).to eql(200)
+          expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@occurrences.map(&:number)[50, 50])
         end
       end
     end
@@ -68,7 +68,7 @@ describe OccurrencesController do
 
     it "should require a logged-in user" do
       get :histogram, polymorphic_params(@bug, true)
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -81,26 +81,26 @@ describe OccurrencesController do
 
       before :each do
         login_as @bug.environment.project.owner
-        Time.stub(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
+        allow(Time).to receive(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
       end
 
       it_should_behave_like "action that 404s at appropriate times", :get, :histogram, "polymorphic_params(@bug, true, dimensions: %w( host pid ), step: 1000*60*60*5, size: 20, format: 'json')"
 
       it "should return a histogram of occurrence frequencies and deploys" do
         get :histogram, polymorphic_params(@bug, true, dimensions: %w( host pid ), step: 1000*60*60*5, size: 20, format: 'json')
-        response.status.should eql(200)
+        expect(response.status).to eql(200)
         json = JSON.parse(response.body)
-        json['occurrences'].should eql([
+        expect(json['occurrences']).to eql([
                                                                 [1234544400000, 1], [1234548000000, 5], [1234551600000, 4], [1234555200000, 5], [1234558800000, 4], [1234562400000, 5], [1234566000000, 3]
                                                             ])
-        json['deploys'].map { |d| d['revision'] }.should eql(%w(30e7c2ff8758f4f19bfbc0a57e26c19ab69d1d44))
+        expect(json['deploys'].map { |d| d['revision'] }).to eql(%w(30e7c2ff8758f4f19bfbc0a57e26c19ab69d1d44))
       end
 
       it "should return empty arrays for bugs with no recent occurrences" do
         @bug.occurrences.delete_all
         get :histogram, polymorphic_params(@bug, true, dimensions: %w( host pid ), step: 1000*60*60*5, size: 20, format: 'json')
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql('occurrences' => [], 'deploys' => [])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql('occurrences' => [], 'deploys' => [])
       end
     end
   end
@@ -110,7 +110,7 @@ describe OccurrencesController do
 
     it "should require a logged-in user" do
       get :aggregate, polymorphic_params(@bug, true)
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -127,15 +127,15 @@ describe OccurrencesController do
 
       before :each do
         login_as @bug.environment.project.owner
-        Time.stub(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
+        allow(Time).to receive(:now).and_return(Time.at(1234567890)) # make sure we don't get boundary errors
       end
 
       it_should_behave_like "action that 404s at appropriate times", :get, :aggregate, "polymorphic_params(@bug, true, dimensions: %w( host pid ), step: 1000*60*60*5, size: 20, format: 'json')"
 
       it "should aggregate occurrences based on given dimensions" do
         get :aggregate, polymorphic_params(@bug, true, dimensions: %w( host pid ), step: 1000*60*60*5, size: 20, format: 'json')
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql({
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql({
                                                  "host" => [
                                                      {"label" => "host2", "data" => [[1234209600000, 100.0], [1234213200000, 100.0], [1234216800000, 0.0], [1234220400000, 0.0], [1234224000000, 100.0], [1234227600000, 100.0], [1234231200000, 0.0], [1234234800000, 0.0], [1234238400000, 100.0], [1234242000000, 100.0], [1234245600000, 0.0], [1234249200000, 0.0], [1234252800000, 100.0], [1234256400000, 100.0], [1234260000000, 0.0], [1234263600000, 0.0], [1234267200000, 100.0], [1234270800000, 100.0], [1234274400000, 0.0], [1234278000000, 0.0], [1234281600000, 100.0], [1234285200000, 100.0], [1234288800000, 0.0], [1234292400000, 0.0], [1234296000000, 100.0], [1234299600000, 100.0], [1234303200000, 0.0], [1234306800000, 0.0], [1234310400000, 100.0], [1234314000000, 100.0], [1234317600000, 0.0], [1234321200000, 0.0], [1234324800000, 100.0], [1234328400000, 100.0], [1234332000000, 0.0], [1234335600000, 0.0], [1234339200000, 100.0], [1234342800000, 100.0], [1234346400000, 0.0], [1234350000000, 0.0], [1234353600000, 100.0], [1234357200000, 100.0], [1234360800000, 0.0], [1234364400000, 0.0], [1234368000000, 100.0], [1234371600000, 100.0], [1234375200000, 0.0], [1234378800000, 0.0], [1234382400000, 100.0], [1234386000000, 100.0], [1234389600000, 0.0], [1234393200000, 0.0], [1234396800000, 100.0], [1234400400000, 100.0], [1234404000000, 0.0], [1234407600000, 0.0], [1234411200000, 100.0], [1234414800000, 100.0], [1234418400000, 0.0], [1234422000000, 0.0], [1234425600000, 100.0], [1234429200000, 100.0], [1234432800000, 0.0], [1234436400000, 0.0], [1234440000000, 100.0], [1234443600000, 100.0], [1234447200000, 0.0], [1234450800000, 0.0], [1234454400000, 100.0], [1234458000000, 100.0], [1234461600000, 0.0], [1234465200000, 0.0], [1234468800000, 100.0], [1234472400000, 100.0], [1234476000000, 0.0], [1234479600000, 0.0], [1234483200000, 100.0], [1234486800000, 100.0], [1234490400000, 0.0], [1234494000000, 0.0], [1234497600000, 100.0], [1234501200000, 100.0], [1234504800000, 0.0], [1234508400000, 0.0], [1234512000000, 100.0], [1234515600000, 100.0], [1234519200000, 0.0], [1234522800000, 0.0], [1234526400000, 100.0], [1234530000000, 100.0], [1234533600000, 0.0], [1234537200000, 0.0], [1234540800000, 100.0], [1234544400000, 100.0], [1234548000000, 0.0], [1234551600000, 0.0], [1234555200000, 100.0], [1234558800000, 100.0], [1234562400000, 0.0], [1234566000000, 0.0]]},
                                                      {"label" => "host1", "data" => [[1234209600000, 0.0], [1234213200000, 0.0], [1234216800000, 100.0], [1234220400000, 100.0], [1234224000000, 0.0], [1234227600000, 0.0], [1234231200000, 100.0], [1234234800000, 100.0], [1234238400000, 0.0], [1234242000000, 0.0], [1234245600000, 100.0], [1234249200000, 100.0], [1234252800000, 0.0], [1234256400000, 0.0], [1234260000000, 100.0], [1234263600000, 100.0], [1234267200000, 0.0], [1234270800000, 0.0], [1234274400000, 100.0], [1234278000000, 100.0], [1234281600000, 0.0], [1234285200000, 0.0], [1234288800000, 100.0], [1234292400000, 100.0], [1234296000000, 0.0], [1234299600000, 0.0], [1234303200000, 100.0], [1234306800000, 100.0], [1234310400000, 0.0], [1234314000000, 0.0], [1234317600000, 100.0], [1234321200000, 100.0], [1234324800000, 0.0], [1234328400000, 0.0], [1234332000000, 100.0], [1234335600000, 100.0], [1234339200000, 0.0], [1234342800000, 0.0], [1234346400000, 100.0], [1234350000000, 100.0], [1234353600000, 0.0], [1234357200000, 0.0], [1234360800000, 100.0], [1234364400000, 100.0], [1234368000000, 0.0], [1234371600000, 0.0], [1234375200000, 100.0], [1234378800000, 100.0], [1234382400000, 0.0], [1234386000000, 0.0], [1234389600000, 100.0], [1234393200000, 100.0], [1234396800000, 0.0], [1234400400000, 0.0], [1234404000000, 100.0], [1234407600000, 100.0], [1234411200000, 0.0], [1234414800000, 0.0], [1234418400000, 100.0], [1234422000000, 100.0], [1234425600000, 0.0], [1234429200000, 0.0], [1234432800000, 100.0], [1234436400000, 100.0], [1234440000000, 0.0], [1234443600000, 0.0], [1234447200000, 100.0], [1234450800000, 100.0], [1234454400000, 0.0], [1234458000000, 0.0], [1234461600000, 100.0], [1234465200000, 100.0], [1234468800000, 0.0], [1234472400000, 0.0], [1234476000000, 100.0], [1234479600000, 100.0], [1234483200000, 0.0], [1234486800000, 0.0], [1234490400000, 100.0], [1234494000000, 100.0], [1234497600000, 0.0], [1234501200000, 0.0], [1234504800000, 100.0], [1234508400000, 100.0], [1234512000000, 0.0], [1234515600000, 0.0], [1234519200000, 100.0], [1234522800000, 100.0], [1234526400000, 0.0], [1234530000000, 0.0], [1234533600000, 100.0], [1234537200000, 100.0], [1234540800000, 0.0], [1234544400000, 0.0], [1234548000000, 100.0], [1234551600000, 100.0], [1234555200000, 0.0], [1234558800000, 0.0], [1234562400000, 100.0], [1234566000000, 100.0]]}
@@ -149,7 +149,7 @@ describe OccurrencesController do
 
       it "should collapse duplicate dimensions" do
         get :aggregate, polymorphic_params(@bug, true, dimensions: %w( host host pid ), step: 1000*60*60*5, size: 20, format: 'json')
-        JSON.parse(response.body).should eql({
+        expect(JSON.parse(response.body)).to eql({
                                                  "host" => [
                                                      {"label" => "host2", "data" => [[1234209600000, 100.0], [1234213200000, 100.0], [1234216800000, 0.0], [1234220400000, 0.0], [1234224000000, 100.0], [1234227600000, 100.0], [1234231200000, 0.0], [1234234800000, 0.0], [1234238400000, 100.0], [1234242000000, 100.0], [1234245600000, 0.0], [1234249200000, 0.0], [1234252800000, 100.0], [1234256400000, 100.0], [1234260000000, 0.0], [1234263600000, 0.0], [1234267200000, 100.0], [1234270800000, 100.0], [1234274400000, 0.0], [1234278000000, 0.0], [1234281600000, 100.0], [1234285200000, 100.0], [1234288800000, 0.0], [1234292400000, 0.0], [1234296000000, 100.0], [1234299600000, 100.0], [1234303200000, 0.0], [1234306800000, 0.0], [1234310400000, 100.0], [1234314000000, 100.0], [1234317600000, 0.0], [1234321200000, 0.0], [1234324800000, 100.0], [1234328400000, 100.0], [1234332000000, 0.0], [1234335600000, 0.0], [1234339200000, 100.0], [1234342800000, 100.0], [1234346400000, 0.0], [1234350000000, 0.0], [1234353600000, 100.0], [1234357200000, 100.0], [1234360800000, 0.0], [1234364400000, 0.0], [1234368000000, 100.0], [1234371600000, 100.0], [1234375200000, 0.0], [1234378800000, 0.0], [1234382400000, 100.0], [1234386000000, 100.0], [1234389600000, 0.0], [1234393200000, 0.0], [1234396800000, 100.0], [1234400400000, 100.0], [1234404000000, 0.0], [1234407600000, 0.0], [1234411200000, 100.0], [1234414800000, 100.0], [1234418400000, 0.0], [1234422000000, 0.0], [1234425600000, 100.0], [1234429200000, 100.0], [1234432800000, 0.0], [1234436400000, 0.0], [1234440000000, 100.0], [1234443600000, 100.0], [1234447200000, 0.0], [1234450800000, 0.0], [1234454400000, 100.0], [1234458000000, 100.0], [1234461600000, 0.0], [1234465200000, 0.0], [1234468800000, 100.0], [1234472400000, 100.0], [1234476000000, 0.0], [1234479600000, 0.0], [1234483200000, 100.0], [1234486800000, 100.0], [1234490400000, 0.0], [1234494000000, 0.0], [1234497600000, 100.0], [1234501200000, 100.0], [1234504800000, 0.0], [1234508400000, 0.0], [1234512000000, 100.0], [1234515600000, 100.0], [1234519200000, 0.0], [1234522800000, 0.0], [1234526400000, 100.0], [1234530000000, 100.0], [1234533600000, 0.0], [1234537200000, 0.0], [1234540800000, 100.0], [1234544400000, 100.0], [1234548000000, 0.0], [1234551600000, 0.0], [1234555200000, 100.0], [1234558800000, 100.0], [1234562400000, 0.0], [1234566000000, 0.0]]},
                                                      {"label" => "host1", "data" => [[1234209600000, 0.0], [1234213200000, 0.0], [1234216800000, 100.0], [1234220400000, 100.0], [1234224000000, 0.0], [1234227600000, 0.0], [1234231200000, 100.0], [1234234800000, 100.0], [1234238400000, 0.0], [1234242000000, 0.0], [1234245600000, 100.0], [1234249200000, 100.0], [1234252800000, 0.0], [1234256400000, 0.0], [1234260000000, 100.0], [1234263600000, 100.0], [1234267200000, 0.0], [1234270800000, 0.0], [1234274400000, 100.0], [1234278000000, 100.0], [1234281600000, 0.0], [1234285200000, 0.0], [1234288800000, 100.0], [1234292400000, 100.0], [1234296000000, 0.0], [1234299600000, 0.0], [1234303200000, 100.0], [1234306800000, 100.0], [1234310400000, 0.0], [1234314000000, 0.0], [1234317600000, 100.0], [1234321200000, 100.0], [1234324800000, 0.0], [1234328400000, 0.0], [1234332000000, 100.0], [1234335600000, 100.0], [1234339200000, 0.0], [1234342800000, 0.0], [1234346400000, 100.0], [1234350000000, 100.0], [1234353600000, 0.0], [1234357200000, 0.0], [1234360800000, 100.0], [1234364400000, 100.0], [1234368000000, 0.0], [1234371600000, 0.0], [1234375200000, 100.0], [1234378800000, 100.0], [1234382400000, 0.0], [1234386000000, 0.0], [1234389600000, 100.0], [1234393200000, 100.0], [1234396800000, 0.0], [1234400400000, 0.0], [1234404000000, 100.0], [1234407600000, 100.0], [1234411200000, 0.0], [1234414800000, 0.0], [1234418400000, 100.0], [1234422000000, 100.0], [1234425600000, 0.0], [1234429200000, 0.0], [1234432800000, 100.0], [1234436400000, 100.0], [1234440000000, 0.0], [1234443600000, 0.0], [1234447200000, 100.0], [1234450800000, 100.0], [1234454400000, 0.0], [1234458000000, 0.0], [1234461600000, 100.0], [1234465200000, 100.0], [1234468800000, 0.0], [1234472400000, 0.0], [1234476000000, 100.0], [1234479600000, 100.0], [1234483200000, 0.0], [1234486800000, 0.0], [1234490400000, 100.0], [1234494000000, 100.0], [1234497600000, 0.0], [1234501200000, 0.0], [1234504800000, 100.0], [1234508400000, 100.0], [1234512000000, 0.0], [1234515600000, 0.0], [1234519200000, 100.0], [1234522800000, 100.0], [1234526400000, 0.0], [1234530000000, 0.0], [1234533600000, 100.0], [1234537200000, 100.0], [1234540800000, 0.0], [1234544400000, 0.0], [1234548000000, 100.0], [1234551600000, 100.0], [1234555200000, 0.0], [1234558800000, 0.0], [1234562400000, 100.0], [1234566000000, 100.0]]}
@@ -163,23 +163,23 @@ describe OccurrencesController do
 
       it "should 422 for non-aggregating dimensions" do
         get :aggregate, polymorphic_params(@bug, true, dimensions: %w( host pid lat ), step: 1000*60*60*5, size: 20, format: 'json')
-        response.status.should eql(422)
+        expect(response.status).to eql(422)
       end
 
       it "should 422 for nonexistent dimensions" do
         get :aggregate, polymorphic_params(@bug, true, dimensions: %w( host pid madeup ), step: 1000*60*60*5, size: 20, format: 'json')
-        response.status.should eql(422)
+        expect(response.status).to eql(422)
       end
 
       it "should return an empty array given no dimensions" do
         get :aggregate, polymorphic_params(@bug, true, dimensions: [], step: 1000*60*60*5, size: 20, format: 'json')
-        response.status.should eql(200)
-        response.body.should eql('[]')
+        expect(response.status).to eql(200)
+        expect(response.body).to eql('[]')
       end
 
       it "should 422 given too many dimensions" do
         get :aggregate, polymorphic_params(@bug, true, dimensions: %w( host pid client revision browser_os ), step: 1000*60*60*5, size: 20, format: 'json')
-        response.status.should eql(422)
+        expect(response.status).to eql(422)
       end
     end
   end
@@ -189,7 +189,7 @@ describe OccurrencesController do
 
     it "should require a logged-in user" do
       get :aggregate, polymorphic_params(@occurrence, false)
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -201,7 +201,7 @@ describe OccurrencesController do
 
       it "should not raise an exception for improperly-formatted JSON" do
         @occurrence.ivars = {foo: {bar: 'baz'}}
-        -> { get :show, polymorphic_params(@occurrence, false) }.should_not raise_error
+        expect { get :show, polymorphic_params(@occurrence, false) }.not_to raise_error
       end
     end
   end

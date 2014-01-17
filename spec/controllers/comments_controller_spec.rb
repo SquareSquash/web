@@ -28,7 +28,7 @@ describe CommentsController do
 
     it "should require a logged-in user" do
       get :index, polymorphic_params(@bug, true)
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -38,8 +38,8 @@ describe CommentsController do
 
       it "should load the 50 most recent comments" do
         get :index, polymorphic_params(@bug, true, format: 'json')
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |r| r['number'] }.should eql(@comments.sort_by(&:created_at).reverse.map(&:number)[0, 50])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@comments.sort_by(&:created_at).reverse.map(&:number)[0, 50])
       end
 
       it "should return the next 50 comments when given a last parameter" do
@@ -47,17 +47,17 @@ describe CommentsController do
         @comments.reverse!
 
         get :index, polymorphic_params(@bug, true, last: @comments[49].number, format: 'json')
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |r| r['number'] }.should eql(@comments.map(&:number)[50, 50])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@comments.map(&:number)[50, 50])
       end
 
       it "should decorate the response" do
         get :index, polymorphic_params(@bug, true, format: 'json')
         JSON.parse(response.body).zip(@comments.sort_by(&:created_at).reverse).each do |(hsh, comment)|
-          hsh['user']['username'].should eql(comment.user.username)
-          hsh['body_html'].should eql(ApplicationController.new.send(:markdown).(comment.body))
-          hsh['user_url'].should eql(user_url(comment.user))
-          hsh['url'].should eql(project_environment_bug_comment_url(@env.project, @env, @bug, comment, format: 'json'))
+          expect(hsh['user']['username']).to eql(comment.user.username)
+          expect(hsh['body_html']).to eql(ApplicationController.new.send(:markdown).(comment.body))
+          expect(hsh['user_url']).to eql(user_url(comment.user))
+          expect(hsh['url']).to eql(project_environment_bug_comment_url(@env.project, @env, @bug, comment, format: 'json'))
         end
       end
     end
@@ -73,8 +73,8 @@ describe CommentsController do
 
     it "should require a logged-in user" do
       post :create, polymorphic_params(@bug, true, comment: {body: 'Hello, world!'})
-      response.should redirect_to(login_url(next: request.fullpath))
-      @bug.comments(true).should be_empty
+      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(@bug.comments(true)).to be_empty
     end
 
     context '[authenticated]' do
@@ -84,21 +84,21 @@ describe CommentsController do
 
       it "should create the comment" do
         post :create, polymorphic_params(@bug, true, comment: {body: 'Hello, world!'}, format: 'json')
-        response.status.should eql(201)
-        (comment = @bug.comments(true).first).should_not be_nil
-        response.body.should eql(comment.to_json)
+        expect(response.status).to eql(201)
+        expect(comment = @bug.comments(true).first).not_to be_nil
+        expect(response.body).to eql(comment.to_json)
       end
 
       it "should discard fields not accessible to creators" do
         @bug.comments.delete_all
         post :create, polymorphic_params(@bug, true, comment: {user_id: FactoryGirl.create(:membership, project: @env.project).user_id, body: 'Hello, world!'}, format: 'json')
-        @bug.comments(true).should be_empty
+        expect(@bug.comments(true)).to be_empty
       end
 
       it "should render the errors with status 422 if invalid" do
         post :create, polymorphic_params(@bug, true, comment: {body: ''}, format: 'json')
-        response.status.should eql(422)
-        response.body.should eql("{\"comment\":{\"body\":[\"can’t be blank\"]}}")
+        expect(response.status).to eql(422)
+        expect(response.body).to eql("{\"comment\":{\"body\":[\"can’t be blank\"]}}")
       end
     end
   end
@@ -108,8 +108,8 @@ describe CommentsController do
 
     it "should require a logged-in user" do
       patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
-      response.status.should eql(401)
-      @comment.reload.body.should_not eql('Hello, world!')
+      expect(response.status).to eql(401)
+      expect(@comment.reload.body).not_to eql('Hello, world!')
     end
 
     context '[authenticated]' do
@@ -120,35 +120,35 @@ describe CommentsController do
 
       it "should update the comment" do
         patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
-        response.status.should eql(200)
-        @comment.reload.body.should eql('Hello, world!')
-        response.body.should eql(@comment.to_json)
+        expect(response.status).to eql(200)
+        expect(@comment.reload.body).to eql('Hello, world!')
+        expect(response.body).to eql(@comment.to_json)
       end
 
       it "should allow admins to update any comment" do
         login_as FactoryGirl.create(:membership, project: @comment.bug.environment.project, admin: true).user
         patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
-        response.status.should eql(200)
-        @comment.reload.body.should eql('Hello, world!')
+        expect(response.status).to eql(200)
+        expect(@comment.reload.body).to eql('Hello, world!')
       end
 
       it "should allow owners to update any comment" do
         login_as @comment.bug.environment.project.owner
         patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
-        response.status.should eql(200)
-        @comment.reload.body.should eql('Hello, world!')
+        expect(response.status).to eql(200)
+        expect(@comment.reload.body).to eql('Hello, world!')
       end
 
       it "should not allow other members to update any comment" do
         login_as FactoryGirl.create(:membership, project: @comment.bug.environment.project, admin: false).user
         patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!'}, format: 'json')
-        response.status.should eql(403)
-        @comment.reload.body.should_not eql('Hello, world!')
+        expect(response.status).to eql(403)
+        expect(@comment.reload.body).not_to eql('Hello, world!')
       end
 
       it "should not allow inaccessible fields to be updated" do
         patch :update, polymorphic_params(@comment, false, comment: {body: 'Hello, world!', number: 123}, format: 'json')
-        @comment.reload.number.should_not eql(123)
+        expect(@comment.reload.number).not_to eql(123)
       end
     end
   end
@@ -158,8 +158,8 @@ describe CommentsController do
 
     it "should require a logged-in user" do
       delete :destroy, polymorphic_params(@comment, false, format: 'json')
-      response.status.should eql(401)
-      -> { @comment.reload }.should_not raise_error
+      expect(response.status).to eql(401)
+      expect { @comment.reload }.not_to raise_error
     end
 
     context '[authenticated]' do
@@ -170,8 +170,8 @@ describe CommentsController do
 
       it "should destroy the comment" do
         delete :destroy, polymorphic_params(@comment, false)
-        response.status.should eql(204)
-        -> { @comment.reload }.should raise_error(ActiveRecord::RecordNotFound)
+        expect(response.status).to eql(204)
+        expect { @comment.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

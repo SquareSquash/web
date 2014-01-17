@@ -32,33 +32,33 @@ relation "users" does not exist
 
   describe "#matched_substring" do
     it "should remove the query from an error message" do
-      MessageTemplateMatcher.instance.matched_substring('Mysql::Error', @mysql_error).should eql("Duplicate entry 'foo@example.com' for key 'index_users_on_email'")
+      expect(MessageTemplateMatcher.instance.matched_substring('Mysql::Error', @mysql_error)).to eql("Duplicate entry 'foo@example.com' for key 'index_users_on_email'")
     end
 
     it "should return the original message if no match was found" do
-      MessageTemplateMatcher.instance.matched_substring('SomeError', @mysql_error).should eql(@mysql_error)
-      MessageTemplateMatcher.instance.matched_substring('Mysql::Error', 'foobar').should eql('foobar')
+      expect(MessageTemplateMatcher.instance.matched_substring('SomeError', @mysql_error)).to eql(@mysql_error)
+      expect(MessageTemplateMatcher.instance.matched_substring('Mysql::Error', 'foobar')).to eql('foobar')
     end
 
     it "should use references to other error types" do
-      MessageTemplateMatcher.instance.matched_substring('ActiveRecord::JDBCError', 'ERROR: ' + @mysql_error).should eql("Duplicate entry 'foo@example.com' for key 'index_users_on_email'")
-      MessageTemplateMatcher.instance.matched_substring('ActiveRecord::JDBCError', 'ERROR: ' + @pg_error).should eql('ERROR: relation "users" does not exist')
+      expect(MessageTemplateMatcher.instance.matched_substring('ActiveRecord::JDBCError', 'ERROR: ' + @mysql_error)).to eql("Duplicate entry 'foo@example.com' for key 'index_users_on_email'")
+      expect(MessageTemplateMatcher.instance.matched_substring('ActiveRecord::JDBCError', 'ERROR: ' + @pg_error)).to eql('ERROR: relation "users" does not exist')
     end
   end
 
   describe "#sanitized_message" do
     it "should filter the error message" do
-      MessageTemplateMatcher.instance.sanitized_message('Mysql::Error', @mysql_error).should eql("Duplicate entry '[STRING]' for key '[STRING]'")
+      expect(MessageTemplateMatcher.instance.sanitized_message('Mysql::Error', @mysql_error)).to eql("Duplicate entry '[STRING]' for key '[STRING]'")
     end
 
     it "should return nil if no match was found" do
-      MessageTemplateMatcher.instance.sanitized_message('SomeError', @mysql_error).should be_nil
-      MessageTemplateMatcher.instance.sanitized_message('Mysql::Error', 'foobar').should be_nil
+      expect(MessageTemplateMatcher.instance.sanitized_message('SomeError', @mysql_error)).to be_nil
+      expect(MessageTemplateMatcher.instance.sanitized_message('Mysql::Error', 'foobar')).to be_nil
     end
 
     it "should use references to other error types" do
-      MessageTemplateMatcher.instance.sanitized_message('ActiveRecord::JDBCError', 'ERROR: ' + @mysql_error).should eql("Duplicate entry '[STRING]' for key '[STRING]'")
-      MessageTemplateMatcher.instance.sanitized_message('ActiveRecord::JDBCError', 'ERROR: ' + @pg_error).should eql('[STRING] [STRING] does not exist')
+      expect(MessageTemplateMatcher.instance.sanitized_message('ActiveRecord::JDBCError', 'ERROR: ' + @mysql_error)).to eql("Duplicate entry '[STRING]' for key '[STRING]'")
+      expect(MessageTemplateMatcher.instance.sanitized_message('ActiveRecord::JDBCError', 'ERROR: ' + @pg_error)).to eql('[STRING] [STRING] does not exist')
     end
   end
 end

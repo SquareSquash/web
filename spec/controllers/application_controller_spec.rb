@@ -21,28 +21,28 @@ describe ApplicationController do
     end
 
     it "should return a proper WHERE clause for an ascending infinite scroll" do
-      ApplicationController.new.send(:infinite_scroll_clause, 'table.created_at', 'ASC', @record, 'table.id').
-        should eql(['table.created_at > ? OR (table.created_at = ? AND table.id > ?)', @record.created_at, @record.created_at, 12345])
+      expect(ApplicationController.new.send(:infinite_scroll_clause, 'table.created_at', 'ASC', @record, 'table.id')).
+        to eql(['table.created_at > ? OR (table.created_at = ? AND table.id > ?)', @record.created_at, @record.created_at, 12345])
     end
 
     it "should return a proper WHERE clause for a descending infinite scroll" do
-      ApplicationController.new.send(:infinite_scroll_clause, 'table.created_at', 'DESC', @record, 'table.id').
-        should eql(['table.created_at < ? OR (table.created_at = ? AND table.id < ?)', @record.created_at, @record.created_at, 12345])
+      expect(ApplicationController.new.send(:infinite_scroll_clause, 'table.created_at', 'DESC', @record, 'table.id')).
+        to eql(['table.created_at < ? OR (table.created_at = ? AND table.id < ?)', @record.created_at, @record.created_at, 12345])
     end
 
     it "should return a proper WHERE clause for an ascending infinite scroll with no fallback key" do
-      ApplicationController.new.send(:infinite_scroll_clause, 'table.id', 'ASC', @record).
-        should eql(['table.id > ?', @record.id])
+      expect(ApplicationController.new.send(:infinite_scroll_clause, 'table.id', 'ASC', @record)).
+        to eql(['table.id > ?', @record.id])
     end
 
     it "should return a proper WHERE clause for a descending infinite scroll with no fallback key" do
-      ApplicationController.new.send(:infinite_scroll_clause, 'table.id', 'DESC', @record).
-        should eql(['table.id < ?', @record.id])
+      expect(ApplicationController.new.send(:infinite_scroll_clause, 'table.id', 'DESC', @record)).
+        to eql(['table.id < ?', @record.id])
     end
 
     it "should return TRUE given bogus sort direction" do
-      ApplicationController.new.send(:infinite_scroll_clause, 'table.created_at', 'SIDEWAYS', @record, 'table.id').
-        should eql('TRUE')
+      expect(ApplicationController.new.send(:infinite_scroll_clause, 'table.created_at', 'SIDEWAYS', @record, 'table.id')).
+        to eql('TRUE')
     end
   end
 end

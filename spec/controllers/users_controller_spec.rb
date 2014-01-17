@@ -25,8 +25,8 @@ describe UsersController do
 
     it "should require a logged-in user" do
       get :index, format: 'json'
-      response.status.should eql(401)
-      response.body.should be_blank
+      expect(response.status).to eql(401)
+      expect(response.body).to be_blank
     end
 
     context '[authenticated]' do
@@ -34,14 +34,14 @@ describe UsersController do
 
       it "should return an empty array given no query" do
         get :index, format: 'json'
-        response.status.should eql(200)
-        response.body.should eql('[]')
+        expect(response.status).to eql(200)
+        expect(response.body).to eql('[]')
       end
 
       it "should load the first 10 filtered users sorted by username" do
         get :index, query: 'filter', format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |r| r['username'] }.should eql(@users.map(&:username).sort[0, 10])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |r| r['username'] }).to eql(@users.map(&:username).sort[0, 10])
       end
 
       it "should include membership information when given a project ID" do
@@ -49,16 +49,16 @@ describe UsersController do
         @users.sort_by(&:username).each_with_index { |user, i| FactoryGirl.create(:membership, project: project, user: user) if i < 5 }
 
         get :index, query: 'filter', format: 'json', project_id: project.to_param
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |r| r['is_member'] }.should eql([true]*5 + [false]*5)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |r| r['is_member'] }).to eql([true]*5 + [false]*5)
       end
 
       it "should load the next 10 filtered users when given a last parameter" do
         @users.sort_by! &:username
 
         get :index, query: 'filter', last: @users[9].username, format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |r| r['username'] }.should eql(@users.map(&:username).sort[10, 10])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |r| r['username'] }).to eql(@users.map(&:username).sort[10, 10])
       end
     end
   end
@@ -79,31 +79,31 @@ describe UsersController do
     if Squash::Configuration.authentication.registration_enabled?
       it "should create the new user" do
         post :create, user: @attrs
-        User.where(username: 'newguy').exists?.should be_true
-        response.should redirect_to(root_url)
+        expect(User.where(username: 'newguy').exists?).to be_true
+        expect(response).to redirect_to(root_url)
       end
 
       it "should log the new user in" do
         post :create, user: @attrs
         user = User.find_by_username!('newguy')
-        session[:user_id].should eql(user.id)
+        expect(session[:user_id]).to eql(user.id)
       end
 
       it "should redirect to the :next parameter" do
         post :create, user: @attrs, next: account_url
-        response.should redirect_to(account_url)
+        expect(response).to redirect_to(account_url)
       end
 
       it "should render the login page for invalid attributes" do
         post :create, user: @attrs.merge('password_confirmation' => 'whoops'), next: account_url
-        response.should render_template('sessions/new')
-        assigns(:user).errors[:password_confirmation].should eql(['doesn’t match'])
+        expect(response).to render_template('sessions/new')
+        expect(assigns(:user).errors[:password_confirmation]).to eql(['doesn’t match'])
       end
     else
       it "should not be possible to create a new user" do
         post :create, user: @attrs
-        User.where(username: 'newguy').exists?.should be_false
-        response.should redirect_to(login_url)
+        expect(User.where(username: 'newguy').exists?).to be_false
+        expect(response).to redirect_to(login_url)
       end
     end
   end if Squash::Configuration.authentication.strategy == 'password'

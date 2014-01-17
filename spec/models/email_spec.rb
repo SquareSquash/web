@@ -19,71 +19,71 @@ describe Email do
     it "should not allow a primary email to be downgraded" do
       email         = FactoryGirl.create(:email, primary: true)
       email.primary = false
-      email.should_not be_valid
-      email.errors[:primary].should eql(['cannot be unset without setting another email as primary'])
+      expect(email).not_to be_valid
+      expect(email.errors[:primary]).to eql(['cannot be unset without setting another email as primary'])
     end
 
     it "should only allow one user to assume redirect ownership of another's primary email" do
       old_user = FactoryGirl.create(:user)
       FactoryGirl.create :email, email: old_user.email
       email = FactoryGirl.build(:email, email: old_user.email)
-      email.should_not be_valid
-      email.errors[:email].should eql(['is already being handled by someone else'])
+      expect(email).not_to be_valid
+      expect(email.errors[:email]).to eql(['is already being handled by someone else'])
     end
 
     it "should allow a user to assume ownership of an otherwise unknown email" do
       email = FactoryGirl.build(:email, email: 'heretoforeunknown@email.com')
-      email.should be_valid
+      expect(email).to be_valid
     end
 
     it "should not allow a user to assume redirect ownership of his/hera primary email" do
       user  = FactoryGirl.create(:user)
       email = FactoryGirl.build(:email, email: user.email, user: user)
-      email.should_not be_valid
-      email.errors[:email].should eql(['is already your main email address'])
+      expect(email).not_to be_valid
+      expect(email.errors[:email]).to eql(['is already your main email address'])
     end
 
     it "should not allow a user to assume redirect ownership of an email twice" do
       old_user  = FactoryGirl.create(:user)
       redirect1 = FactoryGirl.create(:email, email: old_user.email)
       redirect2 = FactoryGirl.build(:email, email: old_user.email, user: redirect1.user)
-      redirect2.should_not be_valid
-      redirect2.errors[:email].should include('is already being handled by someone else')
+      expect(redirect2).not_to be_valid
+      expect(redirect2.errors[:email]).to include('is already being handled by someone else')
     end
 
     it "should not allow a user to assume redirect ownership of an email within a project that he has global redirect ownership of" do
       user          = FactoryGirl.create(:user)
       global_email  = FactoryGirl.create(:email, user: user)
       project_email = FactoryGirl.build(:email, user: user, email: global_email.email, project: FactoryGirl.create(:membership, user: user).project)
-      project_email.should_not be_valid
-      project_email.errors[:email].should eql(['is already globally handled by you'])
+      expect(project_email).not_to be_valid
+      expect(project_email.errors[:email]).to eql(['is already globally handled by you'])
     end
 
     it "should allow a user to assume redirect ownership of an email within a project that someone else has global redirect ownership of" do
       user          = FactoryGirl.create(:user)
       global_email  = FactoryGirl.create(:email)
       project_email = FactoryGirl.build(:email, user: user, email: global_email.email, project: FactoryGirl.create(:membership, user: user).project)
-      project_email.should be_valid
+      expect(project_email).to be_valid
     end
 
     it "should not allow a user to assume redirect ownership of an email for a project he is not a member of" do
       email = FactoryGirl.build(:email, project: FactoryGirl.create(:project))
-      email.should_not be_valid
-      email.errors[:project_id].should eql(['not a member'])
+      expect(email).not_to be_valid
+      expect(email.errors[:project_id]).to eql(['not a member'])
     end
 
     it "should remove project-specific redirect ownership for emails the user claims global ownership of" do
       user          = FactoryGirl.create(:user)
       project_email = FactoryGirl.create(:email, user: user, project: FactoryGirl.create(:membership, user: user).project)
       global_email  = FactoryGirl.create(:email, email: project_email.email, user: user)
-      user.emails.redirected.pluck(:id).should eql([global_email.id])
+      expect(user.emails.redirected.pluck(:id)).to eql([global_email.id])
     end
 
     it "should not remove project-specific redirect ownership for emails the another user claims global ownership of" do
       user          = FactoryGirl.create(:user)
       project_email = FactoryGirl.create(:email, user: user, project: FactoryGirl.create(:membership, user: user).project)
       global_email  = FactoryGirl.create(:email, email: project_email.email)
-      user.emails.redirected.pluck(:id).should eql([project_email.id])
+      expect(user.emails.redirected.pluck(:id)).to eql([project_email.id])
     end
   end
 
@@ -91,10 +91,10 @@ describe Email do
     it "should downgrade another primary email when set as primary" do
       user  = FactoryGirl.create(:user)
       email = user.emails.first
-      email.should be_primary
+      expect(email).to be_primary
 
       FactoryGirl.create(:email, user: user, primary: true)
-      email.reload.should_not be_primary
+      expect(email.reload).not_to be_primary
     end
   end
 end

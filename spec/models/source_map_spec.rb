@@ -43,14 +43,14 @@ describe SourceMap do
                                                           "column"  => 144,
                                                           "symbol"  => "eval",
                                                           "context" => nil}]}])
-      occurrence.should_not be_sourcemapped
+      expect(occurrence).not_to be_sourcemapped
 
       map = Squash::Javascript::SourceMap.new
       map << Squash::Javascript::SourceMap::Mapping.new('http://test.host/example/asset.js', 3, 140, 'app/assets/javascripts/source.js', 25, 1, 'foobar')
       FactoryGirl.create :source_map, environment: env, revision: '2dc20c984283bede1f45863b8f3b4dd9b5b554cc', map: map
 
-      occurrence.reload.should be_sourcemapped
-      occurrence.redirect_target_id.should be_nil
+      expect(occurrence.reload).to be_sourcemapped
+      expect(occurrence.redirect_target_id).to be_nil
     end
 
     it "should reassign to another bug if blame changes" do
@@ -85,15 +85,15 @@ describe SourceMap do
                                                           "column"  => 144,
                                                           "symbol"  => "eval",
                                                           "context" => nil}]}])
-      occurrence.should_not be_sourcemapped
+      expect(occurrence).not_to be_sourcemapped
 
       map = Squash::Javascript::SourceMap.new
       map << Squash::Javascript::SourceMap::Mapping.new('http://test.host/example/asset.js', 3, 140, 'lib/better_caller/extensions.rb', 2, 1, 'foobar')
       FactoryGirl.create :source_map, environment: env, revision: bug1.blamed_revision, map: map
 
-      bug2.occurrences.count.should eql(1)
+      expect(bug2.occurrences.count).to eql(1)
       o2 = bug2.occurrences.first
-      occurrence.reload.redirect_target_id.should eql(o2.id)
+      expect(occurrence.reload.redirect_target_id).to eql(o2.id)
     end
   end
 end

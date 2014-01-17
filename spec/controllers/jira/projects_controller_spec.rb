@@ -22,10 +22,10 @@ describe Jira::ProjectsController do
                            response: Rails.root.join('spec', 'fixtures', 'jira_projects.json')
 
       get :index, format: 'json'
-      response.status.should eql(200)
+      expect(response.status).to eql(200)
       body = JSON.parse(response.body)
-      body.map { |st| st['name'] }.
-          should eql(["Alert", "Android", "Bugs", "Business Intelligence",
+      expect(body.map { |st| st['name'] }).
+          to eql(["Alert", "Android", "Bugs", "Business Intelligence",
                       "Checker", "Coffee Bar", "Compliance"].sort)
     end
   end

@@ -44,15 +44,15 @@ describe ObfuscationMap do
                                                                      "line"   => 15,
                                                                      "symbol" => "int b(int)",
                                                                      "class_name"  => "com.A.B"}]}])
-      occurrence.should_not be_deobfuscated
+      expect(occurrence).not_to be_deobfuscated
 
       namespace = Squash::Java::Namespace.new
       namespace.add_package_alias 'com.foo', 'A'
       namespace.add_class_alias('com.foo.Bar', 'B').path = 'src/foo/Bar.java'
       namespace.add_method_alias 'com.foo.Bar', 'int foo(int)', 'b'
       FactoryGirl.create :obfuscation_map, namespace: namespace, deploy: bug.deploy
-      occurrence.reload.should be_deobfuscated
-      occurrence.redirect_target_id.should be_nil
+      expect(occurrence.reload).to be_deobfuscated
+      expect(occurrence.redirect_target_id).to be_nil
     end
 
     it "should reassign to another bug if blame changes" do
@@ -94,9 +94,9 @@ describe ObfuscationMap do
       namespace.add_method_alias 'com.foo.Bar', 'int foo(int)', 'b'
       FactoryGirl.create :obfuscation_map, namespace: namespace, deploy: bug1.deploy
 
-      bug2.occurrences.count.should eql(1)
+      expect(bug2.occurrences.count).to eql(1)
       o2 = bug2.occurrences.first
-      occurrence.reload.redirect_target_id.should eql(o2.id)
+      expect(occurrence.reload.redirect_target_id).to eql(o2.id)
     end
   end
 end

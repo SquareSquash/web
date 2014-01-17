@@ -21,21 +21,21 @@ describe Environment do
 
     it "should increment the cached counter when a new bug is added" do
       FactoryGirl.create :bug, environment: @env
-      @env.reload.bugs_count.should eql(1)
+      expect(@env.reload.bugs_count).to eql(1)
     end
 
     it "should not increment the cached counter when a new closed bug is added" do
       FactoryGirl.create :bug, environment: @env, fixed: true
-      @env.reload.bugs_count.should eql(0)
+      expect(@env.reload.bugs_count).to eql(0)
 
       FactoryGirl.create :bug, environment: @env, irrelevant: true
-      @env.reload.bugs_count.should eql(0)
+      expect(@env.reload.bugs_count).to eql(0)
     end
 
     it "should decrement the cached counter when an open bug is deleted" do
       bug = FactoryGirl.create(:bug, environment: @env)
       bug.destroy
-      @env.reload.bugs_count.should eql(0)
+      expect(@env.reload.bugs_count).to eql(0)
     end
 
     it "should not decrement the cached counter when a closed bug is deleted" do
@@ -43,32 +43,32 @@ describe Environment do
       
       bug = FactoryGirl.create(:bug, environment: @env, fixed: true)
       bug.destroy
-      @env.reload.bugs_count.should eql(2)
+      expect(@env.reload.bugs_count).to eql(2)
       bug = FactoryGirl.create(:bug, environment: @env, irrelevant: true)
       bug.destroy
-      @env.reload.bugs_count.should eql(2)
+      expect(@env.reload.bugs_count).to eql(2)
     end
 
     it "should increment the cached counter when a bug is opened" do
       bug1 = FactoryGirl.create(:bug, environment: @env, fixed: true)
       bug2 = FactoryGirl.create(:bug, environment: @env, irrelevant: true)
-      @env.reload.bugs_count.should eql(0)
+      expect(@env.reload.bugs_count).to eql(0)
 
       bug1.update_attribute :fixed, false
-      @env.reload.bugs_count.should eql(1)
+      expect(@env.reload.bugs_count).to eql(1)
       bug2.update_attribute :irrelevant, false
-      @env.reload.bugs_count.should eql(2)
+      expect(@env.reload.bugs_count).to eql(2)
     end
 
     it "should decrement the cached counter when a bug is closed" do
       bug1 = FactoryGirl.create(:bug, environment: @env)
       bug2 = FactoryGirl.create(:bug, environment: @env)
-      @env.reload.bugs_count.should eql(2)
+      expect(@env.reload.bugs_count).to eql(2)
 
       bug1.update_attribute :fixed, true
-      @env.reload.bugs_count.should eql(1)
+      expect(@env.reload.bugs_count).to eql(1)
       bug2.update_attribute :irrelevant, true
-      @env.reload.bugs_count.should eql(0)
+      expect(@env.reload.bugs_count).to eql(0)
     end
   end
 end

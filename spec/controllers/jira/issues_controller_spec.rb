@@ -22,9 +22,9 @@ describe Jira::IssuesController do
                            response: Rails.root.join('spec', 'fixtures', 'jira_issue.json')
 
       get :show, id: 'FOO-123', format: 'json'
-      response.status.should eql(200)
+      expect(response.status).to eql(200)
       body = JSON.parse(response.body)
-      body['fields']['summary'].should eql("Double RTs on coffee bar Twitter monitor")
+      expect(body['fields']['summary']).to eql("Double RTs on coffee bar Twitter monitor")
     end
 
     it "should 404 if the JIRA issue is not found" do
@@ -33,7 +33,7 @@ describe Jira::IssuesController do
                            response: Rails.root.join('spec', 'fixtures', 'jira_issue_404.json')
 
       get :show, id: 'FOO-124', format: 'json'
-      response.status.should eql(404)
+      expect(response.status).to eql(404)
     end
   end
 end unless Squash::Configuration.jira.disabled?

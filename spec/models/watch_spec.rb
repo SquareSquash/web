@@ -27,12 +27,12 @@ describe Watch do
 
     it "should fill a user's feed with events when a bug is watched" do
       FactoryGirl.create :watch, user: @user, bug: @unwatched_bug
-      @user.user_events.pluck(:event_id).should include(@unwatched_event.id)
+      expect(@user.user_events.pluck(:event_id)).to include(@unwatched_event.id)
     end
 
     it "should remove events from a user's feed when a bug is unwatched" do
       @watch.destroy
-      @user.user_events.pluck(:event_id).should_not include(@watched_event.id)
+      expect(@user.user_events.pluck(:event_id)).not_to include(@watched_event.id)
     end
   end
 end

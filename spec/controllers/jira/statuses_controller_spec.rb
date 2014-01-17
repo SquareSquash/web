@@ -22,10 +22,10 @@ describe Jira::StatusesController do
                            response: Rails.root.join('spec', 'fixtures', 'jira_statuses.json')
 
       get :index, format: 'json'
-      response.status.should eql(200)
+      expect(response.status).to eql(200)
       body = JSON.parse(response.body)
-      body.map { |st| st['name'] }.
-          should eql(["Open", "In Progress", "Reopened", "Resolved", "Closed",
+      expect(body.map { |st| st['name'] }).
+          to eql(["Open", "In Progress", "Reopened", "Resolved", "Closed",
                       "Needs Review", "Approved", "Hold Pending Info", "IceBox",
                       "Not Yet Started", "Started", "Finished", "Delivered",
                       "Accepted", "Rejected", "Allocated", "Build", "Verify",

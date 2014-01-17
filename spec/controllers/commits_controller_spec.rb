@@ -26,7 +26,7 @@ describe CommitsController do
 
     it "should require a logged-in user" do
       get :index, project_id: @project.to_param, format: 'json'
-      response.status.should eql(401)
+      expect(response.status).to eql(401)
     end
 
     context '[authenticated]' do
@@ -34,8 +34,8 @@ describe CommitsController do
 
       it "should return the 10 most recent commits" do
         get :index, project_id: @project.to_param, format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).size.should eql(10)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).size).to eql(10)
       end
     end
   end
@@ -49,7 +49,7 @@ describe CommitsController do
 
     it "should require a logged-in user" do
       get :context, @valid_params
-      response.status.should eql(401)
+      expect(response.status).to eql(401)
     end
 
     context '[authenticated]' do
@@ -58,38 +58,38 @@ describe CommitsController do
       it "should return an error if the project has no repository" do
         project = FactoryGirl.create(:project, owner: @project.owner, repository_url: 'git@github.com:RISCfuture/doesnt-exist.git')
         get :context, @valid_params.merge(project_id: project.to_param)
-        response.status.should eql(422)
-        JSON.parse(response.body)['error'].should include('repository')
+        expect(response.status).to eql(422)
+        expect(JSON.parse(response.body)['error']).to include('repository')
       end
 
       it "should return an error if the file param is missing" do
         get :context, @valid_params.merge(file: nil)
-        response.status.should eql(400)
-        JSON.parse(response.body)['error'].should include('Missing')
+        expect(response.status).to eql(400)
+        expect(JSON.parse(response.body)['error']).to include('Missing')
       end
 
       it "should return an error if the line param is missing" do
         get :context, @valid_params.merge(line: nil)
-        response.status.should eql(400)
-        JSON.parse(response.body)['error'].should include('Missing')
+        expect(response.status).to eql(400)
+        expect(JSON.parse(response.body)['error']).to include('Missing')
       end
 
       it "should return an error if the line param is less than 1" do
         get :context, @valid_params.merge(line: 0)
-        response.status.should eql(422)
-        JSON.parse(response.body)['error'].should include('out of range')
+        expect(response.status).to eql(422)
+        expect(JSON.parse(response.body)['error']).to include('out of range')
       end
 
       it "should return an error if the line param is greater than the number of lines in the file" do
         get :context, @valid_params.merge(line: 15)
-        response.status.should eql(422)
-        JSON.parse(response.body)['error'].should include('out of range')
+        expect(response.status).to eql(422)
+        expect(JSON.parse(response.body)['error']).to include('out of range')
       end
 
       it "should use 3 lines of context by default" do
         get :context, @valid_params
-        response.status.should eql(200)
-        JSON.parse(response.body)['code'].should eql(<<-TEXT.chomp)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['code']).to eql(<<-TEXT.chomp)
   def set_better_backtrace(bt)
     @better_backtrace = bt.collect do |(file, line, meth, bind)|
       vars = {
@@ -102,8 +102,8 @@ describe CommitsController do
 
       it "should use 3 lines context if an invalid value for the context param is given" do
         get :context, @valid_params.merge(context: -1)
-        response.status.should eql(200)
-        JSON.parse(response.body)['code'].should eql(<<-TEXT.chomp)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['code']).to eql(<<-TEXT.chomp)
   def set_better_backtrace(bt)
     @better_backtrace = bt.collect do |(file, line, meth, bind)|
       vars = {
@@ -116,8 +116,8 @@ describe CommitsController do
 
       it "should use a custom number of lines of context" do
         get :context, @valid_params.merge(context: 2)
-        response.status.should eql(200)
-        JSON.parse(response.body)['code'].should eql(<<-TEXT.chomp)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['code']).to eql(<<-TEXT.chomp)
     @better_backtrace = bt.collect do |(file, line, meth, bind)|
       vars = {
         local_variables: eval("local_variables.inject({}) { |hsh, var| hsh[var] = eval(var) ; hsh }", bind),
@@ -128,8 +128,8 @@ describe CommitsController do
 
       it "should clamp the context at the top of the file" do
         get :context, @valid_params.merge(line: 1)
-        response.status.should eql(200)
-        JSON.parse(response.body)['code'].should eql(<<-TEXT.chomp)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['code']).to eql(<<-TEXT.chomp)
 # @private
 class Exception
   # @private
@@ -139,8 +139,8 @@ class Exception
 
       it "should clamp the context at the bottom of the file" do
         get :context, @valid_params.merge(line: 14)
-        response.status.should eql(200)
-        JSON.parse(response.body)['code'].should eql(<<-TEXT.chomp)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['code']).to eql(<<-TEXT.chomp)
       [ file, line, meth, vars]
     end
   end
@@ -150,51 +150,51 @@ end
 
       it "should return an error given a nonexistent path" do
         get :context, @valid_params.merge(file: 'foo/bar.rb')
-        response.status.should eql(422)
-        JSON.parse(response.body)['error'].should include('Couldn’t find that commit')
+        expect(response.status).to eql(422)
+        expect(JSON.parse(response.body)['error']).to include('Couldn’t find that commit')
       end
 
       it "should update the repo given an unknown revision" do
-        Project.stub(:find_from_slug!).and_return(@project)
-        @project.repo.should_receive(:fetch).once
+        allow(Project).to receive(:find_from_slug!).and_return(@project)
+        expect(@project.repo).to receive(:fetch).once
 
         get :context, @valid_params.merge(id: '39aacf78b603ade2034e93b9b12420b350dfa151') # unknown revision
-        response.status.should eql(422)
-        JSON.parse(response.body)['error'].should include('Couldn’t find that commit')
+        expect(response.status).to eql(422)
+        expect(JSON.parse(response.body)['error']).to include('Couldn’t find that commit')
       end
 
       it "should return an error given a nonexistent file" do
         get :context, @valid_params.merge(file: 'lib/foo.rb')
-        response.status.should eql(422)
-        JSON.parse(response.body)['error'].should include('Couldn’t find that commit')
+        expect(response.status).to eql(422)
+        expect(JSON.parse(response.body)['error']).to include('Couldn’t find that commit')
       end
 
       it "should pick an appropriate brush" do
         get :context, @valid_params
-        response.status.should eql(200)
-        JSON.parse(response.body)['brush'].should eql('ruby')
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['brush']).to eql('ruby')
 
         get :context, @valid_params.merge(file: 'Rakefile')
-        response.status.should eql(200)
-        JSON.parse(response.body)['brush'].should eql('ruby')
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['brush']).to eql('ruby')
 
         get :context, @valid_params.merge(file: 'ext/better_caller.c')
-        response.status.should eql(200)
-        JSON.parse(response.body)['brush'].should eql('cpp')
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['brush']).to eql('cpp')
       end
 
       it "should return a correct first_line value" do
         get :context, @valid_params
-        response.status.should eql(200)
-        JSON.parse(response.body)['first_line'].should eql(4)
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)['first_line']).to eql(4)
       end
 
       it "should reject blank lines from the top of the snippet" do
         get :context, @valid_params.merge(file: 'LICENSE.txt', line: 5)
-        response.status.should eql(200)
+        expect(response.status).to eql(200)
         rsp = JSON.parse(response.body)
-        rsp['first_line'].should eql(3)
-        rsp['code'].should eql(<<-TEXT.chomp)
+        expect(rsp['first_line']).to eql(3)
+        expect(rsp['code']).to eql(<<-TEXT.chomp)
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
 "Software"), to deal in the Software without restriction, including

@@ -41,12 +41,12 @@ describe JiraStatusWorker do
 
       JiraStatusWorker.perform
 
-      linked_bugs.each { |bug| bug.reload.should be_fixed }
-      unlinked_bugs.each { |bug| bug.reload.should_not be_fixed }
+      linked_bugs.each { |bug| expect(bug.reload).to be_fixed }
+      unlinked_bugs.each { |bug| expect(bug.reload).not_to be_fixed }
 
-      linked_bugs.first.events.last.kind.should eql('close')
-      linked_bugs.first.events.last.data['issue'].should eql('FOO-123')
-      linked_bugs.first.events.last.user.should be_nil
+      expect(linked_bugs.first.events.last.kind).to eql('close')
+      expect(linked_bugs.first.events.last.data['issue']).to eql('FOO-123')
+      expect(linked_bugs.first.events.last.user).to be_nil
     end
   end
 end unless Squash::Configuration.jira.disabled?

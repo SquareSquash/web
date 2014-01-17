@@ -23,8 +23,8 @@ describe EmailsController do
 
     it "should require a logged in user" do
       get :index, format: 'json'
-      response.status.should eql(401)
-      response.body.should be_blank
+      expect(response.status).to eql(401)
+      expect(response.body).to be_blank
     end
 
     context "[authenticated]" do
@@ -32,8 +32,8 @@ describe EmailsController do
 
       it "should load the first 10 emails" do
         get :index, format: 'json'
-        response.status.should eql(200)
-        response.body.should eql(@emails.sort_by(&:email)[0, 10].map { |e| e.as_json.merge(url: account_email_url(e)) }.to_json)
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(@emails.sort_by(&:email)[0, 10].map { |e| e.as_json.merge(url: account_email_url(e)) }.to_json)
       end
 
       it "should filter emails given a query" do
@@ -41,21 +41,21 @@ describe EmailsController do
         filter2 = FactoryGirl.create(:email, user: @user, email: 'filter2@example.com')
 
         get :index, format: 'json', query: 'filter'
-        response.status.should eql(200)
-        response.body.should eql([filter1, filter2].map { |e| e.as_json.merge(url: account_email_url(e)) }.to_json)
+        expect(response.status).to eql(200)
+        expect(response.body).to eql([filter1, filter2].map { |e| e.as_json.merge(url: account_email_url(e)) }.to_json)
       end
 
       it "should not include primary emails" do
         @user.emails.redirected.delete_all
         get :index, format: 'json'
-        response.status.should eql(200)
-        response.body.should eql('[]')
+        expect(response.status).to eql(200)
+        expect(response.body).to eql('[]')
       end
 
       it "should not include project-specific emails if project_id is not set" do
         email = FactoryGirl.create(:email, user: @user, project: FactoryGirl.create(:membership, user: @user).project)
         get :index, format: 'json'
-        JSON.parse(response.body).map { |e| e['email'] }.should_not include(email.email)
+        expect(JSON.parse(response.body).map { |e| e['email'] }).not_to include(email.email)
       end
 
       it "should only include project-specific emails if project_id is set" do
@@ -63,7 +63,7 @@ describe EmailsController do
         email1  = FactoryGirl.create(:email, user: @user, project: project)
         FactoryGirl.create :email, user: @user, project: FactoryGirl.create(:membership, user: @user).project
         get :index, project_id: project.to_param, format: 'json'
-        JSON.parse(response.body).map { |e| e['email'] }.should eql([email1.email])
+        expect(JSON.parse(response.body).map { |e| e['email'] }).to eql([email1.email])
       end
     end
   end
@@ -73,9 +73,9 @@ describe EmailsController do
     before(:each) { @user.emails.redirected.delete_all }
 
     it "should require a logged in user" do
-      -> { post :create, format: 'json', email: {email: 'foo@bar.com'} }.should_not change(Email, :count)
-      response.status.should eql(401)
-      response.body.should be_blank
+      expect { post :create, format: 'json', email: {email: 'foo@bar.com'} }.not_to change(Email, :count)
+      expect(response.status).to eql(401)
+      expect(response.body).to be_blank
     end
 
     context "[authenticated]" do
@@ -83,31 +83,31 @@ describe EmailsController do
 
       it "should create a new redirected email" do
         post :create, format: 'json', email: {email: 'new@example.com'}
-        response.status.should eql(201)
-        @user.emails.redirected.count.should eql(1)
-        @user.emails.redirected.first.email.should eql('new@example.com')
-        response.body.should eql(@user.emails.redirected.first.to_json)
+        expect(response.status).to eql(201)
+        expect(@user.emails.redirected.count).to eql(1)
+        expect(@user.emails.redirected.first.email).to eql('new@example.com')
+        expect(response.body).to eql(@user.emails.redirected.first.to_json)
       end
 
       it "should not allow a primary email to be created" do
         post :create, format: 'json', email: {email: 'new@example.com', primary: '1'}
-        response.status.should eql(400)
-        @user.emails.count.should eql(1)
+        expect(response.status).to eql(400)
+        expect(@user.emails.count).to eql(1)
       end
 
       it "should handle validation errors" do
         post :create, format: 'json', email: {email: 'not an email'}
-        response.status.should eql(422)
-        response.body.should eql({email: {email: ['not a valid email address']}}.to_json)
-        @user.emails.redirected.count.should be_zero
+        expect(response.status).to eql(422)
+        expect(response.body).to eql({email: {email: ['not a valid email address']}}.to_json)
+        expect(@user.emails.redirected.count).to be_zero
       end
 
       it "should set project_id if given" do
         @user.emails.redirected.delete_all
         project = FactoryGirl.create(:membership, user: @user).project
         post :create, project_id: project.to_param, format: 'json', email: {email: 'new2@example.com'}
-        response.status.should eql(201)
-        @user.emails.redirected.first.project_id.should eql(project.id)
+        expect(response.status).to eql(201)
+        expect(@user.emails.redirected.first.project_id).to eql(project.id)
       end
     end
   end
@@ -121,9 +121,9 @@ describe EmailsController do
     end
 
     it "should require a logged in user" do
-      -> { delete :destroy, id: @email.to_param, format: 'json' }.should_not change(Email, :count)
-      response.status.should eql(401)
-      response.body.should be_blank
+      expect { delete :destroy, id: @email.to_param, format: 'json' }.not_to change(Email, :count)
+      expect(response.status).to eql(401)
+      expect(response.body).to be_blank
     end
 
     context "[authenticated]" do
@@ -131,19 +131,19 @@ describe EmailsController do
 
       it "should 404 given an unknown email" do
         delete :destroy, id: 'unknown@email.com', format: 'json'
-        response.status.should eql(404)
+        expect(response.status).to eql(404)
       end
 
       it "should not allow a primary email to be deleted" do
         delete :destroy, id: @user.email, format: 'json'
-        response.status.should eql(404)
-        @user.emails.count.should eql(2)
+        expect(response.status).to eql(404)
+        expect(@user.emails.count).to eql(2)
       end
 
       it "should delete a redirected email" do
         delete :destroy, id: @email.to_param, format: 'json'
-        response.status.should eql(204)
-        @user.emails.redirected.count.should be_zero
+        expect(response.status).to eql(204)
+        expect(@user.emails.redirected.count).to be_zero
       end
     end
   end

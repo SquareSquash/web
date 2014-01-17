@@ -17,8 +17,8 @@ require 'spec_helper'
 describe Service::JIRA do
   describe ".new_issue_link" do
     it "should return a proper issue link" do
-      Service::JIRA.new_issue_link(foo: 'bar').
-          should eql(Squash::Configuration.jira.api_host +
+      expect(Service::JIRA.new_issue_link(foo: 'bar')).
+          to eql(Squash::Configuration.jira.api_host +
                          Squash::Configuration.jira.api_root +
                          Squash::Configuration.jira.create_issue_details +
                          '?foo=bar'
@@ -33,8 +33,8 @@ describe Service::JIRA do
                            response: Rails.root.join('spec', 'fixtures', 'jira_issue.json')
 
       issue = Service::JIRA.issue('FOO-123')
-      issue.key.should eql('FOO-123')
-      issue.summary.should eql("Double RTs on coffee bar Twitter monitor")
+      expect(issue.key).to eql('FOO-123')
+      expect(issue.summary).to eql("Double RTs on coffee bar Twitter monitor")
     end
 
     it "should return nil for an unknown issue" do
@@ -42,7 +42,7 @@ describe Service::JIRA do
                            jira_url("/rest/api/2/issue/FOO-124"),
                            response: Rails.root.join('spec', 'fixtures', 'jira_issue_404.json')
 
-      Service::JIRA.issue('FOO-124').should be_nil
+      expect(Service::JIRA.issue('FOO-124')).to be_nil
     end
   end
 
@@ -53,8 +53,8 @@ describe Service::JIRA do
                            response: Rails.root.join('spec', 'fixtures', 'jira_statuses.json')
 
       statuses = Service::JIRA.statuses
-      statuses.map(&:name).
-          should eql(["Open", "In Progress", "Reopened", "Resolved", "Closed",
+      expect(statuses.map(&:name)).
+          to eql(["Open", "In Progress", "Reopened", "Resolved", "Closed",
                       "Needs Review", "Approved", "Hold Pending Info", "IceBox",
                       "Not Yet Started", "Started", "Finished", "Delivered",
                       "Accepted", "Rejected", "Allocated", "Build", "Verify",
@@ -69,8 +69,8 @@ describe Service::JIRA do
                            response: Rails.root.join('spec', 'fixtures', 'jira_projects.json')
 
       projects = Service::JIRA.projects
-      projects.map(&:name).
-          should eql(["Alert", "Android", "Bugs", "Business Intelligence",
+      expect(projects.map(&:name)).
+          to eql(["Alert", "Android", "Bugs", "Business Intelligence",
                       "Checker", "Coffee Bar", "Compliance"])
     end
   end

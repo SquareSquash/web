@@ -37,172 +37,172 @@ describe SearchController do
       it "should respond with the URL for a user given a @username" do
         user = FactoryGirl.create(:user, username: 'foobar', first_name: 'Foo', last_name: 'Bar')
         get :search, query: '@foobar', format: 'json'
-        response.status.should eql(200)
-        response.body.should eql(user_url(user))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(user_url(user))
       end
 
       it "should respond with nil for an unknown username" do
         get :search, query: '@unknown', format: 'json'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
     end
 
     context "[project]" do
       it "should respond with the URL for a project given a project slug" do
         get :search, query: 'example-project'
-        response.status.should eql(200)
-        response.body.should eql(project_url(@project))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_url(@project))
       end
 
       it "should respond with the URL for a project given a project prefix" do
         get :search, query: 'example-p'
-        response.status.should eql(200)
-        response.body.should eql(project_url(@project))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_url(@project))
       end
 
       it "should respond with nil given an unknown project" do
         get :search, query: 'unknown'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an ambiguous project prefix" do
         get :search, query: 'exam'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
     end
 
     context "[environment]" do
       it "should respond with the URL for an environment given a project & environment slug" do
         get :search, query: 'example-project production'
-        response.status.should eql(200)
-        response.body.should eql(project_environment_bugs_url(@project, @environment))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_environment_bugs_url(@project, @environment))
       end
 
       it "should respond with the URL for an environment given a project & environment prefix" do
         get :search, query: 'example-p product'
-        response.status.should eql(200)
-        response.body.should eql(project_environment_bugs_url(@project, @environment))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_environment_bugs_url(@project, @environment))
       end
 
       it "should respond with nil given an unknown project" do
         get :search, query: 'unknown development'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an unknown environment" do
         get :search, query: 'example-project dev'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an ambiguous project prefix" do
         get :search, query: 'exam production'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an ambiguous environment prefix" do
         get :search, query: 'example-project prod'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
     end
 
     context "[bug]" do
       it "should respond with the URL for a bug given a project & environment slug and bug number" do
         get :search, query: 'example-project production 1'
-        response.status.should eql(200)
-        response.body.should eql(project_environment_bug_url(@project, @environment, @bug))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_environment_bug_url(@project, @environment, @bug))
       end
 
       it "should respond with the URL for a bug given a project & environment prefix and bug number" do
         get :search, query: 'example-p product 1'
-        response.status.should eql(200)
-        response.body.should eql(project_environment_bug_url(@project, @environment, @bug))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_environment_bug_url(@project, @environment, @bug))
       end
 
       it "should respond with nil given an unknown project" do
         get :search, query: 'unknown production 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an unknown environment" do
         get :search, query: 'example-project unknown 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an unknown bug number" do
         get :search, query: 'example-project production 123'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an ambiguous project prefix" do
         get :search, query: 'exam production 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an ambiguous environment prefix" do
         get :search, query: 'example-project prod 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
     end
 
     context "[occurrence]" do
       it "should respond with the URL for an occurrence given a project & environment slug and bug & occurrence number" do
         get :search, query: 'example-project production 1 1'
-        response.status.should eql(200)
-        response.body.should eql(project_environment_bug_occurrence_url(@project, @environment, @bug, @occurrence))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_environment_bug_occurrence_url(@project, @environment, @bug, @occurrence))
       end
 
       it "should respond with the URL for an occurrence given a project & environment prefix and a bug & occurrence number" do
         get :search, query: 'example-p product 1 1'
-        response.status.should eql(200)
-        response.body.should eql(project_environment_bug_occurrence_url(@project, @environment, @bug, @occurrence))
+        expect(response.status).to eql(200)
+        expect(response.body).to eql(project_environment_bug_occurrence_url(@project, @environment, @bug, @occurrence))
       end
 
       it "should respond with nil given an unknown project" do
         get :search, query: 'unknown production 1 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an unknown environment" do
         get :search, query: 'example-project unknown 1 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an unknown occurrence number" do
         get :search, query: 'example-project production 1 2'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an unknown bug number" do
         get :search, query: 'example-project production 2 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an ambiguous project prefix" do
         get :search, query: 'exam production 1 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
 
       it "should respond with nil given an ambiguous environment prefix" do
         get :search, query: 'example-project prod 1 1'
-        response.status.should eql(200)
-        response.body.should be_blank
+        expect(response.status).to eql(200)
+        expect(response.body).to be_blank
       end
     end
   end
@@ -222,9 +222,9 @@ describe SearchController do
         foo2 = FactoryGirl.create(:user, username: 'foo2', first_name: 'Foo', last_name: 'Two')
 
         get :suggestions, query: '@foo', format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).
-            should eql([
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).
+            to eql([
                            {'user' => JSON.parse(foo1.to_json),
                             'url'  => user_url(foo1),
                             'type' => 'user'},
@@ -241,9 +241,9 @@ describe SearchController do
         proj2 = FactoryGirl.create(:project, name: 'Project Two')
 
         get :suggestions, query: 'proj', format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).
-            should eql([
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).
+            to eql([
                            {'project' => JSON.parse(proj1.to_json),
                             'url'     => project_url(proj1),
                             'type'    => 'project'},
@@ -261,9 +261,9 @@ describe SearchController do
         env2 = FactoryGirl.create(:environment, name: 'env2', project: proj)
 
         get :suggestions, query: 'another env', format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).
-            should eql([
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).
+            to eql([
                            {'project'     => JSON.parse(proj.to_json),
                             'environment' => JSON.parse(env1.to_json),
                             'type'        => 'environment',
@@ -277,8 +277,8 @@ describe SearchController do
 
       it "should respond with an empty list for an unknown project" do
         get :suggestions, query: 'unknown unknown', format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
     end
 
@@ -287,9 +287,9 @@ describe SearchController do
 
       it "should respond with the bug" do
         get :suggestions, query: "#{@bug.environment.project.slug} #{@bug.environment.name} #{@bug.number}", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).
-            should eql([
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).
+            to eql([
                            {'project'     => JSON.parse(@bug.environment.project.to_json),
                             'environment' => JSON.parse(@bug.environment.to_json),
                             'bug'         => JSON.parse(@bug.to_json),
@@ -300,20 +300,20 @@ describe SearchController do
 
       it "should respond with an empty list for an unknown project" do
         get :suggestions, query: "unknown #{@bug.environment.name} #{@bug.number}", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
 
       it "should respond with an empty list for an unknown environment" do
         get :suggestions, query: "#{@bug.environment.project.slug} unknown #{@bug.number}", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
 
       it "should respond with an empty list for an unknown bug" do
         get :suggestions, query: "#{@bug.environment.project.slug} #{@bug.environment.name} 123", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
     end
 
@@ -322,9 +322,9 @@ describe SearchController do
 
       it "should respond with the occurrence" do
         get :suggestions, query: "#{@occurrence.bug.environment.project.slug} #{@occurrence.bug.environment.name} #{@occurrence.bug.number} #{@occurrence.number}", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).
-            should eql([
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).
+            to eql([
                            {'type'        => 'occurrence',
                             'url'         => project_environment_bug_occurrence_url(@occurrence.bug.environment.project, @occurrence.bug.environment, @occurrence.bug, @occurrence),
                             'project'     => JSON.parse(@occurrence.bug.environment.project.to_json),
@@ -336,33 +336,33 @@ describe SearchController do
 
       it "should respond with an empty list for an unknown project" do
         get :suggestions, query: "unknown #{@occurrence.bug.environment.name} #{@occurrence.bug.number} #{@occurrence.number}", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
 
       it "should respond with an empty list for an unknown environment" do
         get :suggestions, query: "#{@occurrence.bug.environment.project.slug} unknown #{@occurrence.bug.number} #{@occurrence.number}", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
 
       it "should respond with an empty list for an unknown bug" do
         get :suggestions, query: "#{@occurrence.bug.environment.project.slug} #{@occurrence.bug.environment.name} 123 #{@occurrence.number}", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
 
       it "should respond with an empty list for an unknown occurrence" do
         get :suggestions, query: "#{@occurrence.bug.environment.project.slug} #{@occurrence.bug.environment.name} #{@occurrence.bug.number} 123", format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).should eql([])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body)).to eql([])
       end
     end
 
     it "should respond with an empty list for other queries" do
       get :suggestions, query: 'somethingelse', format: 'json'
-      response.status.should eql(200)
-      JSON.parse(response.body).should eql([])
+      expect(response.status).to eql(200)
+      expect(JSON.parse(response.body)).to eql([])
     end
   end
 end

@@ -24,16 +24,16 @@ describe NotificationMailer do
 
   describe "#blame" do
     it "should create an email event" do
-      @bug.stub(:blamed_email).and_return('foo@bar.com')
+      allow(@bug).to receive(:blamed_email).and_return('foo@bar.com')
       NotificationMailer.blame(@bug).deliver
-      @bug.events.count.should eql(@count + 1)
-      @bug.events.order('id DESC').first.kind.should eql('email')
-      @bug.events.order('id DESC').first.data['recipients'].should eql(['foo@bar.com'])
+      expect(@bug.events.count).to eql(@count + 1)
+      expect(@bug.events.order('id DESC').first.kind).to eql('email')
+      expect(@bug.events.order('id DESC').first.data['recipients']).to eql(['foo@bar.com'])
     end
 
     it "... unless no email was sent" do
       NotificationMailer.blame(@bug).deliver
-      @bug.events.count.should eql(@count)
+      expect(@bug.events.count).to eql(@count)
     end
   end
 
@@ -41,14 +41,14 @@ describe NotificationMailer do
     it "should create an email event" do
       @bug.environment.project.critical_mailing_list = 'foo@bar.com'
       NotificationMailer.critical(@bug).deliver
-      @bug.events.count.should eql(@count + 1)
-      @bug.events.order('id DESC').first.kind.should eql('email')
-      @bug.events.order('id DESC').first.data['recipients'].should eql(['foo@bar.com'])
+      expect(@bug.events.count).to eql(@count + 1)
+      expect(@bug.events.order('id DESC').first.kind).to eql('email')
+      expect(@bug.events.order('id DESC').first.data['recipients']).to eql(['foo@bar.com'])
     end
 
     it "... unless no email was sent" do
       NotificationMailer.critical(@bug).deliver
-      @bug.events.count.should eql(@count)
+      expect(@bug.events.count).to eql(@count)
     end
   end
 end

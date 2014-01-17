@@ -41,7 +41,7 @@ describe Account::EventsController do
 
     it "should require a logged-in user" do
       get :index, format: 'json'
-      response.status.should eql(401)
+      expect(response.status).to eql(401)
     end
 
     context '[authenticated]' do
@@ -49,8 +49,8 @@ describe Account::EventsController do
 
       it "should load the 50 most recent events" do
         get :index, format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |e| e['kind'] }.should eql(@events.sort_by(&:created_at).reverse.map(&:kind)[0, 5])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |e| e['kind'] }).to eql(@events.sort_by(&:created_at).reverse.map(&:kind)[0, 5])
       end
 
       it "should return the next 50 events when given a last parameter" do
@@ -58,21 +58,21 @@ describe Account::EventsController do
         @events.reverse!
 
         get :index, last: @events[4].id, format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |e| e['kind'] }.should eql(@events.map(&:kind)[5, 5])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |e| e['kind'] }).to eql(@events.map(&:kind)[5, 5])
       end
 
       it "should decorate the response" do
         get :index, format: 'json'
         JSON.parse(response.body).zip(@events.sort_by(&:created_at).reverse).each do |(hsh, event)|
-          hsh['icon'].should include(icon_for_event(event))
-          hsh['user_url'].should eql(user_url(event.user))
-          hsh['assignee_url'].should eql(user_url(event.assignee))
-          hsh['occurrence_url'].should eql(project_environment_bug_occurrence_url(@env.project, @env, @bug, event.occurrence))
-          hsh['comment_body'].should eql(ApplicationController.new.send(:markdown).(event.comment.body))
-          hsh['resolution_url'].should eql(@bug.resolution_revision)
-          hsh['assignee_you'].should eql(event.assignee == @user)
-          hsh['user_you'].should eql(@user == event.user)
+          expect(hsh['icon']).to include(icon_for_event(event))
+          expect(hsh['user_url']).to eql(user_url(event.user))
+          expect(hsh['assignee_url']).to eql(user_url(event.assignee))
+          expect(hsh['occurrence_url']).to eql(project_environment_bug_occurrence_url(@env.project, @env, @bug, event.occurrence))
+          expect(hsh['comment_body']).to eql(ApplicationController.new.send(:markdown).(event.comment.body))
+          expect(hsh['resolution_url']).to eql(@bug.resolution_revision)
+          expect(hsh['assignee_you']).to eql(event.assignee == @user)
+          expect(hsh['user_you']).to eql(@user == event.user)
         end
       end
 
@@ -85,9 +85,9 @@ describe Account::EventsController do
         get :index, format: 'json'
 
         json = JSON.parse(response.body)
-        json.first['kind'].should eql('dupe')
-        json.first['original_url'].should eql(project_environment_bug_url(original.environment.project, original.environment, original))
-        json.first['original']['number'].should eql(original.number)
+        expect(json.first['kind']).to eql('dupe')
+        expect(json.first['original_url']).to eql(project_environment_bug_url(original.environment.project, original.environment, original))
+        expect(json.first['original']['number']).to eql(original.number)
       end
     end
   end

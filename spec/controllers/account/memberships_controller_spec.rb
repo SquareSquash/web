@@ -24,8 +24,8 @@ describe Account::MembershipsController do
 
     it "should require a logged-in user" do
       get :index, format: 'json'
-      response.status.should eql(401)
-      response.body.should be_blank
+      expect(response.status).to eql(401)
+      expect(response.body).to be_blank
     end
 
     context "[authenticated]" do
@@ -33,14 +33,14 @@ describe Account::MembershipsController do
 
       it "should load the first 10 memberships" do
         get :index, format: 'json'
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |r| r['project']['name'] }.should eql(@memberships.sort_by(&:created_at).reverse.map(&:project).map(&:name)[0, 10])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |r| r['project']['name'] }).to eql(@memberships.sort_by(&:created_at).reverse.map(&:project).map(&:name)[0, 10])
       end
 
       it "should filter memberships by name when a query is given" do
         get :index, format: 'json', query: 'filter'
-        response.status.should eql(200)
-        JSON.parse(response.body).map { |r| r['project']['name'] }.should eql(@filter_memberships.sort_by(&:created_at).reverse.map(&:project).map(&:name)[0, 10])
+        expect(response.status).to eql(200)
+        expect(JSON.parse(response.body).map { |r| r['project']['name'] }).to eql(@filter_memberships.sort_by(&:created_at).reverse.map(&:project).map(&:name)[0, 10])
       end
     end
   end

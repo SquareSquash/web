@@ -25,10 +25,10 @@ describe Occurrence do
       occurrence2_1 = FactoryGirl.create(:rails_occurrence, bug: bug2)
       occurrence2_2 = FactoryGirl.create(:rails_occurrence, bug: bug2)
 
-      occurrence1_1.number.should eql(1)
-      occurrence1_2.number.should eql(2)
-      occurrence2_1.number.should eql(1)
-      occurrence2_2.number.should eql(2)
+      expect(occurrence1_1.number).to eql(1)
+      expect(occurrence1_2.number).to eql(2)
+      expect(occurrence2_1.number).to eql(1)
+      expect(occurrence2_2.number).to eql(2)
     end
 
     it "should not reuse deleted numbers" do
@@ -43,12 +43,12 @@ describe Occurrence do
       c = FactoryGirl.create(:rails_occurrence, bug: bug)
       FactoryGirl.create :rails_occurrence, bug: bug
       c.destroy
-      FactoryGirl.create(:rails_occurrence, bug: bug).number.should eql(4)
+      expect(FactoryGirl.create(:rails_occurrence, bug: bug).number).to eql(4)
     end
 
     it "should set the parent's first occurrence if necessary" do
       o = FactoryGirl.create(:rails_occurrence)
-      o.bug.first_occurrence.should eql(o.occurred_at)
+      expect(o.bug.first_occurrence).to eql(o.occurred_at)
     end
   end
 
@@ -57,13 +57,13 @@ describe Occurrence do
       symbols = Squash::Symbolicator::Symbols.new
       symbols.add 1, 10, 'foo.rb', 5, 'bar'
       symb = FactoryGirl.create(:symbolication, symbols: symbols)
-      FactoryGirl.create(:rails_occurrence,
+      expect(FactoryGirl.create(:rails_occurrence,
                          symbolication: symb,
                          backtraces:    [{"name"      => "1",
                                           "faulted"   => true,
                                           "backtrace" => [{"type"    => "address",
-                                                           "address" => 5}]}]).
-          should be_symbolicated
+                                                           "address" => 5}]}])).
+          to be_symbolicated
     end
 
     it "should send an email if the notification threshold has been tripped" do
@@ -76,11 +76,11 @@ describe Occurrence do
       ActionMailer::Base.deliveries.clear
 
       FactoryGirl.create :rails_occurrence, bug: occurrence.bug
-      ActionMailer::Base.deliveries.should be_empty
+      expect(ActionMailer::Base.deliveries).to be_empty
 
       FactoryGirl.create :rails_occurrence, bug: occurrence.bug
-      ActionMailer::Base.deliveries.size.should eql(1)
-      ActionMailer::Base.deliveries.first.to.should eql([nt.user.email])
+      expect(ActionMailer::Base.deliveries.size).to eql(1)
+      expect(ActionMailer::Base.deliveries.first.to).to eql([nt.user.email])
     end
 
     it "should update last_tripped_at" do
@@ -92,10 +92,10 @@ describe Occurrence do
       nt         = FactoryGirl.create(:notification_threshold, bug: occurrence.bug, period: 1.minute, threshold: 3)
 
       FactoryGirl.create :rails_occurrence, bug: occurrence.bug
-      nt.reload.last_tripped_at.should be_nil
+      expect(nt.reload.last_tripped_at).to be_nil
 
       FactoryGirl.create :rails_occurrence, bug: occurrence.bug
-      nt.reload.last_tripped_at.should be_within(1).of(Time.now)
+      expect(nt.reload.last_tripped_at).to be_within(1).of(Time.now)
     end
 
     context "[PagerDuty integration]" do
@@ -111,13 +111,13 @@ describe Occurrence do
 
       context "[critical threshold notification]" do
         it "should not send an incident to PagerDuty until the critical threshold is breached" do
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
         end
 
         it "should send an incident if always_notify_pagerduty is set" do
           @project.update_attribute :always_notify_pagerduty, true
-          Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+          expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once.with(
               /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
               @bug.pagerduty_incident_key,
               an_instance_of(Hash)
@@ -127,7 +127,7 @@ describe Occurrence do
 
         it "should send an incident to PagerDuty once the critical threshold is breached" do
           FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
-          Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+          expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once.with(
               /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
               @bug.pagerduty_incident_key,
               an_instance_of(Hash)
@@ -138,35 +138,35 @@ describe Occurrence do
         it "should not send an incident if the project does not have a session key configured" do
           @project.update_attribute :pagerduty_service_key, nil
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if incident reporting is disabled" do
           @project.update_attribute :pagerduty_enabled, false
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the environment has incident reporting disabled" do
           @environment.update_attribute :notifies_pagerduty, nil
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the bug is assigned" do
           @bug.update_attribute :assigned_user, FactoryGirl.create(:membership, project: @project).user
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the bug is irrelevant" do
           @bug.update_attribute :irrelevant, true
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
       end
@@ -178,7 +178,7 @@ describe Occurrence do
         end
 
         it "should send an incident to PagerDuty once if the page threshold is breached" do
-          Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+          expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once.with(
               /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
               @bug.pagerduty_incident_key,
               an_instance_of(Hash)
@@ -188,48 +188,48 @@ describe Occurrence do
 
         it "should not send an incident to PagerDuty if the page threshold is breached again inside the page period" do
           @bug.update_attributes page_last_tripped_at: 30.seconds.ago
-          Service::PagerDuty.any_instance.should_not_receive(:trigger)
+          expect_any_instance_of(Service::PagerDuty).not_to receive(:trigger)
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should send an incident to PagerDuty if the page threshold is breached again outside the page period" do
           @bug.update_attributes page_last_tripped_at: 2.minutes.ago
-          Service::PagerDuty.any_instance.should_receive(:trigger).once
+          expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the project does not have a session key configured" do
           @project.update_attribute :pagerduty_service_key, nil
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if incident reporting is disabled" do
           @project.update_attribute :pagerduty_enabled, false
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the environment has incident reporting disabled" do
           @environment.update_attribute :notifies_pagerduty, nil
 
-          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not an incident if the bug is assigned" do
           @bug.update_attribute :assigned_user, FactoryGirl.create(:membership, project: @project).user
 
-          Service::PagerDuty.any_instance.should_receive(:trigger).once
+          expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not an incident if the bug is irrelevant" do
           @bug.update_attribute :irrelevant, true
 
-          Service::PagerDuty.any_instance.should_receive(:trigger).once
+          expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
       end
@@ -256,13 +256,13 @@ describe Occurrence do
         bug = FactoryGirl.create(:bug)
 
         occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
-        occurrence.bug.device_bugs.where(device_id: 'hello').should exist
+        expect(occurrence.bug.device_bugs.where(device_id: 'hello')).to exist
         expect {
           FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
         }.to_not change { bug.device_bugs.where(device_id: 'hello').count }
 
         occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'goodbye')
-        occurrence.bug.device_bugs.where(device_id: 'goodbye').should exist
+        expect(occurrence.bug.device_bugs.where(device_id: 'goodbye')).to exist
       end
     end
   end
@@ -271,17 +271,17 @@ describe Occurrence do
     it "should return the at-fault backtrace" do
       bt1 = [{'file' => 'foo.rb', 'line' => 123, 'symbol' => 'bar'}]
       bt2 = [{'file' => 'bar.rb', 'line' => 321, 'symbol' => 'foo'}]
-      FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
+      expect(FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
                                                   {'name' => '2', 'faulted' => true, 'backtrace' => bt2}]).
-          faulted_backtrace.should eql(bt2)
+          faulted_backtrace).to eql(bt2)
     end
 
     it "should return an empty array if there is no at-fault backtrace" do
       bt1 = [{'file' => 'foo.rb', 'line' => 123, 'symbol' => 'bar'}]
       bt2 = [{'file' => 'bar.rb', 'line' => 321, 'symbol' => 'foo'}]
-      FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
+      expect(FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
                                                   {'name' => '2', 'faulted' => false, 'backtrace' => bt2}]).
-          faulted_backtrace.should eql([])
+          faulted_backtrace).to eql([])
     end
   end
 
@@ -291,13 +291,13 @@ describe Occurrence do
       old = o.attributes
 
       o.truncate!
-      o.should be_truncated
+      expect(o).to be_truncated
 
-      o.metadata.should be_nil
-      o.client.should eql(old['client'])
-      o.occurred_at.should eql(old['occurred_at'])
-      o.bug_id.should eql(old['bug_id'])
-      o.number.should eql(old['number'])
+      expect(o.metadata).to be_nil
+      expect(o.client).to eql(old['client'])
+      expect(o.occurred_at).to eql(old['occurred_at'])
+      expect(o.bug_id).to eql(old['bug_id'])
+      expect(o.number).to eql(old['number'])
     end
   end
 
@@ -306,8 +306,8 @@ describe Occurrence do
       os      = FactoryGirl.create_list :rails_occurrence, 4
       another = FactoryGirl.create :rails_occurrence
       Occurrence.truncate! Occurrence.where(id: os.map(&:id))
-      os.map(&:reload).all?(&:truncated?).should be_true
-      another.reload.should_not be_truncated
+      expect(os.map(&:reload).all?(&:truncated?)).to be_true
+      expect(another.reload).not_to be_truncated
     end
   end
 
@@ -316,9 +316,9 @@ describe Occurrence do
       o1 = FactoryGirl.create(:rails_occurrence)
       o2 = FactoryGirl.create(:rails_occurrence, bug: o1.bug)
       o1.redirect_to! o2
-      o1.redirect_target.should eql(o2)
-      o1.should be_truncated
-      o1.bug.should_not be_irrelevant
+      expect(o1.redirect_target).to eql(o2)
+      expect(o1).to be_truncated
+      expect(o1.bug).not_to be_irrelevant
     end
 
     it "should mark the bug as irrelevant if it's the last occurrence to be redirected" do
@@ -328,8 +328,8 @@ describe Occurrence do
       o2 = FactoryGirl.create(:rails_occurrence, bug: b2)
 
       o1.redirect_to! o2
-      o1.redirect_target.should eql(o2)
-      b1.reload.should be_irrelevant
+      expect(o1.redirect_target).to eql(o2)
+      expect(b1.reload).to be_irrelevant
     end
   end
 
@@ -343,12 +343,12 @@ describe Occurrence do
 
     it "should do nothing if there is no symbolication" do
       @occurrence.symbolication_id = nil
-      -> { @occurrence.symbolicate! }.should_not change(@occurrence, :backtraces)
+      expect { @occurrence.symbolicate! }.not_to change(@occurrence, :backtraces)
     end
 
     it "should do nothing if the occurrence is truncated" do
       @occurrence.truncate!
-      -> { @occurrence.symbolicate! }.should_not change(@occurrence, :metadata)
+      expect { @occurrence.symbolicate! }.not_to change(@occurrence, :metadata)
     end
 
     it "should do nothing if the occurrence is already symbolicated" do
@@ -387,7 +387,7 @@ describe Occurrence do
                                                  {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                   "line"   => 644,
                                                   "symbol" => "initialize"}]}]
-      -> { @occurrence.symbolicate! }.should_not change(@occurrence, :backtraces)
+      expect { @occurrence.symbolicate! }.not_to change(@occurrence, :backtraces)
     end
 
     it "should symbolicate the occurrence" do
@@ -410,8 +410,8 @@ describe Occurrence do
                                                      "symbol" => "timeout"}]}]
       @occurrence.symbolicate!
 
-      @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
                                           "faulted"   => true,
                                           "backtrace" => [{"file"   => "foo.rb",
                                                            "line"   => 15,
@@ -453,8 +453,8 @@ describe Occurrence do
                                                      "symbol" => "timeout"}]}]
       @occurrence.symbolicate! symb2
 
-      @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
                                           "faulted"   => true,
                                           "backtrace" => [{"file"   => "foo3.rb",
                                                            "line"   => 15,
@@ -473,7 +473,7 @@ describe Occurrence do
 
   describe "#symbolicated?" do
     it "should return true if all lines are symbolicated" do
-      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+      expect(FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
                                                    "faulted"   => true,
                                                    "backtrace" => [{"file"   => "/usr/bin/gist",
                                                                     "line"   => 313,
@@ -507,11 +507,11 @@ describe Occurrence do
                                                                     "symbol" => "open"},
                                                                    {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                                     "line"   => 644,
-                                                                    "symbol" => "initialize"}]}]).should be_symbolicated
+                                                                    "symbol" => "initialize"}]}])).to be_symbolicated
     end
 
     it "should return false if any line is unsymbolicated" do
-      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+      expect(FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
                                                    "faulted"   => true,
                                                    "backtrace" => [{"file"   => "/usr/bin/gist",
                                                                     "line"   => 313,
@@ -544,7 +544,7 @@ describe Occurrence do
                                                                     "symbol" => "open"},
                                                                    {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                                     "line"   => 644,
-                                                                    "symbol" => "initialize"}]}]).should_not be_symbolicated
+                                                                    "symbol" => "initialize"}]}])).not_to be_symbolicated
     end
   end
 
@@ -557,12 +557,12 @@ describe Occurrence do
     end
 
     it "should do nothing if there is no source map" do
-      -> { @occurrence.sourcemap! }.should_not change(@occurrence, :backtraces)
+      expect { @occurrence.sourcemap! }.not_to change(@occurrence, :backtraces)
     end
 
     it "should do nothing if the occurrence is truncated" do
       @occurrence.truncate!
-      -> { @occurrence.sourcemap! }.should_not change(@occurrence, :metadata)
+      expect { @occurrence.sourcemap! }.not_to change(@occurrence, :metadata)
     end
 
     it "should do nothing if the occurrence is already sourcemapped" do
@@ -601,7 +601,7 @@ describe Occurrence do
                                                  {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                   "line"   => 644,
                                                   "symbol" => "initialize"}]}]
-      -> { @occurrence.sourcemap! }.should_not change(@occurrence, :backtraces)
+      expect { @occurrence.sourcemap! }.not_to change(@occurrence, :backtraces)
     end
 
     it "should sourcemap the occurrence" do
@@ -619,8 +619,8 @@ describe Occurrence do
                                                   "context" => nil}]}]
       @occurrence.sourcemap!
 
-      @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
                                           "faulted"   => true,
                                           "backtrace" => [{"file"   => "app/assets/javascripts/source.js",
                                                            "line"   => 25,
@@ -647,8 +647,8 @@ describe Occurrence do
                                                   "context" => nil}]}]
       @occurrence.sourcemap! sm2
 
-      @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
                                           "faulted"   => true,
                                           "backtrace" => [{"file"   => "app/assets/javascripts/source2.js",
                                                            "line"   => 2,
@@ -658,7 +658,7 @@ describe Occurrence do
 
   describe "#sourcemapped?" do
     it "should return true if all lines are source-mapped" do
-      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+      expect(FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
                                                    "faulted"   => true,
                                                    "backtrace" => [{"file"   => "/usr/bin/gist",
                                                                     "line"   => 313,
@@ -692,11 +692,11 @@ describe Occurrence do
                                                                     "symbol" => "open"},
                                                                    {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                                     "line"   => 644,
-                                                                    "symbol" => "initialize"}]}]).should be_sourcemapped
+                                                                    "symbol" => "initialize"}]}])).to be_sourcemapped
     end
 
     it "should return false if any line is not source-mapped" do
-      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+      expect(FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
                                                    "faulted"   => true,
                                                    "backtrace" =>
                                                        [{"file" => "/usr/bin/gist", "line" => 313, "symbol" => "<main>"},
@@ -726,7 +726,7 @@ describe Occurrence do
                                                         {"file" => "/usr/lib/ruby/1.9.1/net/http.rb", "line" => 644, "symbol" => "open"},
                                                         {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                          "line"   => 644,
-                                                         "symbol" => "initialize"}]}]).should_not be_sourcemapped
+                                                         "symbol" => "initialize"}]}])).not_to be_sourcemapped
     end
   end
 
@@ -739,12 +739,12 @@ describe Occurrence do
     end
 
     it "should do nothing if there is no obfuscation map" do
-      -> { @occurrence.deobfuscate! }.should_not change(@occurrence, :backtraces)
+      expect { @occurrence.deobfuscate! }.not_to change(@occurrence, :backtraces)
     end
 
     it "should do nothing if the occurrence is truncated" do
       @occurrence.truncate!
-      -> { @occurrence.deobfuscate! }.should_not change(@occurrence, :metadata)
+      expect { @occurrence.deobfuscate! }.not_to change(@occurrence, :metadata)
     end
 
     it "should do nothing if the occurrence is already de-obfuscated" do
@@ -774,7 +774,7 @@ describe Occurrence do
                                       {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                        "line"   => 644,
                                        "symbol" => "initialize"}]}]
-      -> { @occurrence.deobfuscate! }.should_not change(@occurrence, :backtraces)
+      expect { @occurrence.deobfuscate! }.not_to change(@occurrence, :backtraces)
     end
 
     it "should deobfuscate the occurrence" do
@@ -794,8 +794,8 @@ describe Occurrence do
                                        "class_name" => "com.A.B"}]}]
       @occurrence.deobfuscate!
 
-      @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
                                           "faulted"   => true,
                                           "backtrace" =>
                                               [{"file"   => "src/foo/Bar.java",
@@ -825,8 +825,8 @@ describe Occurrence do
                                        "class_name" => "com.squareup.ActivityThread"}]}]
       @occurrence.deobfuscate!
 
-      @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
                                           "faulted"   => true,
                                           "backtrace" =>
                                               [{"file"   => "src/foo/Bar.java",
@@ -863,8 +863,8 @@ describe Occurrence do
                                        "class_name" => "com.A.B"}]}]
       @occurrence.deobfuscate! om2
 
-      @occurrence.changes.should be_empty
-      @occurrence.backtraces.should eql([{"name"      => "Thread 0",
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
                                           "faulted"   => true,
                                           "backtrace" =>
                                               [{"file"   => "src/foo/BarTwo.java",
@@ -875,7 +875,7 @@ describe Occurrence do
 
   describe "#deobfuscated?" do
     it "should return true if all lines are deobfuscated" do
-      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+      expect(FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
                                                    "faulted"   => true,
                                                    "backtrace" =>
                                                        [{"file" => "/usr/bin/gist", "line" => 313, "symbol" => "<main>"},
@@ -900,12 +900,12 @@ describe Occurrence do
                                                         {"file" => "/usr/lib/ruby/1.9.1/net/http.rb", "line" => 644, "symbol" => "open"},
                                                         {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                          "line"   => 644,
-                                                         "symbol" => "initialize"}]}]).
-          should be_deobfuscated
+                                                         "symbol" => "initialize"}]}])).
+          to be_deobfuscated
     end
 
     it "should return false if any line is deobfuscated" do
-      FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
+      expect(FactoryGirl.build(:occurrence, backtraces: [{"name"      => "Thread 0",
                                                    "faulted"   => true,
                                                    "backtrace" =>
                                                        [{"file" => "/usr/bin/gist", "line" => 313, "symbol" => "<main>"},
@@ -934,8 +934,8 @@ describe Occurrence do
                                                         {"file" => "/usr/lib/ruby/1.9.1/net/http.rb", "line" => 644, "symbol" => "open"},
                                                         {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                          "line"   => 644,
-                                                         "symbol" => "initialize"}]}]).
-          should_not be_deobfuscated
+                                                         "symbol" => "initialize"}]}])).
+          not_to be_deobfuscated
     end
   end
 
@@ -946,8 +946,8 @@ describe Occurrence do
       occ  = FactoryGirl.create(:rails_occurrence, bug: bug1)
 
       blamer = bug1.environment.project.blamer.new(occ)
-      blamer.class.stub(:new).and_return(blamer)
-      blamer.should_receive(:find_or_create_bug!).once.and_return(bug2)
+      allow(blamer.class).to receive(:new).and_return(blamer)
+      expect(blamer).to receive(:find_or_create_bug!).once.and_return(bug2)
 
       message     = occ.message
       revision    = occ.revision
@@ -955,14 +955,14 @@ describe Occurrence do
       client      = occ.client
       occ.recategorize!
 
-      bug2.occurrences.count.should eql(1)
+      expect(bug2.occurrences.count).to eql(1)
       occ2 = bug2.occurrences.first
-      occ.redirect_target.should eql(occ2)
+      expect(occ.redirect_target).to eql(occ2)
 
-      occ2.message.should eql(message)
-      occ2.revision.should eql(revision)
-      occ2.occurred_at.should eql(occurred_at)
-      occ2.client.should eql(client)
+      expect(occ2.message).to eql(message)
+      expect(occ2.revision).to eql(revision)
+      expect(occ2.occurred_at).to eql(occurred_at)
+      expect(occ2.client).to eql(client)
     end
 
     it "should reopen the new bug if necessary" do
@@ -971,8 +971,8 @@ describe Occurrence do
       occ  = FactoryGirl.create(:rails_occurrence, bug: bug1)
 
       blamer = bug1.environment.project.blamer.new(occ)
-      blamer.class.stub(:new).and_return(blamer)
-      blamer.should_receive(:find_or_create_bug!).once.and_return(bug2)
+      allow(blamer.class).to receive(:new).and_return(blamer)
+      expect(blamer).to receive(:find_or_create_bug!).once.and_return(bug2)
 
       message     = occ.message
       revision    = occ.revision
@@ -980,14 +980,14 @@ describe Occurrence do
       client      = occ.client
       occ.recategorize!
 
-      bug2.occurrences.count.should eql(1)
+      expect(bug2.occurrences.count).to eql(1)
       occ2 = bug2.occurrences.first
-      occ.redirect_target.should eql(occ2)
+      expect(occ.redirect_target).to eql(occ2)
 
-      occ2.message.should eql(message)
-      occ2.revision.should eql(revision)
-      occ2.occurred_at.should eql(occurred_at)
-      occ2.client.should eql(client)
+      expect(occ2.message).to eql(message)
+      expect(occ2.revision).to eql(revision)
+      expect(occ2.occurred_at).to eql(occurred_at)
+      expect(occ2.client).to eql(client)
     end
   end
 end

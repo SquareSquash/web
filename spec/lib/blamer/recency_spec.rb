@@ -36,7 +36,7 @@ describe Blamer::Recency do
                                                                    "line"   => 2,
                                                                    "symbol" => "foo"}]}],
                                     revision:   'abcdef')
-    -> { Blamer::Recency.new(@occurrence).find_or_create_bug! }.should raise_error('Need a resolvable commit')
+    expect { Blamer::Recency.new(@occurrence).find_or_create_bug! }.to raise_error('Need a resolvable commit')
   end
 
   it "should resolve duplicate bugs" do
@@ -51,7 +51,7 @@ describe Blamer::Recency do
                                                                    "symbol" => "foo"}]}],
                                     revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
     bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-    bug.should eql(original)
+    expect(bug).to eql(original)
   end
 
   context "[hosted projects]" do
@@ -65,7 +65,7 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should eql(@bug)
+      expect(bug).to eql(@bug)
     end
 
     it "should match an existing closed bug in the same environment" do
@@ -79,7 +79,7 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should eql(@bug)
+      expect(bug).to eql(@bug)
     end
 
     it "should create a new bug if no existing bug could be found" do
@@ -92,9 +92,9 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should_not eql(@bug)
-      bug.file.should eql('lib/better_caller/extensions.rb')
-      bug.line.should eql(3)
+      expect(bug).not_to eql(@bug)
+      expect(bug.file).to eql('lib/better_caller/extensions.rb')
+      expect(bug.line).to eql(3)
     end
 
     it "should not match an existing bug in a different environment" do
@@ -108,8 +108,8 @@ describe Blamer::Recency do
                                                                                 "symbol" => "foo"}]}],
                                                  revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug                    = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should_not eql(@bug)
-      bug.environment.should eql(@shell_bug.environment)
+      expect(bug).not_to eql(@bug)
+      expect(bug.environment).to eql(@shell_bug.environment)
     end
 
     it "should not match an existing bug of a different class name" do
@@ -123,8 +123,8 @@ describe Blamer::Recency do
                                                                                "symbol" => "foo"}]}],
                                                 revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug                   = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should_not eql(@bug)
-      bug.class_name.should eql('SomeOtherError')
+      expect(bug).not_to eql(@bug)
+      expect(bug.class_name).to eql('SomeOtherError')
     end
   end
 
@@ -146,8 +146,8 @@ describe Blamer::Recency do
                                                                            "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug               = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should eql(@bug)
-      bug.deploy.should eql(@shell_bug.deploy)
+      expect(bug).to eql(@bug)
+      expect(bug.deploy).to eql(@shell_bug.deploy)
     end
 
     it "should match an existing closed bug in the same deploy" do
@@ -162,7 +162,7 @@ describe Blamer::Recency do
                                                                            "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug               = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should eql(@bug)
+      expect(bug).to eql(@bug)
     end
 
     it "should otherwise match an existing open bug in another deploy, and advance the deploy ID" do
@@ -176,8 +176,8 @@ describe Blamer::Recency do
                                                                            "symbol" => "foo"}]}],
                                             revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug               = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should eql(@bug)
-      bug.deploy.should eql(@shell_bug.deploy)
+      expect(bug).to eql(@bug)
+      expect(bug.deploy).to eql(@shell_bug.deploy)
     end
 
     it "should not otherwise match an existing closed bug" do
@@ -192,8 +192,8 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.should_not eql(@bug)
-      bug.deploy.should eql(@shell_bug.deploy)
+      expect(bug).not_to eql(@bug)
+      expect(bug.deploy).to eql(@shell_bug.deploy)
     end
   end
 
@@ -220,9 +220,9 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.file.should eql('ext/better_caller.c')
-      bug.line.should eql(50)
-      bug.blamed_revision.should eql('7f9ef6977510b3487483cf834ea02d3e6d7f6f13')
+      expect(bug.file).to eql('ext/better_caller.c')
+      expect(bug.line).to eql(50)
+      expect(bug.blamed_revision).to eql('7f9ef6977510b3487483cf834ea02d3e6d7f6f13')
     end
 
     it "should use the topmost file if the backtrace is all library files" do
@@ -241,10 +241,10 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.file.should eql('/library/file')
-      bug.line.should eql(27)
-      bug.special_file?.should be_false
-      bug.blamed_revision.should be_nil
+      expect(bug.file).to eql('/library/file')
+      expect(bug.line).to eql(27)
+      expect(bug.special_file?).to be_false
+      expect(bug.blamed_revision).to be_nil
     end
 
     it "should use the topmost project file if none of the project files have associated commits" do
@@ -263,10 +263,10 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.file.should eql('fake/project/file')
-      bug.line.should eql(11)
-      bug.special_file?.should be_false
-      bug.blamed_revision.should be_nil
+      expect(bug.file).to eql('fake/project/file')
+      expect(bug.line).to eql(11)
+      expect(bug.special_file?).to be_false
+      expect(bug.blamed_revision).to be_nil
     end
 
     it "should set special_file for unsymbolicated bugs" do
@@ -282,9 +282,9 @@ describe Blamer::Recency do
                                                                      "address" => 5}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.file.should eql('0x0000001B')
-      bug.line.should eql(1)
-      bug.special_file?.should be_true
+      expect(bug.file).to eql('0x0000001B')
+      expect(bug.line).to eql(1)
+      expect(bug.special_file?).to be_true
     end
 
     it "should set special_file but use the backtrace elements for an obfuscated Java bug" do
@@ -299,9 +299,9 @@ describe Blamer::Recency do
                                                                      "class_name" => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.file.should eql('A.java')
-      bug.line.should eql(15)
-      bug.special_file?.should be_true
+      expect(bug.file).to eql('A.java')
+      expect(bug.line).to eql(15)
+      expect(bug.special_file?).to be_true
     end
 
     it "should abs Java line numbers, which can apparently be negative" do
@@ -316,8 +316,8 @@ describe Blamer::Recency do
                                                                      "class_name" => "A"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.file.should eql('A.java')
-      bug.line.should eql(15)
+      expect(bug.file).to eql('A.java')
+      expect(bug.line).to eql(15)
     end
   end
 
@@ -333,7 +333,7 @@ describe Blamer::Recency do
                                                                      "symbol" => "foo"}]}],
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.message_template.should eql('Undefined [NUMBER] for #<Object:[ADDRESS]>')
+      expect(bug.message_template).to eql('Undefined [NUMBER] for #<Object:[ADDRESS]>')
     end
 
     it "should use the DB error filters" do
@@ -348,7 +348,7 @@ describe Blamer::Recency do
                                                                                "symbol" => "foo"}]}],
                                                 revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       bug                   = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.message_template.should eql("Cannot drop index '[STRING]': needed in a foreign key")
+      expect(bug.message_template).to eql("Cannot drop index '[STRING]': needed in a foreign key")
     end
 
     it "should not filter the message if filtering is disabled" do
@@ -363,7 +363,7 @@ describe Blamer::Recency do
                                       revision:   '2dc20c984283bede1f45863b8f3b4dd9b5b554cc')
       @shell_bug.environment.project.update_attribute :disable_message_filtering, true
       bug = Blamer::Recency.new(@occurrence).find_or_create_bug!
-      bug.message_template.should eql('Undefined 123 for #<Object:0x007fedfa0aa920>')
+      expect(bug.message_template).to eql('Undefined 123 for #<Object:0x007fedfa0aa920>')
     end
   end
 
@@ -385,7 +385,7 @@ describe Blamer::Recency do
       blamer.reopen_bug_if_necessary! bug
 
 
-      @bug.reload.should be_fixed
+      expect(@bug.reload).to be_fixed
     end
 
     it "should reopen a fixed and deployed bug" do
@@ -403,7 +403,7 @@ describe Blamer::Recency do
       bug    = blamer.find_or_create_bug!
       blamer.reopen_bug_if_necessary! bug
 
-      @bug.reload.should_not be_fixed
+      expect(@bug.reload).not_to be_fixed
     end
 
     it "should reopen a fixed and stale bug" do
@@ -422,7 +422,7 @@ describe Blamer::Recency do
       bug    = blamer.find_or_create_bug!
       blamer.reopen_bug_if_necessary! bug
 
-      @bug.reload.should_not be_fixed
+      expect(@bug.reload).not_to be_fixed
     end
 
     it "should not reopen a distributed project's bug" do
@@ -443,7 +443,7 @@ describe Blamer::Recency do
       bug    = blamer.find_or_create_bug!
       blamer.reopen_bug_if_necessary! bug
 
-      @bug.reload.should be_fixed
+      expect(@bug.reload).to be_fixed
     end
   end
 end

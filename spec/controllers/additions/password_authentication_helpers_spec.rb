@@ -30,18 +30,18 @@ if Squash::Configuration.authentication.strategy == 'password'
       before(:all) { @user = FactoryGirl.create(:user, password: 'password123') }
 
       it "should accept a valid username and password" do
-        @controller.should_receive(:log_in_user).once.with(@user)
-        @controller.log_in(@user.username, 'password123').should be_true
+        expect(@controller).to receive(:log_in_user).once.with(@user)
+        expect(@controller.log_in(@user.username, 'password123')).to be_true
       end
 
       it "should not accept an unknown username" do
-        @controller.should_not_receive :log_in_user
-        @controller.log_in('unknown', 'password123').should be_false
+        expect(@controller).not_to receive :log_in_user
+        expect(@controller.log_in('unknown', 'password123')).to be_false
       end
 
       it "should not accept an invalid password" do
-        @controller.should_not_receive :log_in_user
-        @controller.log_in(@user.username, 'password-wrong').should be_false
+        expect(@controller).not_to receive :log_in_user
+        expect(@controller.log_in(@user.username, 'password-wrong')).to be_false
       end
     end
   end

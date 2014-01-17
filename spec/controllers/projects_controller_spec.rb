@@ -22,7 +22,7 @@ describe ProjectsController do
 
     it "should require a logged-in user" do
       get :index
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -37,20 +37,20 @@ describe ProjectsController do
         it "should find up to 25 projects by search query" do
           get :index, query: 'find me', format: 'json'
 
-          response.status.should eql(200)
+          expect(response.status).to eql(200)
           json = JSON.parse(response.body)
-          json.size.should eql(25)
+          expect(json.size).to eql(25)
           json.each_with_index do |proj, i|
-            proj['url'].should eql("http://test.host/projects/find-me-#{25-i}")
-            proj['join_url'].should eql("http://test.host/projects/find-me-#{25-i}/membership/join")
-            proj['owner']['url'].should include('/users/')
+            expect(proj['url']).to eql("http://test.host/projects/find-me-#{25-i}")
+            expect(proj['join_url']).to eql("http://test.host/projects/find-me-#{25-i}/membership/join")
+            expect(proj['owner']['url']).to include('/users/')
           end
         end
 
         it "should return all projects if the query is empty" do
           get :index, format: 'json'
-          response.status.should eql(200)
-          JSON.parse(response.body).size.should eql(25)
+          expect(response.status).to eql(200)
+          expect(JSON.parse(response.body).size).to eql(25)
         end
       end
     end
@@ -58,8 +58,8 @@ describe ProjectsController do
 
   describe "#create" do
     it "should require a logged-in user" do
-      -> { post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/better_caller.git'}, format: 'json' }.should_not change(Project, :count)
-      response.status.should eql(401)
+      expect { post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/better_caller.git'}, format: 'json' }.not_to change(Project, :count)
+      expect(response.status).to eql(401)
     end
 
     context '[authenticated]' do
@@ -70,17 +70,17 @@ describe ProjectsController do
 
       it "should create the new project" do
         post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/better_caller.git'}, format: 'json'
-        response.status.should eql(201)
+        expect(response.status).to eql(201)
         json = JSON.parse(response.body)
-        json['name'].should eql('New Project')
-        json['repository_url'].should eql('git@github.com:RISCfuture/better_caller.git')
+        expect(json['name']).to eql('New Project')
+        expect(json['repository_url']).to eql('git@github.com:RISCfuture/better_caller.git')
       end
 
       it "should validate project connectivity" do
         post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/nonexistent.git'}, format: 'json'
-        response.status.should eql(422)
+        expect(response.status).to eql(422)
         json = JSON.parse(response.body)
-        json.should eql({'project' => {'repository_url' => ['is not accessible']}})
+        expect(json).to eql({'project' => {'repository_url' => ['is not accessible']}})
       end
 
       it "should not allow protected fields to be set" do
@@ -94,19 +94,19 @@ describe ProjectsController do
 
     it "should require a logged-in user" do
       get :edit, id: @project.to_param
-      response.should redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_url(next: request.fullpath))
     end
 
     it "should allow a project member" do
       login_as FactoryGirl.create(:membership, project: @project).user
       get :edit, id: @project.to_param
-      response.should be_success
+      expect(response).to be_success
     end
 
     it "should allow a project admin" do
       login_as FactoryGirl.create(:membership, project: @project, admin: true).user
       get :edit, id: @project.to_param
-      response.should be_success
+      expect(response).to be_success
     end
 
     context '[authenticated]' do
@@ -114,8 +114,8 @@ describe ProjectsController do
 
       it "should create filter_paths_string and whitelist_paths_string attributes" do
         get :edit, id: @project.to_param
-        assigns(:project).filter_paths_string.should eql(@project.filter_paths.join("\n"))
-        assigns(:project).whitelist_paths_string.should eql(@project.whitelist_paths.join("\n"))
+        expect(assigns(:project).filter_paths_string).to eql(@project.filter_paths.join("\n"))
+        expect(assigns(:project).whitelist_paths_string).to eql(@project.whitelist_paths.join("\n"))
       end
     end
   end
@@ -128,8 +128,8 @@ describe ProjectsController do
 
     it "should require a logged-in user" do
       patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
-      response.status.should eql(401)
-      @project.reload.name.should_not eql('New Name')
+      expect(response.status).to eql(401)
+      expect(@project.reload.name).not_to eql('New Name')
     end
 
     context '[authenticated]' do
@@ -140,32 +140,32 @@ describe ProjectsController do
         login_as user
 
         patch :update, id: @project.to_param, project: {owner_id: user.id}, format: 'json'
-        response.status.should eql(400)
-        @project.reload.owner.should_not eql(user)
+        expect(response.status).to eql(400)
+        expect(@project.reload.owner).not_to eql(user)
       end
 
       it "should not allow members to alter the project" do
         login_as FactoryGirl.create(:membership, project: @project, admin: false).user
         patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
-        response.status.should eql(403)
-        @project.reload.name.should_not eql('New Name')
+        expect(response.status).to eql(403)
+        expect(@project.reload.name).not_to eql('New Name')
       end
 
       it "should allow owners to alter the project" do
         patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
-        response.status.should eql(200)
-        @project.reload.name.should eql('New Name')
-        response.body.should eql(@project.to_json)
+        expect(response.status).to eql(200)
+        expect(@project.reload.name).to eql('New Name')
+        expect(response.body).to eql(@project.to_json)
       end
 
       it "should convert filter_paths_string into filter_paths" do
         patch :update, id: @project.to_param, project: {filter_paths_string: "a\nb\n"}, format: 'json'
-        @project.reload.filter_paths.should eql(%w( a b ))
+        expect(@project.reload.filter_paths).to eql(%w( a b ))
       end
 
       it "should convert whitelist_paths_string into whitelist_paths" do
         patch :update, id: @project.to_param, project: {whitelist_paths_string: "a\nb\n"}, format: 'json'
-        @project.reload.whitelist_paths.should eql(%w( a b ))
+        expect(@project.reload.whitelist_paths).to eql(%w( a b ))
       end
 
       it "should not allow protected fields to be set" do
@@ -175,13 +175,13 @@ describe ProjectsController do
       it "should set Project#uses_releases_override if uses_releases is changed" do
         @project.update_attribute :uses_releases, true
         patch :update, id: @project.to_param, project: {uses_releases: false}, format: 'json'
-        @project.reload.uses_releases?.should be_false
-        @project.reload.uses_releases_override?.should be_true
+        expect(@project.reload.uses_releases?).to be_false
+        expect(@project.reload.uses_releases_override?).to be_true
       end
 
       it "should not set Project#uses_releases_override if uses_releases is not changed" do
         patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
-        @project.reload.uses_releases_override?.should be_false
+        expect(@project.reload.uses_releases_override?).to be_false
       end
     end
   end
@@ -191,8 +191,8 @@ describe ProjectsController do
 
       it "should require a logged-in user" do
         patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
-        response.status.should eql(401)
-        @project.reload.name.should_not eql('New Name')
+        expect(response.status).to eql(401)
+        expect(@project.reload.name).not_to eql('New Name')
       end
 
       context '[authenticated]' do
@@ -201,22 +201,22 @@ describe ProjectsController do
         it "should not allow members to generate an API key" do
           login_as FactoryGirl.create(:membership, project: @project, admin: false).user
           patch :rekey, id: @project.to_param, format: 'json'
-          response.status.should eql(403)
-          -> { @project.reload }.should_not change(@project, :api_key)
+          expect(response.status).to eql(403)
+          expect { @project.reload }.not_to change(@project, :api_key)
         end
 
         it "should allow admins to generate an API key" do
           patch :rekey, id: @project.to_param, format: 'json'
-          response.status.should redirect_to(edit_project_url(@project))
-          -> { @project.reload }.should change(@project, :api_key)
-          flash[:success].should include(@project.api_key)
+          expect(response.status).to redirect_to(edit_project_url(@project))
+          expect { @project.reload }.to change(@project, :api_key)
+          expect(flash[:success]).to include(@project.api_key)
         end
 
         it "should allow owners to generate an API key" do
           patch :rekey, id: @project.to_param, format: 'json'
-          response.status.should redirect_to(edit_project_url(@project))
-          -> { @project.reload }.should change(@project, :api_key)
-          flash[:success].should include(@project.api_key)
+          expect(response.status).to redirect_to(edit_project_url(@project))
+          expect { @project.reload }.to change(@project, :api_key)
+          expect(flash[:success]).to include(@project.api_key)
         end
       end
     end
@@ -226,8 +226,8 @@ describe ProjectsController do
 
     it "should require a logged-in user" do
       delete :destroy, id: @project.to_param
-      response.status.should redirect_to(login_url(next: request.fullpath))
-      -> { @project.reload }.should_not raise_error
+      expect(response.status).to redirect_to(login_url(next: request.fullpath))
+      expect { @project.reload }.not_to raise_error
     end
 
     context '[authenticated]' do
@@ -236,22 +236,22 @@ describe ProjectsController do
       it "should not allow admins to delete the project" do
         login_as FactoryGirl.create(:membership, project: @project, admin: true).user
         delete :destroy, id: @project.to_param
-        response.status.should redirect_to(root_url)
-        -> { @project.reload }.should_not raise_error
+        expect(response.status).to redirect_to(root_url)
+        expect { @project.reload }.not_to raise_error
       end
 
       it "should not allow members to delete the project" do
         login_as FactoryGirl.create(:membership, project: @project, admin: false).user
         delete :destroy, id: @project.to_param
-        response.status.should redirect_to(root_url)
-        -> { @project.reload }.should_not raise_error
+        expect(response.status).to redirect_to(root_url)
+        expect { @project.reload }.not_to raise_error
       end
 
       it "should allow owners to delete project" do
         delete :destroy, id: @project.to_param
-        response.status.should redirect_to root_url
-        flash[:success].should include('was deleted')
-        -> { @project.reload }.should raise_error(ActiveRecord::RecordNotFound)
+        expect(response.status).to redirect_to root_url
+        expect(flash[:success]).to include('was deleted')
+        expect { @project.reload }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

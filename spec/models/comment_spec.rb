@@ -29,10 +29,10 @@ describe Comment do
       comment2_1 = FactoryGirl.create(:comment, bug: bug2, user: user2)
       comment2_2 = FactoryGirl.create(:comment, bug: bug2, user: user2)
 
-      comment1_1.number.should eql(1)
-      comment1_2.number.should eql(2)
-      comment2_1.number.should eql(1)
-      comment2_2.number.should eql(2)
+      expect(comment1_1.number).to eql(1)
+      expect(comment1_2.number).to eql(2)
+      expect(comment2_1.number).to eql(1)
+      expect(comment2_2.number).to eql(2)
     end
 
     it "should not reuse deleted numbers" do
@@ -47,15 +47,15 @@ describe Comment do
       c = FactoryGirl.create(:comment, bug: bug, user: bug.environment.project.owner)
       FactoryGirl.create :comment, bug: bug, user: bug.environment.project.owner
       c.destroy
-      FactoryGirl.create(:comment, bug: bug, user: bug.environment.project.owner).number.should eql(4)
+      expect(FactoryGirl.create(:comment, bug: bug, user: bug.environment.project.owner).number).to eql(4)
     end
   end
 
   context "[validations]" do
     it "should only allow permitted users to leave comments" do
       comment = FactoryGirl.build(:comment, bug: FactoryGirl.create(:bug))
-      comment.should_not be_valid
-      comment.errors[:bug_id].should eql(["You don’t have permission to comment on this bug."])
+      expect(comment).not_to be_valid
+      expect(comment.errors[:bug_id]).to eql(["You don’t have permission to comment on this bug."])
     end
   end
 
@@ -63,9 +63,9 @@ describe Comment do
     it "should create an event when created" do
       comment = FactoryGirl.create(:comment)
       event   = comment.bug.events.last
-      event.kind.should eql('comment')
-      event.data['comment_id'].should eql(comment.id)
-      event.user.should eql(comment.user)
+      expect(event.kind).to eql('comment')
+      expect(event.data['comment_id']).to eql(comment.id)
+      expect(event.user).to eql(comment.user)
     end
 
     it "should destroy related events when deleted" do
@@ -75,8 +75,8 @@ describe Comment do
       FactoryGirl.create(:comment, bug: comment.bug, user: comment.user)
       red_herring = comment.bug.events(true).last
       comment.destroy
-      -> { event.reload }.should raise_error(ActiveRecord::RecordNotFound)
-      -> { red_herring.reload }.should_not raise_error
+      expect { event.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { red_herring.reload }.not_to raise_error
     end
   end
 
@@ -96,23 +96,23 @@ describe Comment do
 
     it "should send an email to the assigned user and all previous commenters when someone comments on a bug" do
       FactoryGirl.create :comment, bug: @bug, user: @cur_commenter
-      ActionMailer::Base.deliveries.size.should eql(2)
-      ActionMailer::Base.deliveries.map(&:to).flatten.sort.should eql([@assigned.email, @prev_commenter.email])
-      ActionMailer::Base.deliveries.each { |d| d.subject.should include("A comment has been added") }
+      expect(ActionMailer::Base.deliveries.size).to eql(2)
+      expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to eql([@assigned.email, @prev_commenter.email])
+      ActionMailer::Base.deliveries.each { |d| expect(d.subject).to include("A comment has been added") }
     end
 
     it "should not send an email to the assigned user if the assigned user was the commenter" do
       FactoryGirl.create :comment, bug: @bug, user: @assigned
-      ActionMailer::Base.deliveries.size.should eql(1)
-      ActionMailer::Base.deliveries.first.to.should eql([@prev_commenter.email])
-      ActionMailer::Base.deliveries.first.subject.should include("A comment has been added")
+      expect(ActionMailer::Base.deliveries.size).to eql(1)
+      expect(ActionMailer::Base.deliveries.first.to).to eql([@prev_commenter.email])
+      expect(ActionMailer::Base.deliveries.first.subject).to include("A comment has been added")
     end
 
     it "should not send an email to the author even if the author has previously commented" do
       FactoryGirl.create :comment, bug: @bug, user: @prev_commenter
-      ActionMailer::Base.deliveries.size.should eql(1)
-      ActionMailer::Base.deliveries.first.to.should eql([@assigned.email])
-      ActionMailer::Base.deliveries.first.subject.should include("A comment has been added")
+      expect(ActionMailer::Base.deliveries.size).to eql(1)
+      expect(ActionMailer::Base.deliveries.first.to).to eql([@assigned.email])
+      expect(ActionMailer::Base.deliveries.first.subject).to include("A comment has been added")
     end
 
     it "should send only one email to the assigned user if the assigned user has previously commented on the bug" do
@@ -120,32 +120,32 @@ describe Comment do
       ActionMailer::Base.deliveries.clear
 
       FactoryGirl.create :comment, bug: @bug, user: @cur_commenter
-      ActionMailer::Base.deliveries.size.should eql(2)
-      ActionMailer::Base.deliveries.map(&:to).flatten.sort.should eql([@assigned.email, @prev_commenter.email])
-      ActionMailer::Base.deliveries.each { |d| d.subject.should include("A comment has been added") }
+      expect(ActionMailer::Base.deliveries.size).to eql(2)
+      expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to eql([@assigned.email, @prev_commenter.email])
+      ActionMailer::Base.deliveries.each { |d| expect(d.subject).to include("A comment has been added") }
     end
 
     it "should not send an email if the environment is configured not to send emails" do
       @bug.environment.update_attribute :sends_emails, false
       FactoryGirl.create :comment, bug: @bug, user: @cur_commenter
-      ActionMailer::Base.deliveries.should be_empty
+      expect(ActionMailer::Base.deliveries).to be_empty
     end
 
     it "should not send an email if the recipient has turned off comment emails (assigned user)" do
       Membership.for(@assigned, @project).first.update_attribute :send_comment_emails, false
       FactoryGirl.create :comment, bug: @bug, user: @cur_commenter
-      ActionMailer::Base.deliveries.size.should eql(1)
-      ActionMailer::Base.deliveries.first.to.should eql([@prev_commenter.email])
-      ActionMailer::Base.deliveries.first.subject.should include("A comment has been added")
+      expect(ActionMailer::Base.deliveries.size).to eql(1)
+      expect(ActionMailer::Base.deliveries.first.to).to eql([@prev_commenter.email])
+      expect(ActionMailer::Base.deliveries.first.subject).to include("A comment has been added")
     end
 
     it "should not send an email if the recipient has turned off comment emails (commenter)" do
       Membership.for(@assigned, @project).first.update_attribute :send_comment_emails, true
       Membership.for(@prev_commenter, @project).first.update_attribute :send_comment_emails, false
       FactoryGirl.create :comment, bug: @bug, user: @cur_commenter
-      ActionMailer::Base.deliveries.size.should eql(1)
-      ActionMailer::Base.deliveries.first.to.should eql([@assigned.email])
-      ActionMailer::Base.deliveries.first.subject.should include("A comment has been added")
+      expect(ActionMailer::Base.deliveries.size).to eql(1)
+      expect(ActionMailer::Base.deliveries.first.to).to eql([@assigned.email])
+      expect(ActionMailer::Base.deliveries.first.subject).to include("A comment has been added")
     end
   end
 
@@ -159,16 +159,16 @@ describe Comment do
     it "should automatically have the author watch the bug" do
       @user.watches.destroy_all
       FactoryGirl.create :comment, user: @user, bug: @bug
-      @user.watches.count.should eql(1)
-      @user.watches(true).first.bug_id.should eql(@bug.id)
+      expect(@user.watches.count).to eql(1)
+      expect(@user.watches(true).first.bug_id).to eql(@bug.id)
     end
 
     it "should do nothing if the author is already watching the bug" do
       @user.watches.destroy_all
       FactoryGirl.create :watch, user: @user, bug: @bug
       FactoryGirl.create :comment, user: @user, bug: @bug
-      @user.watches.count.should eql(1)
-      @user.watches(true).first.bug_id.should eql(@bug.id)
+      expect(@user.watches.count).to eql(1)
+      expect(@user.watches(true).first.bug_id).to eql(@bug.id)
     end
   end
 end

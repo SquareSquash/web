@@ -22,18 +22,18 @@ describe NotificationThreshold do
 
     it "should return false if the threshold has not yet been exceeded within the period" do
       FactoryGirl.create_list :rails_occurrence, 9, bug: @threshold.bug
-      @threshold.should_not be_tripped
+      expect(@threshold).not_to be_tripped
     end
 
     it "should return true if the threshold has been exceeded within the period" do
       FactoryGirl.create_list :rails_occurrence, 10, bug: @threshold.bug
-      @threshold.should be_tripped
+      expect(@threshold).to be_tripped
     end
 
     it "should return false if the threshold was tripped within the last period" do
       FactoryGirl.create_list :rails_occurrence, 10, bug: @threshold.bug
       @threshold.last_tripped_at = 45.seconds.ago
-      @threshold.should_not be_tripped
+      expect(@threshold).not_to be_tripped
     end
   end
 end

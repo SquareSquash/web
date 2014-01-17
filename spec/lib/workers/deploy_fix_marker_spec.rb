@@ -16,7 +16,7 @@ require 'spec_helper'
 
 describe DeployFixMarker do
   it "should raise an error if the deploy cannot be found" do
-    -> { DeployFixMarker.perform 0 }.should raise_error(ActiveRecord::RecordNotFound)
+    expect { DeployFixMarker.perform 0 }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
   it "should mark the appropriate bugs as fix_deployed" do
@@ -33,9 +33,9 @@ describe DeployFixMarker do
     deploy.save!
     DeployFixMarker.perform deploy.id
 
-    bug_in_range_not_fixed.reload.fix_deployed?.should be_false
-    bug_in_range_fixed_not_deployed.reload.fix_deployed?.should be_true
-    bug_not_in_range_fixed_not_deployed.reload.fix_deployed?.should be_false
+    expect(bug_in_range_not_fixed.reload.fix_deployed?).to be_false
+    expect(bug_in_range_fixed_not_deployed.reload.fix_deployed?).to be_true
+    expect(bug_not_in_range_fixed_not_deployed.reload.fix_deployed?).to be_false
   end
 
   it "should create events for the fixed bugs" do
@@ -49,8 +49,8 @@ describe DeployFixMarker do
     deploy.save!
     DeployFixMarker.perform deploy.id
 
-    bug.events(true).count.should eql(1)
-    bug.events.first.kind.should eql('deploy')
-    bug.events.first.data['revision'].should eql(deploy.revision)
+    expect(bug.events(true).count).to eql(1)
+    expect(bug.events.first.kind).to eql('deploy')
+    expect(bug.events.first.data['revision']).to eql(deploy.revision)
   end
 end

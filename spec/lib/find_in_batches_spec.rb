@@ -25,29 +25,29 @@ describe "ActiveRecord::Base.find_in_batches" do
 
     it "should yield all records for lists < batch size" do
       User.find_in_batches(batch_size: 100) { |batch| @batches << batch }
-      @batches.size.should eql(1)
-      @batches.first.map(&:id).should eql(@users.flatten.map(&:id))
+      expect(@batches.size).to eql(1)
+      expect(@batches.first.map(&:id)).to eql(@users.flatten.map(&:id))
     end
 
     it "should yield all records for lists = batch size" do
       User.find_in_batches(batch_size: 48) { |batch| @batches << batch }
-      @batches.size.should eql(1)
-      @batches.first.map(&:id).should eql(@users.flatten.map(&:id))
+      expect(@batches.size).to eql(1)
+      expect(@batches.first.map(&:id)).to eql(@users.flatten.map(&:id))
     end
 
     it "should yield groups of records for lists > batch size" do
       User.find_in_batches(batch_size: 10) { |batch| @batches << batch }
-      @batches.size.should eql(5)
+      expect(@batches.size).to eql(5)
       @batches.zip(@users).each do |(batch, users)|
-        batch.map(&:id).should eql(users.map(&:id))
+        expect(batch.map(&:id)).to eql(users.map(&:id))
       end
     end
 
     it "should allow a custom start" do
       User.find_in_batches(batch_size: 10, start: @users.flatten[21].id) { |batch| @batches << batch }
-      @batches.size.should eql(3)
+      expect(@batches.size).to eql(3)
       @batches.zip(@users.flatten[21..-1].in_groups_of(10, false)).each do |(batch, users)|
-        batch.map(&:id).should eql(users.map(&:id))
+        expect(batch.map(&:id)).to eql(users.map(&:id))
       end
     end
   end
@@ -64,30 +64,30 @@ describe "ActiveRecord::Base.find_in_batches" do
 
     it "should yield all records for lists < batch size" do
       Membership.find_in_batches(batch_size: 100) { |batch| @batches << batch }
-      @batches.size.should eql(1)
-      @batches.first.map { |m| [m.user_id, m.project_id] }.should eql(@memberships.flatten.map { |m| [m.user_id, m.project_id] })
+      expect(@batches.size).to eql(1)
+      expect(@batches.first.map { |m| [m.user_id, m.project_id] }).to eql(@memberships.flatten.map { |m| [m.user_id, m.project_id] })
     end
 
     it "should yield all records for lists = batch size" do
       Membership.find_in_batches(batch_size: 48) { |batch| @batches << batch }
-      @batches.size.should eql(1)
-      @batches.first.map { |m| [m.user_id, m.project_id] }.should eql(@memberships.flatten.map { |m| [m.user_id, m.project_id] })
+      expect(@batches.size).to eql(1)
+      expect(@batches.first.map { |m| [m.user_id, m.project_id] }).to eql(@memberships.flatten.map { |m| [m.user_id, m.project_id] })
     end
 
     it "should yield groups of records for lists > batch size" do
       Membership.find_in_batches(batch_size: 10) { |batch| @batches << batch }
-      @batches.size.should eql(5)
+      expect(@batches.size).to eql(5)
       @batches.zip(@memberships).each do |(batch, memberships)|
-        batch.map { |m| [m.user_id, m.project_id] }.should eql(memberships.map { |m| [m.user_id, m.project_id] })
+        expect(batch.map { |m| [m.user_id, m.project_id] }).to eql(memberships.map { |m| [m.user_id, m.project_id] })
       end
     end
 
     it "should allow a custom start" do
       start = @memberships.flatten[21].attributes.slice('user_id', 'project_id').values
       Membership.find_in_batches(batch_size: 10, start: start) { |batch| @batches << batch }
-      @batches.size.should eql(3)
+      expect(@batches.size).to eql(3)
       @batches.zip(@memberships.flatten[21..-1].in_groups_of(10, false)).each do |(batch, memberships)|
-        batch.map { |m| [m.user_id, m.project_id] }.should eql(memberships.map { |m| [m.user_id, m.project_id] })
+        expect(batch.map { |m| [m.user_id, m.project_id] }).to eql(memberships.map { |m| [m.user_id, m.project_id] })
       end
     end
   end

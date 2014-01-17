@@ -39,13 +39,13 @@ describe Symbolication do
                                                           "backtrace" =>
                                                               [{"file" => "lib/better_caller/extensions.rb", "line" => 5, "symbol" => "foo"},
                                                                {"type" => "address", "address" => 1}]}])
-      occurrence.should_not be_symbolicated
+      expect(occurrence).not_to be_symbolicated
 
       symbols = Squash::Symbolicator::Symbols.new
       symbols.add 1, 5, 'lib/better_caller/extensions.rb', 2, 'bar'
       FactoryGirl.create :symbolication, uuid: occurrence.symbolication_id, symbols: symbols
-      occurrence.reload.should be_symbolicated
-      occurrence.redirect_target_id.should be_nil
+      expect(occurrence.reload).to be_symbolicated
+      expect(occurrence.redirect_target_id).to be_nil
     end
 
     it "should reassign to another bug if blame changes" do
@@ -80,9 +80,9 @@ describe Symbolication do
       symbols.add 1, 5, 'lib/better_caller/extensions.rb', 5, 'bar'
       FactoryGirl.create :symbolication, uuid: occurrence.symbolication_id, symbols: symbols
 
-      bug2.occurrences.count.should eql(1)
+      expect(bug2.occurrences.count).to eql(1)
       o2 = bug2.occurrences.first
-      occurrence.reload.redirect_target_id.should eql(o2.id)
+      expect(occurrence.reload.redirect_target_id).to eql(o2.id)
     end
   end
 
@@ -101,14 +101,14 @@ describe Symbolication do
     end
 
     it "should symbolicate an address using lines" do
-      @symbolication.symbolicate(12).should eql(
+      expect(@symbolication.symbolicate(12)).to eql(
                                                 'file' => 'foo.rb',
                                                 'line' => 12
                                             )
     end
 
     it "should symbolicate an address using symbols" do
-      @symbolication.symbolicate(16).should eql(
+      expect(@symbolication.symbolicate(16)).to eql(
                                                 'file'   => 'foo2.rb',
                                                 'line'   => 15,
                                                 'symbol' => 'baz'
@@ -116,7 +116,7 @@ describe Symbolication do
     end
 
     it "should symbolicate an address using lines and symbols" do
-      @symbolication.symbolicate(5).should eql(
+      expect(@symbolication.symbolicate(5)).to eql(
                                                'file'   => 'foo.rb',
                                                'line'   => 7,
                                                'symbol' => 'bar'
@@ -124,7 +124,7 @@ describe Symbolication do
     end
 
     it "should return nil for unsymbolicatable addresses" do
-      @symbolication.symbolicate(50).should be_nil
+      expect(@symbolication.symbolicate(50)).to be_nil
     end
   end
 end
