@@ -37,24 +37,33 @@ class PagerDutyNotifier
   # Sends a PagerDuty API call creating a new incident (if appropriate).
 
   def perform
-    if should_notify_pagerduty?
+    if should_notify_pagerduty_of_new_occurrence? || should_notify_pagerduty_when_tripped?
       @occurrence.bug.environment.project.pagerduty.trigger description,
                                                             @occurrence.bug.pagerduty_incident_key,
                                                             details
+      @occurrence.bug.update_attribute :page_last_tripped_at, Time.now
     end
   end
 
   private
 
   def should_notify_pagerduty?
-    !@occurrence.bug.irrelevant? &&
-        !@occurrence.bug.assigned_user_id &&
-        @occurrence.bug.environment.notifies_pagerduty? &&
+    @occurrence.bug.environment.notifies_pagerduty? &&
         @occurrence.bug.environment.project.pagerduty_enabled? &&
-        @occurrence.bug.environment.project.pagerduty_service_key &&
+        @occurrence.bug.environment.project.pagerduty_service_key
+
+  end
+
+  def should_notify_pagerduty_of_new_occurrence?
+    should_notify_pagerduty? &&
+        !@occurrence.bug.irrelevant? &&
+        !@occurrence.bug.assigned_user_id &&
         (@occurrence.bug.occurrences_count > @occurrence.bug.environment.project.critical_threshold ||
             @occurrence.bug.environment.project.always_notify_pagerduty?)
+  end
 
+  def should_notify_pagerduty_when_tripped?
+    should_notify_pagerduty? && @occurrence.bug.page_threshold_tripped?
   end
 
   def description

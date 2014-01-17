@@ -77,6 +77,8 @@ en:
         line: relevant line
         message_template: exception message
         number: number
+        page_period: PagerDuty occurrence time period
+        page_threshold: PagerDuty occurrence threshold
         resolution_revision: fix commit
         revision: revision of first occurrence
       comment:

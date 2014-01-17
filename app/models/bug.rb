@@ -96,6 +96,9 @@
 # | `special_file`         | If `true`, the `file` property has a special value (e.g., a function address), as does `line`.       |
 # | `jira_issue`           | The key of a linked JIRA issue, such as "PROJ-123".                                                  |
 # | `jira_status_id`       | The ID value of the status field of the JIRA issue that should automatically resolve this Bug.       |
+# | `page_threshold`       | Will notify PagerDuty any time this bug occurs this many times within a given period..               |
+# | `page_period`          | Will notify PagerDuty any time this bug occurs a given number of times within this period (seconds). |
+# | `page_last_tripped_at` | The last time PagerDuty was notified due to `page_threshold` being exceeded.                         |
 
 class Bug < ActiveRecord::Base
   belongs_to :environment, inverse_of: :bugs
@@ -136,7 +139,11 @@ class Bug < ActiveRecord::Base
       special_file:         {type: Boolean, default: false, allow_nil: false},
 
       jira_issue:           {type: String, allow_nil: true},
-      jira_status_id:       {type: Fixnum, allow_nil: true, numericality: {only_integer: true, greater_than_or_equal_to: 0}}
+      jira_status_id:       {type: Fixnum, allow_nil: true, numericality: {only_integer: true, greater_than_or_equal_to: 0}},
+
+      page_threshold:       {type: Fixnum, numericality: {greater_than: 0}, allow_nil: true},
+      page_period:          {type: Fixnum, numericality: {greater_than: 0}, allow_nil: true},
+      page_last_tripped_at: {type: Time, allow_nil: true}
   )
 
   validates :environment,
@@ -368,6 +375,16 @@ class Bug < ActiveRecord::Base
 
   def pagerduty_incident_key
     "Squash:Bug:#{id}"
+  end
+
+  # @return [true, false] Whether or not this Bug has occurred `page_threshold`
+  #   times in the past `page_period` seconds.
+
+  def page_threshold_tripped?
+    return false unless page_threshold && page_period
+
+    (page_last_tripped_at.nil? || page_last_tripped_at < page_period.seconds.ago) &&
+        occurrences.where('occurred_at >= ?', page_threshold.seconds.ago).count >= page_threshold
   end
 
   private

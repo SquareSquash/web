@@ -143,7 +143,7 @@ module Views
           li { a "Notifications", href: '#notifications', rel: 'tab' }
           li do
             a(href: '#comments', rel: 'tab') do
-              text  "Comments"
+              text "Comments"
               text " (#{number_with_delimiter @bug.comments_count})" if @bug.comments_count > 0
             end
           end
@@ -337,18 +337,38 @@ module Views
           end
         end
 
+        if @project.pagerduty_service_key?
+          form_for([@project, @environment, @bug], format: 'json', html: {class: 'labeled whitewashed', id: 'page-threshold-form'}) do |f|
+            fieldset do
+              h5 "Page the team when this bug occurs a lot"
+              p "You will be paged even if the bug is marked as unimportant. This is useful for exceptions you do not intend to fix, but can blow up."
+
+              f.label :page_threshold, "this many exceptions occur"
+              f.number_field :page_threshold, class: 'input-small'
+
+              f.label :page_period, "in this period of time"
+              span(class: 'input-append') do
+                f.number_field :page_period, class: 'input-small input-inline'
+                span " seconds"
+              end
+            end
+
+            div(class: 'form-actions') { f.submit class: 'default' }
+          end
+        end
+
         nt = current_user.notification_thresholds.find_by_bug_id(@bug.id) || NotificationThreshold.new
         form_for(nt, url: project_environment_bug_notification_threshold_url(@project, @environment, @bug, format: 'json'), html: {class: 'labeled whitewashed', id: 'notification-form'}) do |f|
           fieldset do
-            h5 "Notify me when this bug occurs a lot"
+            h5 "Email me when this bug occurs a lot"
 
             f.label :threshold, "this many exceptions occur"
             f.number_field :threshold, class: 'input-small'
 
             f.label :period, "in this period of time"
-            div(class: 'field-group') do
-              f.number_field :period, class: 'input-small'
-              text " seconds"
+            span(class: 'input-append') do
+              f.number_field :period, class: 'input-small input-inline'
+              span " seconds"
             end
 
             div(class: 'form-actions') do

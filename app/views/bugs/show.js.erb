@@ -250,6 +250,10 @@ function PageManager() {
   };
 
   this.setupNotificationForm = function() {
+    new SmartForm($('#page-threshold-form'), function() {
+      new Flash('success').text("Paging options saved.");
+    });
+
     return new SmartForm($('#notification-form'), function() {
       new Flash('success').text("Notification set.");
     });

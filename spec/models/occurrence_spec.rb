@@ -104,69 +104,134 @@ describe Occurrence do
                              Squash::Configuration.pagerduty.api_url,
                              response: File.read(Rails.root.join('spec', 'fixtures', 'pagerduty_response.json'))
 
-        @project = FactoryGirl.create(:project, pagerduty_service_key: 'abc123', critical_threshold: 2, pagerduty_enabled: true)
+        @project     = FactoryGirl.create(:project, pagerduty_service_key: 'abc123', critical_threshold: 2, pagerduty_enabled: true)
         @environment = FactoryGirl.create(:environment, project: @project, notifies_pagerduty: true)
-        @bug = FactoryGirl.create(:bug, environment: @environment)
+        @bug         = FactoryGirl.create(:bug, environment: @environment)
       end
 
-      it "should not send an incident to PagerDuty until the critical threshold is breached" do
-        PagerDutyNotifier.any_instance.should_not_receive :trigger
-        FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
+      context "[critical threshold notification]" do
+        it "should not send an incident to PagerDuty until the critical threshold is breached" do
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
+        end
+
+        it "should send an incident if always_notify_pagerduty is set" do
+          @project.update_attribute :always_notify_pagerduty, true
+          Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+              /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+              @bug.pagerduty_incident_key,
+              an_instance_of(Hash)
+          )
+          FactoryGirl.create :rails_occurrence, bug: @bug
+        end
+
+        it "should send an incident to PagerDuty once the critical threshold is breached" do
+          FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
+          Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+              /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+              @bug.pagerduty_incident_key,
+              an_instance_of(Hash)
+          )
+          FactoryGirl.create :rails_occurrence, bug: @bug
+        end
+
+        it "should not send an incident if the project does not have a session key configured" do
+          @project.update_attribute :pagerduty_service_key, nil
+
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
+
+        it "should not send an incident if incident reporting is disabled" do
+          @project.update_attribute :pagerduty_enabled, false
+
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
+
+        it "should not send an incident if the environment has incident reporting disabled" do
+          @environment.update_attribute :notifies_pagerduty, nil
+
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
+
+        it "should not send an incident if the bug is assigned" do
+          @bug.update_attribute :assigned_user, FactoryGirl.create(:membership, project: @project).user
+
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
+
+        it "should not send an incident if the bug is irrelevant" do
+          @bug.update_attribute :irrelevant, true
+
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
       end
 
-      it "should send an incident if always_notify_pagerduty is set" do
-        @project.update_attribute :always_notify_pagerduty, true
-        Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
-            /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
-            @bug.pagerduty_incident_key,
-            an_instance_of(Hash)
-        )
-        FactoryGirl.create :rails_occurrence, bug: @bug
-      end
+      context "[paging threshold notification]" do
+        before :each do
+          @project.update_attribute :critical_threshold, 200
+          @bug.update_attributes page_threshold: 2, page_period: 1.minute
+        end
 
-      it "should send an incident to PagerDuty once the critical threshold is breached" do
-        FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
-        Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
-            /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
-            @bug.pagerduty_incident_key,
-            an_instance_of(Hash)
-        )
-        FactoryGirl.create :rails_occurrence, bug: @bug
-      end
+        it "should send an incident to PagerDuty once if the page threshold is breached" do
+          Service::PagerDuty.any_instance.should_receive(:trigger).once.with(
+              /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+              @bug.pagerduty_incident_key,
+              an_instance_of(Hash)
+          )
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
 
-      it "should not send an incident if the project does not have a session key configured" do
-        @project.update_attribute :pagerduty_service_key, nil
+        it "should not send an incident to PagerDuty if the page threshold is breached again inside the page period" do
+          @bug.update_attributes page_last_tripped_at: 30.seconds.ago
+          Service::PagerDuty.any_instance.should_not_receive(:trigger)
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
 
-        PagerDutyNotifier.any_instance.should_not_receive :trigger
-        FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
-      end
+        it "should send an incident to PagerDuty if the page threshold is breached again outside the page period" do
+          @bug.update_attributes page_last_tripped_at: 2.minutes.ago
+          Service::PagerDuty.any_instance.should_receive(:trigger).once
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
 
-      it "should not send an incident if incident reporting is disabled" do
-        @project.update_attribute :pagerduty_enabled, false
+        it "should not send an incident if the project does not have a session key configured" do
+          @project.update_attribute :pagerduty_service_key, nil
 
-        PagerDutyNotifier.any_instance.should_not_receive :trigger
-        FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
-      end
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
 
-      it "should not send an incident if the environment has incident reporting disabled" do
-        @environment.update_attribute :notifies_pagerduty, nil
+        it "should not send an incident if incident reporting is disabled" do
+          @project.update_attribute :pagerduty_enabled, false
 
-        PagerDutyNotifier.any_instance.should_not_receive :trigger
-        FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
-      end
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
 
-      it "should not send an incident if the bug is assigned" do
-        @bug.update_attribute :assigned_user, FactoryGirl.create(:membership, project: @project).user
+        it "should not send an incident if the environment has incident reporting disabled" do
+          @environment.update_attribute :notifies_pagerduty, nil
 
-        PagerDutyNotifier.any_instance.should_not_receive :trigger
-        FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
-      end
+          PagerDutyNotifier.any_instance.should_not_receive :trigger
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
 
-      it "should not send an incident if the bug is irrelevant" do
-        @bug.update_attribute :irrelevant, true
+        it "should not an incident if the bug is assigned" do
+          @bug.update_attribute :assigned_user, FactoryGirl.create(:membership, project: @project).user
 
-        PagerDutyNotifier.any_instance.should_not_receive :trigger
-        FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+          Service::PagerDuty.any_instance.should_receive(:trigger).once
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
+
+        it "should not an incident if the bug is irrelevant" do
+          @bug.update_attribute :irrelevant, true
+
+          Service::PagerDuty.any_instance.should_receive(:trigger).once
+          FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
+        end
       end
     end unless Squash::Configuration.pagerduty.disabled?
 
@@ -175,14 +240,14 @@ describe Occurrence do
         bug = FactoryGirl.create(:bug)
         expect {
           FactoryGirl.create(:rails_occurrence, bug: bug, crashed: true)
-        }.to change{ bug.reload.any_occurrence_crashed }.from(false).to(true)
+        }.to change { bug.reload.any_occurrence_crashed }.from(false).to(true)
       end
 
       it "should not change any_occurrence_crashed if crashed is false" do
         bug = FactoryGirl.create(:bug)
         expect {
           FactoryGirl.create(:rails_occurrence, bug: bug, crashed: false)
-        }.to_not change{ bug.reload.any_occurrence_crashed }
+        }.to_not change { bug.reload.any_occurrence_crashed }
       end
     end
 
@@ -194,7 +259,7 @@ describe Occurrence do
         occurrence.bug.device_bugs.where(device_id: 'hello').should exist
         expect {
           FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'hello')
-        }.to_not change{ bug.device_bugs.where(device_id: 'hello').count }
+        }.to_not change { bug.device_bugs.where(device_id: 'hello').count }
 
         occurrence = FactoryGirl.create(:rails_occurrence, bug: bug, device_id: 'goodbye')
         occurrence.bug.device_bugs.where(device_id: 'goodbye').should exist
@@ -722,11 +787,11 @@ describe Occurrence do
       @occurrence.backtraces = [{"name"      => "Thread 0",
                                  "faulted"   => true,
                                  "backtrace" =>
-                                     [{"type"   => "obfuscated",
-                                       "file"   => "B.java",
-                                       "line"   => 15,
-                                       "symbol" => "int a(java.lang.String)",
-                                       "class_name"  => "com.A.B"}]}]
+                                     [{"type"       => "obfuscated",
+                                       "file"       => "B.java",
+                                       "line"       => 15,
+                                       "symbol"     => "int a(java.lang.String)",
+                                       "class_name" => "com.A.B"}]}]
       @occurrence.deobfuscate!
 
       @occurrence.changes.should be_empty
@@ -748,16 +813,16 @@ describe Occurrence do
       @occurrence.backtraces = [{"name"      => "Thread 0",
                                  "faulted"   => true,
                                  "backtrace" =>
-                                     [{"type"   => "obfuscated",
-                                       "file"   => "B.java",
-                                       "line"   => 15,
-                                       "symbol" => "int b(java.lang.String)",
-                                       "class_name"  => "com.A.B"},
-                                      {"type"   => "obfuscated",
-                                       "file"   => "ActivityThread.java",
-                                       "line"   => 15,
-                                       "symbol" => "int a(java.lang.String)",
-                                       "class_name"  => "com.squareup.ActivityThread"}]}]
+                                     [{"type"       => "obfuscated",
+                                       "file"       => "B.java",
+                                       "line"       => 15,
+                                       "symbol"     => "int b(java.lang.String)",
+                                       "class_name" => "com.A.B"},
+                                      {"type"       => "obfuscated",
+                                       "file"       => "ActivityThread.java",
+                                       "line"       => 15,
+                                       "symbol"     => "int a(java.lang.String)",
+                                       "class_name" => "com.squareup.ActivityThread"}]}]
       @occurrence.deobfuscate!
 
       @occurrence.changes.should be_empty
@@ -767,11 +832,11 @@ describe Occurrence do
                                               [{"file"   => "src/foo/Bar.java",
                                                 "line"   => 15,
                                                 "symbol" => "int b(java.lang.String)"},
-                                               {"type"   => "obfuscated",
-                                                "file"   => "ActivityThread.java",
-                                                "line"   => 15,
-                                                "symbol" => "int a(java.lang.String)",
-                                                "class_name"  => "com.squareup.ActivityThread"}]}])
+                                               {"type"       => "obfuscated",
+                                                "file"       => "ActivityThread.java",
+                                                "line"       => 15,
+                                                "symbol"     => "int a(java.lang.String)",
+                                                "class_name" => "com.squareup.ActivityThread"}]}])
     end
 
     it "should use a custom obfuscation map" do
@@ -791,11 +856,11 @@ describe Occurrence do
       @occurrence.backtraces = [{"name"      => "Thread 0",
                                  "faulted"   => true,
                                  "backtrace" =>
-                                     [{"type"   => "obfuscated",
-                                       "file"   => "B.java",
-                                       "line"   => 15,
-                                       "symbol" => "int a(java.lang.String)",
-                                       "class_name"  => "com.A.B"}]}]
+                                     [{"type"       => "obfuscated",
+                                       "file"       => "B.java",
+                                       "line"       => 15,
+                                       "symbol"     => "int a(java.lang.String)",
+                                       "class_name" => "com.A.B"}]}]
       @occurrence.deobfuscate! om2
 
       @occurrence.changes.should be_empty
@@ -849,11 +914,11 @@ describe Occurrence do
                                                         {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                          "line"   => 626,
                                                          "symbol" => "start"},
-                                                        {"type"   => "obfuscated",
-                                                         "file"   => "A.java",
-                                                         "line"   => 15,
-                                                         "symbol" => "b",
-                                                         "class_name"  => "A"},
+                                                        {"type"       => "obfuscated",
+                                                         "file"       => "A.java",
+                                                         "line"       => 15,
+                                                         "symbol"     => "b",
+                                                         "class_name" => "A"},
                                                         {"file"   => "/usr/lib/ruby/1.9.1/net/http.rb",
                                                          "line"   => 644,
                                                          "symbol" => "connect"},

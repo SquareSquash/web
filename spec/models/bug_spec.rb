@@ -1026,4 +1026,31 @@ describe Bug do
       end
     end
   end
+
+  describe "#page_threshold_tripped?" do
+    before :all do
+      @bug = FactoryGirl.create(:bug, page_threshold: 10, page_period: 1.minute, page_last_tripped_at: 2.minutes.ago)
+    end
+
+    it "should return false if a threshold or period has not been configured" do
+      FactoryGirl.build(:bug, page_threshold: 10, page_period: nil).should_not be_page_threshold_tripped
+      FactoryGirl.build(:bug, page_threshold: nil, page_period: 1.minute).should_not be_page_threshold_tripped
+    end
+
+    it "should return false if the threshold has not yet been exceeded within the period" do
+      FactoryGirl.create_list :rails_occurrence, 9, bug: @bug
+      @bug.should_not be_page_threshold_tripped
+    end
+
+    it "should return true if the threshold has been exceeded within the period" do
+      FactoryGirl.create_list :rails_occurrence, 10, bug: @bug
+      @bug.should be_page_threshold_tripped
+    end
+
+    it "should return false if the threshold was tripped within the last period" do
+      FactoryGirl.create_list :rails_occurrence, 10, bug: @bug
+      @bug.page_last_tripped_at = 45.seconds.ago
+      @bug.should_not be_page_threshold_tripped
+    end
+  end
 end

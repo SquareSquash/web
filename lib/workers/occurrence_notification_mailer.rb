@@ -15,8 +15,8 @@
 # Simple worker class that sends the following emails when appropriate:
 #
 # * everyone on a {Bug}'s `notify_on_occurrence` list,
-# * frequency-based email notifications when frequency thresholds are tripped,
-#   and
+# * frequency-based email and PagerDurity notifications when frequency
+#   thresholds are tripped, and
 # * the project-wide critical email if the critical threshold was breached.
 #
 # See {NotificationThreshold} for more information on frequency-based
