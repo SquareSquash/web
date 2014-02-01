@@ -92,14 +92,7 @@ class Api::V1Controller < ActionController::Base
 
   def symbolication
     require_params :symbolications
-
-    params['symbolications'].each do |attrs|
-      Symbolication.where(uuid: attrs['uuid']).create_or_update do |symbolication|
-        symbolication.send :write_attribute, :symbols, attrs['symbols']
-        symbolication.send :write_attribute, :lines, attrs['lines']
-      end
-    end
-
+    BackgroundRunner.run SymbolicationCreator, params.slice('symbolications')
     head :created
   end
 
@@ -113,17 +106,7 @@ class Api::V1Controller < ActionController::Base
 
   def deobfuscation
     require_params :api_key, :environment, :build, :namespace
-
-    map = YAML.load(Zlib::Inflate.inflate(Base64.decode64(params['namespace'])), safe: true, deserialize_symbols: false)
-    return head(:unprocessable_entity) unless map.kind_of?(Squash::Java::Namespace)
-
-    project = Project.find_by_api_key(params['api_key']) or raise(API::UnknownAPIKeyError)
-    deploy = project.
-        environments.with_name(params['environment']).first!.
-        deploys.find_by_build!(params['build'])
-    deploy.obfuscation_map.try! :destroy
-    deploy.create_obfuscation_map!(namespace: map)
-
+    BackgroundRunner.run ObfuscationMapCreator, params.slice('namespace', 'api_key', 'environment', 'build')
     head :created
   end
 
@@ -137,15 +120,8 @@ class Api::V1Controller < ActionController::Base
   # * `POST /api/1.0/sourcemap`
 
   def sourcemap
-    require_params :api_key, :environment, :revision, :sourcemap
-
-    sourcemap = YAML.load(Zlib::Inflate.inflate(Base64.decode64(params['sourcemap'])), safe: true, deserialize_symbols: false)
-    return head(:unprocessable_entity) unless sourcemap.kind_of?(Squash::Javascript::SourceMap)
-
-    project = Project.find_by_api_key(params['api_key']) or raise(API::UnknownAPIKeyError)
-    project.
-        environments.with_name(params['environment']).find_or_create!(name: params['environment']).
-        source_maps.create(map: sourcemap, revision: params['revision'])
+    require_params :api_key, :environment, :revision, :sourcemap, :from, :to
+    BackgroundRunner.run SourceMapCreator, params.slice('sourcemap', 'api_key', 'environment', 'revision', 'from', 'to')
     head :created
   end
 

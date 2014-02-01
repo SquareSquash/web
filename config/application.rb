@@ -20,6 +20,17 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
 
+# Ugh. The sourcemap gem defines a module called SourceMap, which shares the name
+# of one of our models. So we have to rename it before we load our model.
+if ::SourceMap.kind_of?(Module)
+  ::GemSourceMap = ::SourceMap
+  Object.send :remove_const, :SourceMap
+elsif ::SourceMap.kind_of?(Class)
+  raise "SourceMap (the model) defined prior to SourceMap (the module) -- see application.rb"
+else
+  raise "SourceMap must be defined -- see application.rb"
+end
+
 # Load preinitializers
 Dir.glob(File.expand_path('../preinitializers/**/*.rb', __FILE__)).each { |f| require f }
 

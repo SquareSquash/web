@@ -23,7 +23,7 @@ describe SourceMap do
 
       Project.delete_all
       project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
-      env = FactoryGirl.create(:environment, project: project)
+      env     = FactoryGirl.create(:environment, project: project)
 
       bug        = FactoryGirl.create(:bug,
                                       file:            'lib/better_caller/extensions.rb',
@@ -45,8 +45,9 @@ describe SourceMap do
                                                           "context" => nil}]}])
       expect(occurrence).not_to be_sourcemapped
 
-      map = Squash::Javascript::SourceMap.new
-      map << Squash::Javascript::SourceMap::Mapping.new('http://test.host/example/asset.js', 3, 140, 'app/assets/javascripts/source.js', 25, 1, 'foobar')
+      map = GemSourceMap::Map.new([
+                                   GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(25, 1))
+                               ], 'http://test.host/example/asset.js')
       FactoryGirl.create :source_map, environment: env, revision: '2dc20c984283bede1f45863b8f3b4dd9b5b554cc', map: map
 
       expect(occurrence.reload).to be_sourcemapped
@@ -60,7 +61,7 @@ describe SourceMap do
 
       Project.delete_all
       project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
-      env = FactoryGirl.create(:environment, project: project)
+      env     = FactoryGirl.create(:environment, project: project)
 
       bug1       = FactoryGirl.create(:bug,
                                       file:            '_JS_ASSET_',
@@ -87,13 +88,45 @@ describe SourceMap do
                                                           "context" => nil}]}])
       expect(occurrence).not_to be_sourcemapped
 
-      map = Squash::Javascript::SourceMap.new
-      map << Squash::Javascript::SourceMap::Mapping.new('http://test.host/example/asset.js', 3, 140, 'lib/better_caller/extensions.rb', 2, 1, 'foobar')
+      map = GemSourceMap::Map.new([
+                                   GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(2, 1))
+                               ], 'http://test.host/example/asset.js')
       FactoryGirl.create :source_map, environment: env, revision: bug1.blamed_revision, map: map
 
       expect(bug2.occurrences.count).to eql(1)
       o2 = bug2.occurrences.first
       expect(occurrence.reload.redirect_target_id).to eql(o2.id)
+    end
+  end
+
+  describe '#resolve' do
+    before :all do
+      @map1 = GemSourceMap::Map.new([
+                                   GemSourceMap::Mapping.new('app/assets/javascripts/example/url.coffee', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(2, 1)),
+                               ], 'http://test.host/example/url.js')
+      @map2 = GemSourceMap::Map.new([
+                                    GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(2, 1)),
+                                ], '/example/path.js')
+    end
+
+    it "should resolve a route, line, and column" do
+      map = FactoryGirl.create(:source_map, map: @map1)
+      expect(map.resolve('http://test.host/example/url.js', 3, 144)).
+          to eql(
+                 'file'   => 'app/assets/javascripts/example/url.coffee',
+                 'line'   => 2,
+                 'column' => 1
+             )
+    end
+
+    it "should resolve a URL path, line, and column" do
+      map = FactoryGirl.create(:source_map, map: @map2)
+      expect(map.resolve('http://test.host/example/path.js', 3, 144)).
+          to eql(
+                 'file'   => 'app/assets/javascripts/source.js',
+                 'line'   => 2,
+                 'column' => 1
+             )
     end
   end
 end

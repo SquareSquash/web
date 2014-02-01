@@ -73,15 +73,16 @@
 # trace return address. Unsymbolicated backtrace lines can be symbolicated by
 # calling {#symbolicate}, assuming an appropriate {Symbolication} is available.
 #
-# For un-sourcemapped JavaScript lines, the `type` field will be **minified**
-# and the other fields will be:
+# For un-sourcemapped JavaScript lines, the `type` field will start with **js:**
+# (the type depends on the stage of the JavaScript [hosted, concatenated,
+# compiled, etc.]), and the other fields will be:
 #
 # |           |                                                                    |
 # |:----------|:-------------------------------------------------------------------|
-# | `url`     | The URL of the minified JavaScript asset.                          |
-# | `line`    | The line number in the minified file.                              |
-# | `column`  | The column number in the minified file.                            |
-# | `symbol`  | The minified method or function name.                              |
+# | `url`     | The URL of the compiled JavaScript asset.                          |
+# | `line`    | The line number in the compiled file.                              |
+# | `column`  | The column number in the compiled file.                            |
+# | `symbol`  | The compiled method or function name.                              |
 # | `context` | An array of strings containing the lines of code around the error. |
 #
 # Some elements will be `nil` depending on browser support. Un-sourcemapped
@@ -475,7 +476,7 @@ class Occurrence < ActiveRecord::Base
                                user_id occurred_at root symbolication_id
                                redirect_target_id )
   # Fields that can be used by the aggregation view.
-  AGGREGATING_FIELDS = (Occurrence.columns.map(&:name) rescue []) + Occurrence.metadata_column_fields.keys.map(&:to_s) - NON_AGGREGATING_FIELDS
+  AGGREGATING_FIELDS     = (Occurrence.columns.map(&:name) rescue []) + Occurrence.metadata_column_fields.keys.map(&:to_s) - NON_AGGREGATING_FIELDS
 
   validates :bug,
             presence: true
@@ -498,7 +499,9 @@ class Occurrence < ActiveRecord::Base
                    :browser_engine, :browser_os, :browser_engine_version
   before_validation(on: :create) { |obj| obj.revision = obj.revision.downcase if obj.revision }
   after_create :reload # grab the number value after the rule has been run
+  before_create :sourcemap
   before_create :symbolicate
+  before_create :deobfuscate
 
   # @return [URI::Generic] The URL of the Web request that resulted in this
   #   Occurrence.
@@ -720,11 +723,8 @@ class Occurrence < ActiveRecord::Base
 
   # @overload sourcemap(source_map, ...)
   #   Apply one or more source maps to this Occurrence's backtrace. Any matching
-  #   un-sourcemapped lines will be converted. Source maps will be run in the
-  #   order they are provided: If you have, e.g., a source map that converts
-  #   minified JavaScript to JavaScript, and one that converts JavaScript to
-  #   CoffeeScript, you should place the former source map earlier in the list
-  #   than the latter.
+  #   un-sourcemapped lines will be converted. Source maps will be searched and
+  #   applied in until no further lines can be converted (see {SourceMap}).
   #
   #   Does not save the record.
   #
@@ -737,13 +737,41 @@ class Occurrence < ActiveRecord::Base
 
     sourcemaps = bug.environment.source_maps.where(revision: revision) if sourcemaps.empty?
     return if sourcemaps.empty?
+    sourcemaps = sourcemaps.group_by(&:from)
 
     (bt = backtraces).each do |bt|
       bt['backtrace'].each do |elem|
-        next unless elem['type'] == 'minified'
-        symbolicated = nil
-        sourcemaps.each { |map| symbolicated ||= map.resolve(elem['url'], elem['line'], elem['column']) }
-        elem.replace(symbolicated) if symbolicated
+        found_at_least_one_applicable_sourcemap = true
+        # repeat until there's no more sourcemapping we can do on this line
+        while found_at_least_one_applicable_sourcemap
+          # assume we haven't found one
+          found_at_least_one_applicable_sourcemap = false
+          next unless elem['type'].start_with?('js:')
+
+          type = elem['type'][3..-1]
+          # try every valid source map on this line
+          sourcemapped = nil
+          Array.wrap(sourcemaps[type]).each do |map|
+            file                 = (map.from == 'hosted' ? elem['url'] : elem['file'])
+            sourcemapped         = map.resolve(file, elem['line'], elem['column'])
+
+            if sourcemapped
+              sourcemapped['type'] = "js:#{map.to}"
+              # stop when we find one that applies
+              break
+            end
+          end
+          # if we found one that applies
+          if sourcemapped
+            # change the backtrace
+            elem.replace sourcemapped
+            # and make sure we try sourcemapping the line again
+            found_at_least_one_applicable_sourcemap = true
+          end
+        end
+
+        # clear out the type if we were able to sourcemap at least once
+        elem.delete('type') if elem['type'] != 'js:hosted'
       end
     end
     self.backtraces = bt # refresh the actual JSON
@@ -768,7 +796,7 @@ class Occurrence < ActiveRecord::Base
   def sourcemapped?
     return true if truncated?
     backtraces.all? do |bt|
-      bt['backtrace'].none? { |elem| elem['type'] == 'minified' }
+      bt['backtrace'].none? { |elem| elem['type'] && elem['type'] == 'js:hosted' }
     end
   end
 
@@ -780,7 +808,7 @@ class Occurrence < ActiveRecord::Base
   # @see #deobfuscate!
 
   def deobfuscate(map=nil)
-    map ||= bug.deploy.obfuscation_map
+    map ||= bug.deploy.try!(:obfuscation_map)
 
     return unless map
     return if truncated?
@@ -834,8 +862,8 @@ class Occurrence < ActiveRecord::Base
   # Saves the record.
 
   def recategorize!
-    blamer = bug.environment.project.blamer.new(self)
-    new_bug    = blamer.find_or_create_bug!
+    blamer  = bug.environment.project.blamer.new(self)
+    new_bug = blamer.find_or_create_bug!
     if new_bug.id != bug_id
       copy = new_bug.occurrences.build
       copy.assign_attributes attributes.except('number', 'id', 'bug_id')
@@ -897,7 +925,7 @@ class Occurrence < ActiveRecord::Base
             }
           when '_JS_ASSET_'
             {
-                'type'    => 'minified',
+                'type'    => 'js:hosted',
                 'url'     => bt_line[1],
                 'line'    => bt_line[2],
                 'column'  => bt_line[3],

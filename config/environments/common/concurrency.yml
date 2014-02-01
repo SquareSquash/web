@@ -10,6 +10,7 @@ multithread:
     DeployFixMarker: 70
     DeployNotificationMailer: 80
     JiraStatusWorker: 20
+    ObfuscationMapCreator: 60
     ObfuscationMapWorker: 60
     OccurrenceNotificationMailer: 80
     OccurrencesWorker: 40
@@ -17,7 +18,9 @@ multithread:
     PagerDutyNotifier: 80
     PagerDutyResolver: 20
     ProjectRepoFetcher: 30
+    SourceMapCreator: 60
     SourceMapWorker: 60
+    SymbolicationCreator: 60
     SymbolicationWorker: 60
 
 resque:
@@ -31,6 +34,7 @@ resque:
     DeployFixMarker: squash
     DeployNotificationMailer: squash
     JiraStatusWorker: squash
+    ObfuscationMapCreator: squash
     ObfuscationMapWorker: squash
     OccurrenceNotificationMailer: squash
     OccurrencesWorker: squash
@@ -38,7 +42,9 @@ resque:
     PagerDutyNotifier: squash
     PagerDutyResolver: squash
     ProjectRepoFetcher: squash
+    SourceMapCreator: squash
     SourceMapWorker: squash
+    SymbolicationCreator: squash
     SymbolicationWorker: squash
 
 sidekiq:
@@ -63,6 +69,8 @@ sidekiq:
     JiraStatusWorker:
       queue: services
       retry: false
+    ObfuscationMapCreator:
+      queue: processing
     ObfuscationMapWorker:
       queue: processing
     OccurrenceNotificationMailer:
@@ -78,7 +86,11 @@ sidekiq:
       queue: services
     ProjectRepoFetcher:
       queue: git
+    SourceMapCreator:
+      queue: processing
     SourceMapWorker:
+      queue: processing
+    SymbolicationCreator:
       queue: processing
     SymbolicationWorker:
       queue: processing

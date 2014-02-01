@@ -47,6 +47,7 @@
 //= require sh/shBrushDelphi
 //= require sh/shBrushDiff
 //= require sh/shBrushErlang
+//= require sh/shBrushGit
 //= require sh/shBrushGroovy
 //= require sh/shBrushJava
 //= require sh/shBrushJavaFX
