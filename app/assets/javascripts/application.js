@@ -36,7 +36,31 @@
 //= require flot/stack
 //= require flot/time
 //
-//= require sh/manifest
+//= require sh/shCore
+//= require sh/shBrushAppleScript
+//= require sh/shBrushAS3
+//= require sh/shBrushBash
+//= require sh/shBrushColdFusion
+//= require sh/shBrushCpp
+//= require sh/shBrushCSharp
+//= require sh/shBrushCss
+//= require sh/shBrushDelphi
+//= require sh/shBrushDiff
+//= require sh/shBrushErlang
+//= require sh/shBrushGroovy
+//= require sh/shBrushJava
+//= require sh/shBrushJavaFX
+//= require sh/shBrushJScript
+//= require sh/shBrushPerl
+//= require sh/shBrushPhp
+//= require sh/shBrushPlain
+//= require sh/shBrushPowerShell
+//= require sh/shBrushPython
+//= require sh/shBrushRuby
+//= require sh/shBrushSass
+//= require sh/shBrushScala
+//= require sh/shBrushSql
+//= require sh/shBrushVb
 //
 //= require bootstrap
 //
