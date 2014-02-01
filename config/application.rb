@@ -75,3 +75,5 @@ module Squash
 end
 
 require 'api/errors'
+
+Sprockets.register_engine '.coffee', Squash::Javascript::SourceMappingCoffeescriptTemplate
