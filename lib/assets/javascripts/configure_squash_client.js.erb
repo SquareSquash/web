@@ -12,16 +12,16 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-<% unless Squash::Ruby.send :configuration, :disabled %>
+<% unless Squash::Ruby.configuration :disabled %>
   <% class SprocketsHelperMethods_; extend ActionView::Helpers::JavaScriptHelper; end %>
 
   (function() {
     // first the settings imported from the ruby client
     SquashJavascript.instance().configure({
-      revision:    "<%= Squash::Ruby.send :current_revision %>",
-      APIKey:      "<%= Squash::Ruby.send :configuration, :api_key %>",
-      APIHost:     "<%= Squash::Ruby.send :configuration, :api_host %>",
-      notifyPath:  "<%= Squash::Ruby.send :configuration, :notify_path %>",
+      revision:    "<%= Squash::Ruby.current_revision %>",
+      APIKey:      "<%= Squash::Ruby.configuration :api_key %>",
+      APIHost:     "<%= Squash::Ruby.configuration :api_host %>",
+      notifyPath:  "<%= Squash::Ruby.configuration :notify_path %>",
       environment: "<%= Rails.env %>"
     });
 

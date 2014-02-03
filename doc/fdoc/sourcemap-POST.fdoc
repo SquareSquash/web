@@ -18,9 +18,7 @@ requestParameters:
   properties:
     sourcemap:
       description: |
-        A `Squash::Javascript::SourceMap` object (as generated using the
-        `squash_javascript` gem), YAML-serialized, then gzipped, then base
-        64-encoded.
+        A JSON-serialized source map, gzipped, then base 64-encoded.
       required: true
       type: string
       example: "eJxj4ci3UgguLE0szvBKLEssTi7KLCixsgrOLy1KTvVNLGCz4nPITSwoyMxL\nL45mAABqrw+t\n"
@@ -41,3 +39,18 @@ requestParameters:
       required: true
       type: string
       example: 2dc20c984283bede1f45863b8f3b4dd9b5b554cc
+    from:
+      description: |
+        The type of generated JavaScript code this source map transforms from.
+        "hosted" should be used for the final hosted JS; other names are
+        arbitrary.
+      required: true
+      type: string
+      example: hosted
+    to:
+      description: |
+        The type of generated or human-written JavaScript/CoffeeScript code this
+        source map transforms to.
+      required: true
+      type: string
+      example: concatenated

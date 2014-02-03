@@ -114,9 +114,30 @@ For more specific information on those last two fields, see the
 
 **Request:** `POST /api/1.0/sourcemap`
 
-This API endpoint is still a work in progress. It will be used for sending
-source maps (e.g., CoffeeScript-to-JavaScript or JavaScript-to-minified) to
-Squash.
+**Body:** JSON-formatted hash with the following **required** fields:
+
+|               |                                                                                                                                                                                                                       |
+|:--------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `environment` | The environment name that this source map applies to.                                                                                                                                                                 |
+| `revision`    | The SHA of the repository revision that this source map was generated from.                                                                                                                                           |
+| `sourcemap`   | Source map data; JSON-serialized, gzipped, and base-64-encoded. (Note that the JSON serialization is different from the V3 source map standard; use the Squash JavaScript client library to generate the source map.) |
+| `from`        | The type of generated code this source map transforms from (`hosted` is used for the final hosted code).                                                                                                              |
+| `to`          | The type of generated or original code this source map transforms to.                                                                                                                                                 |
+
+This API is used to post source maps to Squash. Your deploy toolchain will need
+to generate source maps for every transformation your JavaScript client
+undergoes (CoffeeScript to compiled, compiled to concatenated, concatenated to
+minified, etc.). The JavaScript client library always reports exception
+backtraces with a type of "hosted", so the final source map in your chain should
+convert to the "hosted" format.
+
+For more specific information on these fields, see the
+[Squash JavaScript gem](https://github.com/SquareSquash/javascript).
+
+**Responses:**
+
+* `201 Created`: Symbolication received and recorded.
+* `422 Unprocessable Entity`: Invalid request body.
 
 Backtrace Format
 ----------------

@@ -55,4 +55,3 @@ class root.Flash
     @close.remove()
     @element.addClass('flash-hidden')
     @element.oneTime 1000, => @element.remove()
-    delete this

@@ -21,5 +21,5 @@ gem 'less-rails'
 gem 'font-awesome-rails', '< 4.0'
 
 gem 'coffee-rails'
-gem 'uglifier'
+gem 'closure-compiler'
 gem 'jquery-rails'

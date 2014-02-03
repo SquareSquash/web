@@ -36,7 +36,7 @@ module BacktraceRendering
     if !@occurrence.symbolicated? && !@occurrence.symbolication
       p "Portions of the backtrace have not yet been symbolicated. If you would like a meaningful backtrace, please upload a symbolication file using your language’s client library.", class: 'alert info'
     end
-    if !@occurrence.sourcemapped? #&& !@occurrence.source_map
+    unless @occurrence.sourcemapped?
       p "Portions of the backtrace have not yet been source-mapped. If you would like a meaningful backtrace, please upload a JavaScript source map using the Squash JavaScript client library.", class: 'alert info'
     end
     unless @occurrence.deobfuscated?
@@ -87,8 +87,8 @@ module BacktraceRendering
     case element['type']
       when 'address'
         li "0x#{element['address'].to_s(16).rjust(8, '0').upcase}", class: 'lib long-words'
-      when 'minified'
-        render_minified_backtrace_element element, identifier, index, lindex
+      when /^js:/
+        render_js_backtrace_element element, identifier, index, lindex
       when 'obfuscated'
         li format_backtrace_element(element['file'], element['line'], element['symbol']), class: 'lib long-words'
       when 'java_native'
@@ -104,7 +104,7 @@ module BacktraceRendering
     end
   end
 
-  def render_minified_backtrace_element(element, identifier, index, lindex)
+  def render_js_backtrace_element(element, identifier, index, lindex)
     line_portion = if element['line'] && element['column'] then
                      "#{element['line']}:#{element['column']}"
                    elsif element['line'] then

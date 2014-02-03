@@ -128,7 +128,7 @@ module Blamer
         when 'obfuscated'
           @special = true
           [element['file'], element['line'].abs]
-        when 'minified'
+        when 'js:hosted'
           @special = true
           [element['url'], element['line']]
         when 'address'

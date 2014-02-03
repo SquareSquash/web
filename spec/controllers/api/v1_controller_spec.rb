@@ -26,7 +26,7 @@ describe Api::V1Controller do
 
       # this will be a valid exception but with a stack trace that doesn't make
       # sense in the context of the project (the files don't actually exist in the
-                                                                   # repo). this will test the scenarios where no blamed commits can be found.
+      # repo). this will test the scenarios where no blamed commits can be found.
       @exception = nil
       begin
         raise ArgumentError, "Well crap"
@@ -46,7 +46,7 @@ describe Api::V1Controller do
 
     before :each do
       Bug.delete_all
-      @valid_params = Squash::Ruby.send(:exception_info_hash, @exception, Time.now.utc, {}, nil).deep_clone
+      @valid_params                = Squash::Ruby.send(:exception_info_hash, @exception, Time.now.utc, {}, nil).deep_clone
       @valid_params['occurred_at'] = @valid_params['occurred_at'].iso8601
       @valid_params.merge!('api_key'     => @project.api_key,
                            'environment' => 'production',
@@ -136,7 +136,7 @@ describe Api::V1Controller do
     it "should create a new symbolication" do
       Symbolication.delete_all
 
-      uuid = SecureRandom.uuid
+      uuid   = SecureRandom.uuid
       params = {
           'symbolications' => [
               'uuid'    => uuid,
@@ -166,7 +166,9 @@ describe Api::V1Controller do
           'sourcemap'   => @map.send(:read_attribute, :map),
           'api_key'     => @project.api_key,
           'environment' => @env.name,
-          'revision'    => (@rev = @project.repo.object('HEAD').sha)
+          'revision'    => (@rev = @project.repo.object('HEAD').sha),
+          'from'        => 'hosted',
+          'to'          => 'original'
       }
     end
 
