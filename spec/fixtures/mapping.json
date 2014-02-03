@@ -1,0 +1,8 @@
+{
+    "version":3,
+    "file":"out.js",
+    "sourceRoot":"/Documents/Projects/SquareSquash/javascript",
+    "sources":["/Documents/Projects/SquareSquash/javascript/vendor/assets/foo.js", "/Documents/Projects/SquareSquash/javascript/vendor/assets/bar.js"],
+    "names":["src", "maps", "are", "fun"],
+    "mappings":"AAgBC,SAAQ,CAAEA"
+}
