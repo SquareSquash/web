@@ -22,8 +22,13 @@ module Views
     class Edit < Views::Projects::Show
       include Accordion
 
-      def page_title() "Edit #{@project.name}" end
-      def breadcrumbs() [@project, "Configuration"] end
+      def page_title()
+        "Edit #{@project.name}"
+      end
+
+      def breadcrumbs()
+        [@project, "Configuration"]
+      end
 
       private
 
@@ -250,8 +255,9 @@ end
 
         p do
           text "You will need to generate source maps for your JavaScript if you want backtraces that correspond to files in your project. See the Squash Javascript client README for information on how to generate and upload source maps to Squash."
+        end
       end
-      
+
       def java
         p do
           text "Download the "
@@ -413,4 +419,3 @@ end
     end
   end
 end
-
