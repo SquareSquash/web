@@ -1,33 +1,18 @@
-/**
- * SyntaxHighlighter
- * http://alexgorbatchev.com/SyntaxHighlighter
- *
- * SyntaxHighlighter is donationware. If you are using it, please donate.
- * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
- *
- * @version
- * 3.0.83 (July 02 2010)
- * 
- * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
- *
- * @license
- * Dual licensed under the MIT and GPL licenses.
- */
 ;(function()
 {
 	// CommonJS
-	typeof(require) != 'undefined' ? SyntaxHighlighter = require('shCore').SyntaxHighlighter : null;
+	SyntaxHighlighter = SyntaxHighlighter || (typeof require !== 'undefined'? require('shCore').SyntaxHighlighter : null);
 
 	function Brush()
 	{
-		var keywords =	'abstract as base bool break byte case catch char checked class const ' +
-						'continue decimal default delegate do double else enum event explicit ' +
+		var keywords =	'abstract as async await base bool break byte case catch char checked class const ' +
+						'continue decimal default delegate do double else enum event explicit volatile ' +
 						'extern false finally fixed float for foreach get goto if implicit in int ' +
 						'interface internal is lock long namespace new null object operator out ' +
 						'override params private protected public readonly ref return sbyte sealed set ' +
 						'short sizeof stackalloc static string struct switch this throw true try ' +
-						'typeof uint ulong unchecked unsafe ushort using virtual void while';
+						'typeof uint ulong unchecked unsafe ushort using virtual void while var ' +
+						'from group by into select let where orderby join on equals ascending descending';
 
 		function fixComments(match, regexInfo)
 		{
@@ -62,4 +47,3 @@
 	// CommonJS
 	typeof(exports) != 'undefined' ? exports.Brush = Brush : null;
 })();
-

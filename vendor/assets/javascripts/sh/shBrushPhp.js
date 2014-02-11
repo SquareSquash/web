@@ -1,23 +1,7 @@
-/**
- * SyntaxHighlighter
- * http://alexgorbatchev.com/SyntaxHighlighter
- *
- * SyntaxHighlighter is donationware. If you are using it, please donate.
- * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
- *
- * @version
- * 3.0.83 (July 02 2010)
- * 
- * @copyright
- * Copyright (C) 2004-2010 Alex Gorbatchev.
- *
- * @license
- * Dual licensed under the MIT and GPL licenses.
- */
 ;(function()
 {
 	// CommonJS
-	typeof(require) != 'undefined' ? SyntaxHighlighter = require('shCore').SyntaxHighlighter : null;
+	SyntaxHighlighter = SyntaxHighlighter || (typeof require !== 'undefined'? require('shCore').SyntaxHighlighter : null);
 
 	function Brush()
 	{
@@ -57,10 +41,10 @@
 						'strtoupper strtr strval substr substr_compare';
 
 		var keywords =	'abstract and array as break case catch cfunction class clone const continue declare default die do ' +
-						'else elseif enddeclare endfor endforeach endif endswitch endwhile extends final for foreach ' +
-						'function include include_once global goto if implements interface instanceof namespace new ' +
+						'else elseif enddeclare endfor endforeach endif endswitch endwhile extends final finally for foreach ' +
+						'function global goto if implements include include_once interface instanceof insteadof namespace new ' +
 						'old_function or private protected public return require require_once static switch ' +
-						'throw try use var while xor ';
+						'trait throw try use var while xor yield ';
 		
 		var constants	= '__FILE__ __LINE__ __METHOD__ __FUNCTION__ __CLASS__';
 

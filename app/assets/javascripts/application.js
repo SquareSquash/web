@@ -12,7 +12,7 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-// This is a manifest file that'll be compiled into application.js, which will include all the files
+// This is a manifest file that'll be compiled into application, which will include all the files
 // listed below.
 //
 // Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
@@ -49,9 +49,11 @@
 //= require sh/shBrushErlang
 //= require sh/shBrushGit
 //= require sh/shBrushGroovy
+//= require sh/shBrushHaxe
 //= require sh/shBrushJava
 //= require sh/shBrushJavaFX
 //= require sh/shBrushJScript
+//= require sh/shBrushObjC
 //= require sh/shBrushPerl
 //= require sh/shBrushPhp
 //= require sh/shBrushPlain
@@ -61,7 +63,10 @@
 //= require sh/shBrushSass
 //= require sh/shBrushScala
 //= require sh/shBrushSql
+//= require sh/shBrushTAP
+//= require sh/shBrushTypeScript
 //= require sh/shBrushVb
+//= require sh/shBrushXml
 //
 //= require bootstrap
 //
