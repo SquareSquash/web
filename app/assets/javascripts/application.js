@@ -67,6 +67,7 @@
 //= require sh/shBrushTypeScript
 //= require sh/shBrushVb
 //= require sh/shBrushXml
+//= require sh/shBrushYaml
 //
 //= require bootstrap
 //

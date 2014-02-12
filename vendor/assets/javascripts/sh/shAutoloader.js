@@ -1,3 +1,19 @@
+/**
+ * SyntaxHighlighter
+ * http://alexgorbatchev.com/SyntaxHighlighter
+ *
+ * SyntaxHighlighter is donationware. If you are using it, please donate.
+ * http://alexgorbatchev.com/SyntaxHighlighter/donate.html
+ *
+ * @version
+ * 3.0.83 (Wed, 12 Feb 2014 03:42:24 GMT)
+ *
+ * @copyright
+ * Copyright (C) 2004-2013 Alex Gorbatchev.
+ *
+ * @license
+ * Dual licensed under the MIT and GPL licenses.
+ */
 (function() {
 
 var sh = SyntaxHighlighter;
