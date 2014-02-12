@@ -261,6 +261,9 @@ members to administrator status, and modify/delete others' Comments.
 **Owners** (each Project has only one) can do everything administrators can do,
 and can also delete the Project and reassign ownership.
 
+If you disable user registration on ```authentication.yml```, you can add new users
+using the ```rake users:create``` task. It will prompt for user data and perform validations.
+
 Recording and Categorizing Occurrences
 --------------------------------------
 
