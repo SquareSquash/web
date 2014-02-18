@@ -203,8 +203,8 @@ describe Api::V1Controller do
 
   describe "#deobfuscation", fdoc: '/deobfuscation' do
     before :all do
-      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
-      @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
+      Project.where(repository_url: 'git@github.com:RISCfuture/better_caller.git').delete_all
+      @project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
     end
 
     before :each do
