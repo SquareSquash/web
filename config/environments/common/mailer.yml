@@ -1,3 +1,12 @@
 ---
 from: squash@YOUR_DOMAIN
 domain: YOUR_DOMAIN
+strategy: sendmail
+smtp_settings:
+  address:
+  port:
+  domain:
+  user_name:
+  password:
+  authentication:
+  enable_starttls_auto:
