@@ -261,7 +261,7 @@ if step < 1
   https         = prompt("Will your production instance be using HTTPS?", hostname)
   email_domain  = query("What is the domain portion of your organization's email addresses?", hostname)
   sender        = query("What sender should Squash emails use?", "squash@#{email_domain}")
-  mail_strategy = choose("How will Squash send email?", %w(localhost smtp))
+  mail_strategy = choose("How will Squash send email?", %w(sendmail smtp))
 
   if mail_strategy == 'smtp'
     smtp_domain = email_domain
