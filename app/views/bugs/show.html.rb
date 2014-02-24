@@ -129,6 +129,7 @@ module Views
             text! editor_link 'sublime', @project, @bug.file, @bug.line; br
             text! editor_link 'vim', @project, @bug.file, @bug.line; br
             text! editor_link 'emacs', @project, @bug.file, @bug.line
+            text! editor_link 'rubymine', @project, @bug.file, @bug.line; br
           end
           pre class: 'context', :'data-project' => @project.to_param, :'data-revision' => @bug.revision, :'data-file' => @bug.file, :'data-line' => @bug.line
         end

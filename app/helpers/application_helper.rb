@@ -51,8 +51,8 @@ module ApplicationHelper
   # Creates a link to open a project file in the user's editor. See the
   # editor_link.js.coffee file for more information.
   #
-  # @param [String] editor The editor ("textmate", "sublime", "vim", or
-  #   "emacs").
+  # @param [String] editor The editor ("textmate", "sublime", "vim", "emacs",
+  #   or "rubymine").
   # @param [Project] project The project containing the file.
   # @param [String] file The file path relative to the project root.
   # @param [String] line The line number within the file.
