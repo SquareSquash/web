@@ -32,6 +32,7 @@ $(window).ready ->
     if target.hasClass('shown')
       link.find('.icon-chevron-down').removeClass('icon-chevron-down').addClass 'icon-chevron-up'
 
+    e.preventDefault()
     return false
 
   # Clicking elsewhere hides all dropdowns
