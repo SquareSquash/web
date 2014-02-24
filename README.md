@@ -19,8 +19,8 @@ Squash consists of the following components:
 
 This project is the front-end and the API.
 
-Pull requests are more than welcome; please check out {file:CONTRIBUTING} for
-details.
+Pull requests are more than welcome; please check out
+[CONTRIBUTING.md](file.CONTRIBUTING.html) for details.
 
 How to Install
 --------------
@@ -150,7 +150,7 @@ multiple private methods.
 In addition to the usual helpers (in `app/helpers`), there are view mixins under
 `app/views/additions` that simplify view coding.
 
-Embedded code snippets are all rendered using the {ProjectsController#context}
+Embedded code snippets are all rendered using the {CommitsController#context}
 action. This action loads the appropriate file and revision from the Git
 repository and returns a snippet plus the name of the SyntaxHighlighter brush to
 use. The brush is determined from the file name/extension; the mapping can be
