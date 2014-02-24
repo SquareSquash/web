@@ -257,18 +257,42 @@ if step < 1
   puts "If you don't know what URL your production instance will have, just make",
        "something up. You can always change it later."
 
-  hostname     = query("What hostname will your production instance have (e.g., squash.mycompany.com)?")
-  https        = prompt("Will your production instance be using HTTPS?", hostname)
-  email_domain = query("What is the domain portion of your organization's email addresses?", hostname)
-  sender       = query("What sender should Squash emails use?", "squash@#{email_domain}")
+  hostname      = query("What hostname will your production instance have (e.g., squash.mycompany.com)?")
+  https         = prompt("Will your production instance be using HTTPS?", hostname)
+  email_domain  = query("What is the domain portion of your organization's email addresses?", hostname)
+  sender        = query("What sender should Squash emails use?", "squash@#{email_domain}")
+  mail_strategy = choose("How will Squash send email?", %w(sendmail smtp))
 
+  if mail_strategy == 'smtp'
+    smtp_domain = email_domain
+    smtp_host   = query("What's the hostname of your SMTP server?")
+    smtp_port   = query("What's the port of your SMTP server?", '25')
+    smtp_auth   = choose("What's the authentication for your SMTP server?", %w(none plain ntlm))
+    unless smtp_auth == 'none'
+      smtp_username = query("What's the username for your SMTP server?")
+      smtp_password = query("What's the password for your SMTP server?")
+    end
+    smtp_ssl    = prompt("Do you want to skip SSL verification?")
+  end
+  smtp_settings = {
+                    'address'               => smtp_host,
+                    'port'                  => smtp_port,
+                    'domain'                => smtp_domain,
+                    'user_name'             => smtp_username,
+                    'password'              => smtp_password,
+                    'authentication'        => smtp_auth,
+                    'enable_starttls_auto'  => smtp_ssl
+                  }
   say "Updating config/environments/common/mailer.yml..."
   File.open('config/environments/common/mailer.yml', 'w') do |f|
     f.puts({
-               'from'   => sender,
-               'domain' => email_domain
+               'from'           => sender,
+               'domain'         => email_domain,
+               'strategy'       => mail_strategy,
+               'smtp_settings'  => smtp_settings
            }.to_yaml)
   end
+
   say "Updating config/environments/production/mailer.yml..."
   File.open('config/environments/production/mailer.yml', 'w') do |f|
     f.puts({
@@ -278,6 +302,7 @@ if step < 1
                }
            }.to_yaml)
   end
+
   unless https
     say "Updating config/environments/production.rb..."
     prod_config = File.read('config/environments/production.rb')
