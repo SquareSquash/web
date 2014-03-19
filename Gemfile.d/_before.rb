@@ -30,6 +30,8 @@ def load_groups(configuration_path, values)
 end
 
 def traverse_hash(hsh, *keys)
+  return nil unless hsh
+  
   if keys.size == 1
     hsh[keys.first]
   else
