@@ -13,6 +13,7 @@
 #    limitations under the License.
 
 gem 'sass-rails'
+gem 'sprockets', '< 2.12.0' # fix nil error
 gem 'libv8', platform: :mri
 gem 'therubyracer', '>= 0.11.1', platform: :mri
 gem 'therubyrhino', platform: :jruby
