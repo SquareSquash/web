@@ -80,10 +80,13 @@ module LdapAuthenticationHelpers
   private
 
   def build_ldap_interface
-    ldap      = Net::LDAP.new
+    ldap_opts = {}
+    if Squash::Configuration.authentication.ldap.ssl
+      ldap_opts[:encryption] = Squash::Configuration.authentication.ldap.encryption_method.to_sym || :start_tls
+    end
+    ldap      = Net::LDAP.new(ldap_opts)
     ldap.host = Squash::Configuration.authentication.ldap.host
     ldap.port = Squash::Configuration.authentication.ldap.port
-    ldap.encryption(:start_tls) if Squash::Configuration.authentication.ldap.ssl
     ldap
   end
 
