@@ -24,7 +24,7 @@ describe OccurrencesWorker do
 
     # this will be a valid exception but with a stack trace that doesn't make
     # sense in the context of the project (the files don't actually exist in the
-                                                                 # repo). this will test the scenarios where no blamed commits can be found.
+    # repo). this will test the scenarios where no blamed commits can be found.
     @exception = nil
     begin
       raise ArgumentError, "Well crap"
@@ -106,6 +106,49 @@ describe OccurrencesWorker do
     end
 
     context "[attributes]" do
+      it "works for js:hosted types" do
+        js_params = @params.merge({
+                                      "client"         => "javascript",
+                                      "class_name"     => "ReferenceError",
+                                      "message"        => "foo is not defined",
+                                      "backtraces"     => [
+                                          {
+                                              "name"      => "Active Thread",
+                                              "faulted"   => true,
+                                              "backtrace" => [
+                                                  {
+                                                      "url"     => "http://localhost:3000/assets/vendor.js",
+                                                      "line"    => 11671,
+                                                      "symbol"  => "?",
+                                                      "context" => nil,
+                                                      "type"    => "js:hosted"
+                                                  }
+                                              ]
+                                          }
+                                      ],
+                                      "capture_method" => "onerror",
+                                      "occurred_at"    => "2014-05-26T22:43:31Z",
+                                      "schema"         => "http",
+                                      "host"           => "localhost",
+                                      "port"           => "3000",
+                                      "path"           => "/admin",
+                                      "query"          => "",
+                                      "user_agent"     => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:28.0) Gecko/20100101 Firefox/28.0",
+                                      "screen_width"   => 1920,
+                                      "screen_height"  => 1200,
+                                      "window_width"   => 1870,
+                                      "window_height"  => 767,
+                                      "color_depth"    => 24
+                                  })
+
+        occ = OccurrencesWorker.new(js_params).perform
+        expect(occ).to be_kind_of(Occurrence)
+
+        expect(occ.client).to eql('javascript')
+        expect(occ.bug.environment.name).to eql('production')
+        expect(occ.bug.client).to eql('javascript')
+      end
+
       it "should create an occurrence with the given attributes" do
         occ = OccurrencesWorker.new(@params).perform
         expect(occ).to be_kind_of(Occurrence)
@@ -302,7 +345,7 @@ describe OccurrencesWorker do
 
         # O1 occurs on R1
         o1  = OccurrencesWorker.new(@params.merge('revision' => r1)).perform
-                                 # Bug should start out open
+        # Bug should start out open
         bug = o1.bug
         expect(bug).not_to be_fixed
         expect(bug).not_to be_fix_deployed

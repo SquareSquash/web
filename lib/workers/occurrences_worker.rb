@@ -153,11 +153,17 @@ class OccurrencesWorker
     occurrence          = Occurrence.new(occurrence_attrs)
     occurrence.metadata = JSON.parse(occurrence.metadata).reverse_merge(other_data).to_json
     occurrence.message  ||= occurrence.class_name # hack for Java
+
     # must symbolicate before assigning blame
+
     occurrence.symbolicate
-    occurrence.sourcemap(*environment.source_maps.where(revision: sha))
+
+    sourcemaps = environment.source_maps.where(revision: sha)
+    occurrence.sourcemap(*sourcemaps) unless sourcemaps.empty?
+
     obfuscation_map = ObfuscationMap.joins(:deploy).where(deploys: {environment_id: environment.id, revision: sha}).first
     occurrence.deobfuscate(obfuscation_map) if obfuscation_map
+
     occurrence
   end
 
