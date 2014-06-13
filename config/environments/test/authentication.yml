@@ -1,0 +1,4 @@
+---
+strategy: password
+password:
+  salt: abc123

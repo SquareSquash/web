@@ -1,4 +1,6 @@
 ---
+from: squash@example.com
+domain: example.com
 default_url_options:
   host: "test.host"
   protocol: http

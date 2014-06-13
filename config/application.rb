@@ -18,7 +18,7 @@ require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
-Bundler.require(:default, Rails.env)
+Bundler.require(*Rails.groups)
 
 # Load preinitializers
 Dir.glob(File.expand_path('../preinitializers/**/*.rb', __FILE__)).each { |f| require f }
@@ -38,26 +38,30 @@ module Squash
     config.autoload_paths << config.root.join('lib', 'workers')
 
     # Activate observers that should always be running.
-    config.active_record.observers = :bug_observer, :comment_observer,
+    config.active_record.observers     = :bug_observer, :comment_observer,
         :event_observer, :watch_observer, :occurrence_observer, :deploy_observer
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = 'Pacific Time (US & Canada)'
+    config.time_zone                   = 'Pacific Time (US & Canada)'
 
     # Use SQL instead of Active Record's schema dumper when creating the database.
     # This is necessary if your schema can't be completely dumped by the schema dumper,
     # like if you have constraints or database-specific column types
     config.active_record.schema_format = :sql
 
+    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
+    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+    # config.i18n.default_locale = :de
+
     # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
     config.assets.precompile << 'flot/excanvas.js'
 
     # Use custom generators
     config.generators do |g|
-      g.template_engine     :erector
-      g.test_framework      :rspec, fixture: true, views: false
-      g.integration_tool    :rspec
+      g.template_engine :erector
+      g.test_framework :rspec, fixture: true, views: false
+      g.integration_tool :rspec
       g.fixture_replacement :factory_girl, dir: 'spec/factories'
     end
   end

@@ -97,7 +97,7 @@ describe Comment do
     it "should send an email to the assigned user and all previous commenters when someone comments on a bug" do
       FactoryGirl.create :comment, bug: @bug, user: @cur_commenter
       expect(ActionMailer::Base.deliveries.size).to eql(2)
-      expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to eql([@assigned.email, @prev_commenter.email])
+      expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to match_array([@assigned.email, @prev_commenter.email])
       ActionMailer::Base.deliveries.each { |d| expect(d.subject).to include("A comment has been added") }
     end
 
@@ -121,7 +121,7 @@ describe Comment do
 
       FactoryGirl.create :comment, bug: @bug, user: @cur_commenter
       expect(ActionMailer::Base.deliveries.size).to eql(2)
-      expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to eql([@assigned.email, @prev_commenter.email])
+      expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to match_array([@assigned.email, @prev_commenter.email])
       ActionMailer::Base.deliveries.each { |d| expect(d.subject).to include("A comment has been added") }
     end
 

@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-Squash::Application.routes.draw do
+Rails.application.routes.draw do
   resources :projects, except: [:new] do
     member { patch :rekey }
     resources :commits do
