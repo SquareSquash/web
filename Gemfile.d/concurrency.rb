@@ -19,6 +19,7 @@ end
 
 conditionally('concurrency.background_runner', 'Sidekiq') do
   gem 'sidekiq'
+  gem 'capistrano-sidekiq'
 
   # disable if you don't need Sidekiq monitoring
   gem 'slim'
