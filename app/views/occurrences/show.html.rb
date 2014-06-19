@@ -98,7 +98,7 @@ module Views
       def other_occurrence_info
         if @occurrence.web?
           h5 "Request"
-          pre "#{@occurrence.request_method} #{@occurrence.url.to_s}", class: 'scrollable'
+          pre "#{@occurrence.request_method} #{@occurrence.url.try!(:to_s) || '(invalid URL)'}", class: 'scrollable'
         end
       end
 

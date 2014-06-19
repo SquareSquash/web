@@ -511,6 +511,8 @@ class Occurrence < ActiveRecord::Base
       return nil unless web?
       return nil unless URI.scheme_list.include?(schema.upcase)
       URI.scheme_list[schema.upcase].build(host: host, port: port, path: path, query: query, fragment: fragment)
+    rescue URI::InvalidComponentError
+      nil
     end
   end
 

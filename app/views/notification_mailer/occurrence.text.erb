@@ -19,7 +19,11 @@ THE OCCURRENCE
 <%= @occurrence.message %>
 
 <% if @occurrence.web? %>
+<% if @occurrence.url %>
 Request: <%=  @occurrence.request_method %> <%= @occurrence.url.to_s %>
+<% else %>
+Request: <%=  @occurrence.request_method %> (invalid URL)
+<% end %>
 <% end %>
 <% if @occurrence.rails? %>
 Controller: <%= @occurrence.controller %>
