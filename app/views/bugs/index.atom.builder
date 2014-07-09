@@ -17,12 +17,12 @@ atom_feed(root_url: project_environment_bugs_url(@project, @environment)) do |fe
   feed.updated @bugs.first.first_occurrence if @bugs.any?
 
   @bugs.each do |bug|
-    feed.entry(@bug,
+    feed.entry(bug,
                published: bug.first_occurrence,
                url:       project_environment_bug_url(@project, @environment, bug),
                id:        "project:#{@project.slug},environment:#{@environment.name},bug:#{bug.number}") do |entry|
       entry.title(
-          if @bug.special_file?
+          if bug.special_file?
             "#{bug.class_name} in #{bug.file}"
           else
             "#{bug.class_name} in #{bug.file}:#{bug.line}"
