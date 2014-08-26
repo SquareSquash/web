@@ -10,3 +10,4 @@ ignored_exception_messages:
   - This connection has been closed.
 failsafe_log: log/squash.failsafe.log
 disabled: true
+allowed_origins: []
