@@ -42,6 +42,7 @@ Squash::Application.configure do
   config.assets.debug                        = true
 
   # Configure development JavaScript self-reporting
+  config.middleware.delete 'Rack::Cors'
   config.middleware.use Rack::Cors do
     allow do
       origins "localhost:#{$own_port}",
