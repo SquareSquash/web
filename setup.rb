@@ -427,6 +427,8 @@ if step < 3
 end
 
 if step < 4
+  run 'bundle', 'install'
+
   db_config = YAML.load_file('config/database.yml')
 
   dev_host  = db_config['development']['host']
