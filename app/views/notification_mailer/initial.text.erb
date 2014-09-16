@@ -15,5 +15,9 @@ in <%= @bug.file %>:<%= @bug.line %>
 
 <%= @bug.message_template %>
 
+Stack trace of initial occurrence:
+
+<%= render_backtrace(@bug.occurrences.first.faulted_backtrace).indent(2) %>
+
         Yours truly,
         Squash

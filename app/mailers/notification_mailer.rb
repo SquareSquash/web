@@ -22,7 +22,7 @@
 # send all emails.
 
 class NotificationMailer < ActionMailer::Base
-  helper :mail
+  helper :mail, :application
 
   default from: Squash::Configuration.mailer.from
   default_url_options.merge! Squash::Configuration.mailer.default_url_options.symbolize_keys

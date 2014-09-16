@@ -22,7 +22,7 @@ module Views
   module Occurrences
     # @private
     class Show < Views::Layouts::Application
-      include BacktraceRendering
+      include HTMLBacktraceRendering
 
       needs :project, :environment, :bug, :occurrence
 

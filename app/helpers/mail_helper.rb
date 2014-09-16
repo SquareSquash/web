@@ -15,6 +15,8 @@
 # Helper methods for email content.
 
 module MailHelper
+  include TextBacktraceRendering
+
   # The typical maximum line width for plaintext emails (per RFC 2822).
   EMAIL_WRAP_WIDTH = 78
 

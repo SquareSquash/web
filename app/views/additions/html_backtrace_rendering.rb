@@ -15,9 +15,9 @@
 #    limitations under the License.
 
 # Adds methods to a view class that allow it to render backtraces in a standard
-# style.
+# HTML style.
 
-module BacktraceRendering
+module HTMLBacktraceRendering
   protected
 
   # Renders a list of backtraces.

@@ -12,8 +12,6 @@ in <%= @bug.file %>
 in <%= @bug.file %>:<%= @bug.line %>
 <% end %>
 
-<%= @bug.message_template %>
-
 THE OCCURRENCE
 
 <%= @occurrence.message %>
@@ -45,6 +43,10 @@ Network Type: <%= @occurrence.network_type %>
 <% if @occurrence.browser? %>
 Web Browser: <%= @occurrence.browser_name %> (<%= @occurrence.browser_version %>)
 <% end %>
+
+Stack trace:
+
+<%= render_backtrace(@occurrence.faulted_backtrace).indent(2) %>
 
         Yours truly,
         Squash
