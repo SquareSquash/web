@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Multithread::PriorityQueue do
+RSpec.describe Multithread::PriorityQueue do
   before(:each) { @queue = Multithread::PriorityQueue.new(50, 10) }
 
   describe "#deq" do

@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe ProjectsController do
+RSpec.describe ProjectsController, type: :controller do
   describe "#index" do
     before(:all) { @user = FactoryGirl.create(:user) }
 
@@ -83,9 +83,7 @@ describe ProjectsController do
         expect(json).to eql({'project' => {'repository_url' => ['is not accessible']}})
       end
 
-      it "should not allow protected fields to be set" do
-        pending "No protected fields"
-      end
+      it "should not allow protected fields to be set"
     end
   end
 
@@ -140,7 +138,6 @@ describe ProjectsController do
         login_as user
 
         patch :update, id: @project.to_param, project: {owner_id: user.id}, format: 'json'
-        expect(response.status).to eql(400)
         expect(@project.reload.owner).not_to eql(user)
       end
 
@@ -168,20 +165,18 @@ describe ProjectsController do
         expect(@project.reload.whitelist_paths).to eql(%w( a b ))
       end
 
-      it "should not allow protected fields to be set" do
-        pending "No protected fields"
-      end
+      it "should not allow protected fields to be set"
 
       it "should set Project#uses_releases_override if uses_releases is changed" do
         @project.update_attribute :uses_releases, true
         patch :update, id: @project.to_param, project: {uses_releases: false}, format: 'json'
-        expect(@project.reload.uses_releases?).to be_false
-        expect(@project.reload.uses_releases_override?).to be_true
+        expect(@project.reload.uses_releases?).to eql(false)
+        expect(@project.reload.uses_releases_override?).to eql(true)
       end
 
       it "should not set Project#uses_releases_override if uses_releases is not changed" do
         patch :update, id: @project.to_param, project: {name: 'New Name'}, format: 'json'
-        expect(@project.reload.uses_releases_override?).to be_false
+        expect(@project.reload.uses_releases_override?).to eql(false)
       end
     end
   end

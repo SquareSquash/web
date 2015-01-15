@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe "/users" do
+RSpec.describe "/users", type: :routing do
   describe "/:id [GET]" do
     it "should route to usernames with dots in them" do
       expect(get: '/users/user.dot').

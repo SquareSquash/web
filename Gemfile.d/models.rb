@@ -20,8 +20,8 @@ gem 'email_validation'
 gem 'url_validation'
 gem 'json_serialize'
 gem 'validates_timeliness'
-gem 'find_or_create_on_scopes', '>= 1.2.1'
-gem 'composite_primary_keys', github: 'RISCfuture/composite_primary_keys', branch: 'rebase'
+gem 'find_or_create_on_scopes'
+gem 'composite_primary_keys'
 gem 'rails-observers'
 
 conditionally('activerecord.cursors', true) do

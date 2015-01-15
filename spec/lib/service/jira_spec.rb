@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Service::JIRA do
+RSpec.describe Service::JIRA do
   describe ".new_issue_link" do
     it "should return a proper issue link" do
       expect(Service::JIRA.new_issue_link(foo: 'bar')).

@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Occurrence do
+RSpec.describe Occurrence, type: :model do
   context "[database rules]" do
     it "should set number sequentially for a given bug" do
       bug1 = FactoryGirl.create(:bug)
@@ -68,7 +68,7 @@ describe Occurrence do
 
     it "should send an email if the notification threshold has been tripped" do
       if RSpec.configuration.use_transactional_fixtures
-        pending "This is done in an after_commit hook, and it can't be tested with transactional fixtures (which are always rolled back)"
+        skip "This is done in an after_commit hook, and it can't be tested with transactional fixtures (which are always rolled back)"
       end
 
       occurrence = FactoryGirl.create(:rails_occurrence)
@@ -85,7 +85,7 @@ describe Occurrence do
 
     it "should update last_tripped_at" do
       if RSpec.configuration.use_transactional_fixtures
-        pending "This is done in an after_commit hook, and it can't be tested with transactional fixtures (which are always rolled back)"
+        skip "This is done in an after_commit hook, and it can't be tested with transactional fixtures (which are always rolled back)"
       end
 
       occurrence = FactoryGirl.create(:rails_occurrence)
@@ -111,7 +111,7 @@ describe Occurrence do
 
       context "[critical threshold notification]" do
         it "should not send an incident to PagerDuty until the critical threshold is breached" do
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
         end
 
@@ -138,35 +138,35 @@ describe Occurrence do
         it "should not send an incident if the project does not have a session key configured" do
           @project.update_attribute :pagerduty_service_key, nil
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if incident reporting is disabled" do
           @project.update_attribute :pagerduty_enabled, false
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the environment has incident reporting disabled" do
           @environment.update_attribute :notifies_pagerduty, nil
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the bug is assigned" do
           @bug.update_attribute :assigned_user, FactoryGirl.create(:membership, project: @project).user
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the bug is irrelevant" do
           @bug.update_attribute :irrelevant, true
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
       end
@@ -201,21 +201,21 @@ describe Occurrence do
         it "should not send an incident if the project does not have a session key configured" do
           @project.update_attribute :pagerduty_service_key, nil
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if incident reporting is disabled" do
           @project.update_attribute :pagerduty_enabled, false
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
         it "should not send an incident if the environment has incident reporting disabled" do
           @environment.update_attribute :notifies_pagerduty, nil
 
-          expect_any_instance_of(PagerDutyNotifier).not_to receive :trigger
+          expect_any_instance_of(Service::PagerDuty).not_to receive :trigger
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
@@ -306,7 +306,7 @@ describe Occurrence do
       os      = FactoryGirl.create_list :rails_occurrence, 4
       another = FactoryGirl.create :rails_occurrence
       Occurrence.truncate! Occurrence.where(id: os.map(&:id))
-      expect(os.map(&:reload).all?(&:truncated?)).to be_true
+      expect(os.map(&:reload).all?(&:truncated?)).to eql(true)
       expect(another.reload).not_to be_truncated
     end
   end

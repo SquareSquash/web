@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Email do
+RSpec.describe Email, type: :model do
   context "[validations]" do
     it "should not allow a primary email to be downgraded" do
       email         = FactoryGirl.create(:email, primary: true)

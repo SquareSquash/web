@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe BugsController do
+RSpec.describe BugsController, type: :controller do
   describe "#index" do
     before :all do
       membership = FactoryGirl.create(:membership)
@@ -235,17 +235,9 @@ describe BugsController do
         expect(@bug.comments.count).to eql(0)
       end
 
-      it "should limit owners to only updating owner-accessible fields" do
-        pending "There are no owner-only fields on Bug"
-      end
-
-      it "should limit admins to only updating admin-accessible fields" do
-        pending "There are no admin-only fields on Bug"
-      end
-
-      it "should limit members to only updating member-accessible fields" do
-        pending "There are no owner-only or admin-only fields on Bug"
-      end
+      it "should limit owners to only updating owner-accessible fields"
+      it "should limit admins to only updating admin-accessible fields"
+      it "should limit members to only updating member-accessible fields"
 
       it "should set duplicate_of_id from duplicate_of_number" do
         other = FactoryGirl.create(:bug, environment: @bug.environment)

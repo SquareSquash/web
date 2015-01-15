@@ -384,7 +384,7 @@ class Bug < ActiveRecord::Base
     return false unless page_threshold && page_period
 
     (page_last_tripped_at.nil? || page_last_tripped_at < page_period.seconds.ago) &&
-        occurrences.where('occurred_at >= ?', page_threshold.seconds.ago).count >= page_threshold
+        occurrences.where('occurred_at >= ?', page_period.seconds.ago).count >= page_threshold
   end
 
   private

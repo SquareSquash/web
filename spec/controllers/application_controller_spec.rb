@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe ApplicationController do
+RSpec.describe ApplicationController do
   describe "#infinite_scroll_clause" do
     before :each do
       @record = double('Record', created_at: Time.at(12345890), id: 12345)

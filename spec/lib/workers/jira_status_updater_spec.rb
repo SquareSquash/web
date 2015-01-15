@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe JiraStatusWorker do
+RSpec.describe JiraStatusWorker do
   describe "#perform" do
     it "should update bugs linked to newly-closed JIRA tickets" do
       FakeWeb.register_uri :get,

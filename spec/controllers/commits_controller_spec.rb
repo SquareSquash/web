@@ -15,9 +15,9 @@
 #    limitations under the License.
 
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe CommitsController do
+RSpec.describe CommitsController, type: :controller do
   describe '#index' do
     before :all do
       Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all

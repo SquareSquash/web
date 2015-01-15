@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-shared_examples_for "action that 404s at appropriate times" do |method, action, params='{}'|
+RSpec.shared_examples_for "action that 404s at appropriate times" do |method, action, params='{}'|
   it "should only allow projects that exist" do
     send method, action, eval(params).merge(project_id: 'not-found')
     expect(response.status).to eql(404)
@@ -24,7 +24,7 @@ shared_examples_for "action that 404s at appropriate times" do |method, action, 
   end
 end
 
-shared_examples_for "singleton action that 404s at appropriate times" do |method, action, params='{}'|
+RSpec.shared_examples_for "singleton action that 404s at appropriate times" do |method, action, params='{}'|
   it "should only find bugs within the current environment" do
     send method, action, eval(params).merge(id: 'not-found')
     expect(response.status).to eql(404)

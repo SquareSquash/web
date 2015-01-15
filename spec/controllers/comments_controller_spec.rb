@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe CommentsController do
+RSpec.describe CommentsController, type: :controller do
   describe "#index" do
     before :all do
       membership = FactoryGirl.create(:membership)
@@ -92,7 +92,7 @@ describe CommentsController do
       it "should discard fields not accessible to creators" do
         @bug.comments.delete_all
         post :create, polymorphic_params(@bug, true, comment: {user_id: FactoryGirl.create(:membership, project: @env.project).user_id, body: 'Hello, world!'}, format: 'json')
-        expect(@bug.comments(true)).to be_empty
+        expect(@bug.comments(true).first.user_id).to eql(@bug.environment.project.owner_id)
       end
 
       it "should render the errors with status 422 if invalid" do

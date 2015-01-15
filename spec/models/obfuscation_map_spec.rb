@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe ObfuscationMap do
+RSpec.describe ObfuscationMap, type: :model do
   context "[hooks]" do
     it "should deobfuscate pending occurrences when created" do
       if RSpec.configuration.use_transactional_fixtures

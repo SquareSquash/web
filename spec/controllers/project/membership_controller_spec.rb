@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Project::MembershipController do
+RSpec.describe Project::MembershipController, type: :controller do
   describe "#join" do
     before :each do
       @project = FactoryGirl.create(:project)
@@ -54,7 +54,7 @@ describe Project::MembershipController do
     it "should require a logged-in user" do
       patch :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
       expect(response).to redirect_to(login_url(next: request.fullpath))
-      expect(@membership.reload.send_comment_emails).to be_false
+      expect(@membership.reload.send_comment_emails).to eql(false)
     end
 
     context "[authenticated]" do
@@ -63,12 +63,11 @@ describe Project::MembershipController do
       it "should modify the membership" do
         patch :update, project_id: @membership.project.to_param, membership: {send_comment_emails: '1'}
         expect(response.status).to redirect_to(edit_project_my_membership_url(@membership.project))
-        expect(@membership.reload.send_comment_emails).to be_true
+        expect(@membership.reload.send_comment_emails).to eql(true)
       end
 
       it "should not allow protected attributes to be updated" do
         patch :update, project_id: @membership.project.to_param, membership: {project_id: 123}
-        expect(response.status).to eql(400)
         expect { @membership.reload }.not_to change(@membership, :project_id)
       end
     end

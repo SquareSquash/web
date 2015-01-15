@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Jira::StatusesController do
+RSpec.describe Jira::StatusesController, type: :controller do
   describe "#index" do
     it "should a list of known statuses" do
       FakeWeb.register_uri :get,

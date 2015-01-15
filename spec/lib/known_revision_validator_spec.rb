@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe KnownRevisionValidator do
+RSpec.describe KnownRevisionValidator do
   before :all do
     env    = FactoryGirl.create(:environment)
     @model = FactoryGirl.build(:deploy, environment: env)

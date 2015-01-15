@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe MessageTemplateMatcher do
+RSpec.describe MessageTemplateMatcher do
   before :all do
     @mysql_error = <<-ERR.strip
       Duplicate entry 'foo@example.com' for key 'index_users_on_email': UPDATE `users` SET `name` = 'Sancho Sample', `crypted_password` = '349857346384697346', `updated_at` = '2012-09-23 21:18:37', `email` = 'foo@example.com' WHERE `id` = 123456 -- app/controllers/api/v1/user_controller.rb:35

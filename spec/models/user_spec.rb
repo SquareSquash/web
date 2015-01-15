@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe User do
+RSpec.describe User, type: :model do
   describe "#gravatar" do
     it "should return the correct Gravatar URL" do
       user = FactoryGirl.create(:user, username: 'gravatar-test')
@@ -174,8 +174,8 @@ describe User do
     describe "#authentic?" do
       it "should return true for valid credentials and false for invalid credentials" do
         user = FactoryGirl.create(:user, password: 'developers developers developers developers')
-        expect(user.authentic?('developers developers developers')).to be_false
-        expect(user.authentic?('developers developers developers developers')).to be_true
+        expect(user.authentic?('developers developers developers')).to eql(false)
+        expect(user.authentic?('developers developers developers developers')).to eql(true)
       end
     end
   end if Squash::Configuration.authentication.strategy == 'password'

@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Blamer::Cache do
+RSpec.describe Blamer::Cache do
   describe "#blame" do
     before(:all) { @project = FactoryGirl.create(:project) }
     before(:each) { Blame.delete_all }

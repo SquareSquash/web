@@ -12,13 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
-require 'fdoc/spec_watcher'
+require 'rails_helper'
 
-describe Api::V1Controller do
-  include Fdoc::SpecWatcher
-
-  describe "#notify", fdoc: '/notify' do
+RSpec.describe Api::V1Controller, type: :controller do
+  describe "#notify" do
     before :all do
       Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
       @project   = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
@@ -75,7 +72,7 @@ describe Api::V1Controller do
     end
   end
 
-  describe "#deploy", fdoc: '/deploy' do
+  describe "#deploy" do
     before :all do
       Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
       @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
@@ -127,7 +124,7 @@ describe Api::V1Controller do
     end
   end
 
-  describe "#symbolication", fdoc: '/symbolication' do
+  describe "#symbolication" do
     it "should return 422 if the symbolication param is not provided" do
       post :symbolication, format: 'json'
       expect(response.status).to eql(422)
@@ -153,7 +150,7 @@ describe Api::V1Controller do
     end
   end
 
-  describe "#sourcemap", fdoc: '/sourcemap' do
+  describe "#sourcemap" do
     before :all do
       Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
       @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
@@ -201,7 +198,7 @@ describe Api::V1Controller do
     end
   end
 
-  describe "#deobfuscation", fdoc: '/deobfuscation' do
+  describe "#deobfuscation" do
     before :all do
       Project.where(repository_url: 'git@github.com:RISCfuture/better_caller.git').delete_all
       @project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')

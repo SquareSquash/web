@@ -37,9 +37,6 @@ class BugsController < ApplicationController
   }
   SORTS.default     = SORTS['latest']
 
-  # Valid columns to filter the bug list on.
-  VALID_FILTER_KEYS = %w( fixed irrelevant assigned_user_id deploy_id search any_occurrence_crashed )
-
   # Number of Bugs to return per page.
   PER_PAGE          = 50
 
@@ -100,7 +97,7 @@ class BugsController < ApplicationController
       end
 
       format.json do
-        filter = (params[:filter] || {}).slice(*VALID_FILTER_KEYS)
+        filter = (params[:filter] || ActionController::Parameters.new).permit(:fixed, :irrelevant, :assigned_user_id, :deploy_id, :search, :any_occurrence_crashed)
         filter.each { |k, v| filter[k] = nil if v == '' }
 
         filter.delete('deploy_id') if filter['deploy_id'].nil? # no deploy set means ANY deploy, not NO deploy

@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Jira::ProjectsController do
+RSpec.describe Jira::ProjectsController, type: :controller do
   describe "#index" do
     it "should a list of known projects" do
       FakeWeb.register_uri :get,

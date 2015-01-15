@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Service::PagerDuty do
+RSpec.describe Service::PagerDuty do
   before :each do
     @pagerduty = Service::PagerDuty.new('abc123')
     FakeWeb.register_uri :post,

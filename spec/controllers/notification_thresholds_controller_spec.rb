@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe NotificationThresholdsController do
+RSpec.describe NotificationThresholdsController, type: :controller do
   {create: :post, update: :patch}.each do |action, method|
     before :all do
       @env    = FactoryGirl.create(:environment)
@@ -58,8 +58,8 @@ describe NotificationThresholdsController do
         it "should not allow user or bug ID to be changed" do
           @bug.notification_thresholds.delete_all
           send method, action, polymorphic_params(@bug, true, notification_threshold: {user_id: 1, bug_id: 1, period: 1, threshold: 2}, format: 'json')
-          expect(response.status).to eql(400)
-          expect(@bug.notification_thresholds.count).to eql(0)
+          expect(@bug.notification_thresholds.count).to eql(1)
+          expect(@bug.notification_thresholds(true).first.user_id).to eql(@bug.environment.project.owner_id)
         end
       end
     end

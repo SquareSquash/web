@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe UsersController do
+RSpec.describe UsersController, type: :controller do
   describe "#index" do
     before :all do
       [Project, User].each &:destroy_all
@@ -79,7 +79,7 @@ describe UsersController do
     if Squash::Configuration.authentication.registration_enabled?
       it "should create the new user" do
         post :create, user: @attrs
-        expect(User.where(username: 'newguy').exists?).to be_true
+        expect(User.where(username: 'newguy').exists?).to eql(true)
         expect(response).to redirect_to(root_url)
       end
 
@@ -102,7 +102,7 @@ describe UsersController do
     else
       it "should not be possible to create a new user" do
         post :create, user: @attrs
-        expect(User.where(username: 'newguy').exists?).to be_false
+        expect(User.where(username: 'newguy').exists?).to eql(false)
         expect(response).to redirect_to(login_url)
       end
     end

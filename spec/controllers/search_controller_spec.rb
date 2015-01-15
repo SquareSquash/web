@@ -12,16 +12,10 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe SearchController do
-  before :all do
-    Environment.delete_all
-    Project.delete_all
-    Slug.delete_all
-    User.delete_all
-    Rails.cache.clear
-
+RSpec.describe SearchController, type: :controller do
+  before :each do
     @project     = FactoryGirl.create(:project, name: 'Example Project')
     @environment = FactoryGirl.create(:environment, name: 'production', project: @project)
     @bug         = FactoryGirl.create(:bug, environment: @environment)
@@ -225,18 +219,19 @@ describe SearchController do
         expect(response.status).to eql(200)
         expect(JSON.parse(response.body)).
             to eql([
-                           {'user' => JSON.parse(foo1.to_json),
-                            'url'  => user_url(foo1),
-                            'type' => 'user'},
-                           {'user' => JSON.parse(foo2.to_json),
-                            'url'  => user_url(foo2),
-                            'type' => 'user'},
-                       ])
+                       {'user' => JSON.parse(foo1.to_json),
+                        'url'  => user_url(foo1),
+                        'type' => 'user'},
+                       {'user' => JSON.parse(foo2.to_json),
+                        'url'  => user_url(foo2),
+                        'type' => 'user'},
+                   ])
       end
     end
 
     context "[project]" do
       it "should respond with a list of project suggestions" do
+        Project.delete_all
         proj1 = FactoryGirl.create(:project, name: 'Project One')
         proj2 = FactoryGirl.create(:project, name: 'Project Two')
 
@@ -244,13 +239,13 @@ describe SearchController do
         expect(response.status).to eql(200)
         expect(JSON.parse(response.body)).
             to eql([
-                           {'project' => JSON.parse(proj1.to_json),
-                            'url'     => project_url(proj1),
-                            'type'    => 'project'},
-                           {'project' => JSON.parse(proj2.to_json),
-                            'type'    => 'project',
-                            'url'     => project_url(proj2)},
-                       ])
+                       {'project' => JSON.parse(proj1.to_json),
+                        'url'     => project_url(proj1),
+                        'type'    => 'project'},
+                       {'project' => JSON.parse(proj2.to_json),
+                        'type'    => 'project',
+                        'url'     => project_url(proj2)},
+                   ])
       end
     end
 
@@ -264,15 +259,15 @@ describe SearchController do
         expect(response.status).to eql(200)
         expect(JSON.parse(response.body)).
             to eql([
-                           {'project'     => JSON.parse(proj.to_json),
-                            'environment' => JSON.parse(env1.to_json),
-                            'type'        => 'environment',
-                            'url'         => project_environment_bugs_url(proj, env1)},
-                           {'project'     => JSON.parse(proj.to_json),
-                            'environment' => JSON.parse(env2.to_json),
-                            'type'        => 'environment',
-                            'url'         => project_environment_bugs_url(proj, env2)},
-                       ])
+                       {'project'     => JSON.parse(proj.to_json),
+                        'environment' => JSON.parse(env1.to_json),
+                        'type'        => 'environment',
+                        'url'         => project_environment_bugs_url(proj, env1)},
+                       {'project'     => JSON.parse(proj.to_json),
+                        'environment' => JSON.parse(env2.to_json),
+                        'type'        => 'environment',
+                        'url'         => project_environment_bugs_url(proj, env2)},
+                   ])
       end
 
       it "should respond with an empty list for an unknown project" do
@@ -290,12 +285,12 @@ describe SearchController do
         expect(response.status).to eql(200)
         expect(JSON.parse(response.body)).
             to eql([
-                           {'project'     => JSON.parse(@bug.environment.project.to_json),
-                            'environment' => JSON.parse(@bug.environment.to_json),
-                            'bug'         => JSON.parse(@bug.to_json),
-                            'type'        => 'bug',
-                            'url'         => project_environment_bug_url(@bug.environment.project, @bug.environment, @bug)},
-                       ])
+                       {'project'     => JSON.parse(@bug.environment.project.to_json),
+                        'environment' => JSON.parse(@bug.environment.to_json),
+                        'bug'         => JSON.parse(@bug.reload.to_json),
+                        'type'        => 'bug',
+                        'url'         => project_environment_bug_url(@bug.environment.project, @bug.environment, @bug)},
+                   ])
       end
 
       it "should respond with an empty list for an unknown project" do
@@ -325,13 +320,13 @@ describe SearchController do
         expect(response.status).to eql(200)
         expect(JSON.parse(response.body)).
             to eql([
-                           {'type'        => 'occurrence',
-                            'url'         => project_environment_bug_occurrence_url(@occurrence.bug.environment.project, @occurrence.bug.environment, @occurrence.bug, @occurrence),
-                            'project'     => JSON.parse(@occurrence.bug.environment.project.to_json),
-                            'environment' => JSON.parse(@occurrence.bug.environment.to_json),
-                            'bug'         => JSON.parse(@occurrence.bug.to_json),
-                            'occurrence'  => JSON.parse(@occurrence.to_json)}
-                       ])
+                       {'type'        => 'occurrence',
+                        'url'         => project_environment_bug_occurrence_url(@occurrence.bug.environment.project, @occurrence.bug.environment, @occurrence.bug, @occurrence),
+                        'project'     => JSON.parse(@occurrence.bug.environment.project.to_json),
+                        'environment' => JSON.parse(@occurrence.bug.environment.to_json),
+                        'bug'         => JSON.parse(@occurrence.bug.to_json),
+                        'occurrence'  => JSON.parse(@occurrence.to_json)}
+                   ])
       end
 
       it "should respond with an empty list for an unknown project" do

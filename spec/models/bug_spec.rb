@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Bug do
+RSpec.describe Bug, type: :model do
   context "[database rules]" do
     it "should automatically increment/decrement occurrences_count" do
       bug = FactoryGirl.create(:bug)
@@ -347,7 +347,7 @@ describe Bug do
     end
 
     context "[deploy]" do
-      before(:all) { @bug = FactoryGirl.create(:bug, environment: @environment, fixed: true) }
+      before(:each) { @bug = FactoryGirl.create(:bug, environment: @environment, fixed: true) }
 
       it "should create a deploy event when marked fix_deployed" do
         @bug.update_attribute :fix_deployed, true
@@ -828,7 +828,7 @@ describe Bug do
   end
 
   describe "#blamed_users" do
-    before :all do
+    before :each do
       @bug = FactoryGirl.create(:bug)
 
       @sean  = FactoryGirl.create(:user, first_name: 'Sean', last_name: 'Sorrell', username: 'ssorrell')
@@ -1028,8 +1028,8 @@ describe Bug do
   end
 
   describe "#page_threshold_tripped?" do
-    before :all do
-      @bug = FactoryGirl.create(:bug, page_threshold: 10, page_period: 1.minute, page_last_tripped_at: 2.minutes.ago)
+    before :each do
+      @bug = FactoryGirl.create(:bug, page_threshold: 10, page_period: 10.minutes, page_last_tripped_at: 20.minutes.ago)
     end
 
     it "should return false if a threshold or period has not been configured" do

@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe DeployFixMarker do
+RSpec.describe DeployFixMarker do
   it "should raise an error if the deploy cannot be found" do
     expect { DeployFixMarker.perform 0 }.to raise_error(ActiveRecord::RecordNotFound)
   end
@@ -33,9 +33,9 @@ describe DeployFixMarker do
     deploy.save!
     DeployFixMarker.perform deploy.id
 
-    expect(bug_in_range_not_fixed.reload.fix_deployed?).to be_false
-    expect(bug_in_range_fixed_not_deployed.reload.fix_deployed?).to be_true
-    expect(bug_not_in_range_fixed_not_deployed.reload.fix_deployed?).to be_false
+    expect(bug_in_range_not_fixed.reload.fix_deployed?).to eql(false)
+    expect(bug_in_range_fixed_not_deployed.reload.fix_deployed?).to eql(true)
+    expect(bug_not_in_range_fixed_not_deployed.reload.fix_deployed?).to eql(false)
   end
 
   it "should create events for the fixed bugs" do

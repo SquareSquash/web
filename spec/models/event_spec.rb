@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Event do
+RSpec.describe Event, type: :model do
   describe "#as_json" do
     before :all do
       m           = FactoryGirl.create(:membership)

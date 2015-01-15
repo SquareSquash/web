@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe "ActiveRecord::Base.find_in_batches" do
+RSpec.describe "ActiveRecord::Base.find_in_batches" do
   context "[single surrogate key]" do
     before :all do
       Project.delete_all; User.delete_all

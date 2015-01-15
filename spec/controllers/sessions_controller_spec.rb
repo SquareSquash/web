@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe SessionsController do
+RSpec.describe SessionsController, type: :controller do
   before(:all) do
     attrs = Squash::Configuration.authentication.strategy == 'password' ? {password: 'password123'} : {}
     @user = FactoryGirl.create(:user, attrs)
@@ -33,8 +33,7 @@ describe SessionsController do
         allow(@ldap).to receive(:bind).and_return(true)
         allow(@ldap).to receive :encryption
 
-        entry = {:givenname => %w(Sancho), :sn => %w(Sample)}
-        allow(entry).to receive(:dn).and_return('some dn')
+        entry = OpenStruct.new(:givenname => %w(Sancho), :sn => %w(Sample), :dn => 'some dn')
         allow(@ldap).to receive(:search).and_yield(entry)
       end if defined?(Net::LDAP)
 

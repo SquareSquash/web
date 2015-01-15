@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-class FakeController
+class FakeController < ApplicationController
   def self.helper_method(*args) end
   def logger(*args) Rails.logger end
   def session() @session ||= Hash.new end
@@ -25,7 +25,7 @@ class FakeController
   include AuthenticationHelpers
 end
 
-describe AuthenticationHelpers do
+RSpec.describe AuthenticationHelpers, type: :integration do
   before(:all) { @user = FactoryGirl.create(:user) }
   before(:each) { @controller = FakeController.new }
 
@@ -63,37 +63,37 @@ describe AuthenticationHelpers do
   describe "#logged_in?" do
     it "should return true if the user is logged in" do
       @controller.send :log_in_user,  @user
-      expect(@controller.logged_in?).to be_true
+      expect(@controller.logged_in?).to eql(true)
     end
 
     it "should return false if the user is logged out" do
       @controller.log_out
-      expect(@controller.logged_in?).to be_false
+      expect(@controller.logged_in?).to eql(false)
     end
   end
 
   describe "#logged_out?" do
     it "should return true if the user is logged out" do
       @controller.log_out
-      expect(@controller.logged_out?).to be_true
+      expect(@controller.logged_out?).to eql(true)
     end
 
     it "should return false if the user is logged in" do
       @controller.send :log_in_user,  @user
-      expect(@controller.logged_out?).to be_false
+      expect(@controller.logged_out?).to eql(false)
     end
   end
 
   describe "#login_required" do
     it "should return true if the user is logged in" do
       @controller.send :log_in_user,  @user
-      expect(@controller.send(:login_required)).to be_true
+      expect(@controller.send(:login_required)).to eql(true)
     end
 
     it "should return false and redirect if the user is logged out" do
       expect(@controller).to receive(:respond_to).once
       @controller.log_out
-      expect(@controller.send(:login_required)).to be_false
+      expect(@controller.send(:login_required)).to eql(false)
     end
   end
 
@@ -101,12 +101,12 @@ describe AuthenticationHelpers do
     it "should return false and redirect if the user is logged in" do
       expect(@controller).to receive(:respond_to).once
       @controller.send :log_in_user,  @user
-      expect(@controller.send(:must_be_unauthenticated)).to be_false
+      expect(@controller.send(:must_be_unauthenticated)).to eql(false)
     end
 
     it "should return true if the user is logged out" do
       @controller.log_out
-      expect(@controller.send(:must_be_unauthenticated)).to be_true
+      expect(@controller.send(:must_be_unauthenticated)).to eql(true)
     end
   end
 

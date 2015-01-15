@@ -12,11 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe EmailsController do
+RSpec.describe EmailsController, type: :controller do
   describe "#index" do
-    before :all do
+    before :each do
       @user   = FactoryGirl.create(:user)
       @emails = FactoryGirl.create_list(:email, 11, user: @user)
     end
@@ -91,8 +91,7 @@ describe EmailsController do
 
       it "should not allow a primary email to be created" do
         post :create, format: 'json', email: {email: 'new@example.com', primary: '1'}
-        expect(response.status).to eql(400)
-        expect(@user.emails.count).to eql(1)
+        expect(@user.emails.find_by_email('new@example.com')).not_to be_primary
       end
 
       it "should handle validation errors" do

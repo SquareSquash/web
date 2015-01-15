@@ -41,6 +41,9 @@ Squash::Application.configure do
   # number of complex assets.
   config.assets.debug                        = true
 
+  # Raises error for missing translations
+  # config.action_view.raise_on_missing_translations = true
+
   # Configure development JavaScript self-reporting
   config.middleware.delete 'Rack::Cors'
   config.middleware.use Rack::Cors do

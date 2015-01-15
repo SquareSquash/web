@@ -32,8 +32,3 @@ if Rails.env.development?
     doc.files = %w( app/**/*.rb lib/**/*.rb - doc/*.md )
   end
 end
-
-desc "Generate fdoc documentation to doc/fdoc-html"
-task :fdoc do
-  system 'fdoc_to_html', 'doc/fdoc', 'doc/fdoc-html'
-end

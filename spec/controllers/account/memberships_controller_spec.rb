@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Account::MembershipsController do
+RSpec.describe Account::MembershipsController, type: :controller do
   describe "#index" do
     before :all do
       @user               = FactoryGirl.create(:user)

@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Project::MembershipsController do
+RSpec.describe Project::MembershipsController, type: :controller do
   describe "#index" do
     before :all do
       @project            = FactoryGirl.create(:project)
@@ -115,8 +115,7 @@ describe Project::MembershipsController do
       it "should not allow admins to create admins" do
         login_as FactoryGirl.create(:membership, project: @project, admin: true).user
         post :create, polymorphic_params(@project, true, membership: {user_id: @user.id, admin: 'true'}, format: 'json')
-        expect(response.status).to eql(400)
-        expect(@project.memberships.where(user_id: @user.id).first).to be_nil
+        expect(@project.memberships.where(user_id: @user.id).first).not_to be_admin
       end
 
       it "should render the errors with status 422 if invalid" do
@@ -168,13 +167,10 @@ describe Project::MembershipsController do
       it "should not allow admins to promote or demote admins" do
         login_as FactoryGirl.create(:membership, project: @project, admin: true).user
         patch :update, polymorphic_params(@membership, false, membership: {admin: true}, format: 'json')
-        expect(response.status).to eql(400)
         expect(@membership.reload).not_to be_admin
       end
 
-      it "should render the errors with status 422 if invalid" do
-        pending "No way to generate errors"
-      end
+      it "should render the errors with status 422 if invalid"
     end
   end
 

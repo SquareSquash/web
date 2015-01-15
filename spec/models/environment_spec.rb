@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Environment do
+RSpec.describe Environment, type: :model do
   context "[triggers]" do
     before(:all) { @env = FactoryGirl.create(:environment) }
     before(:each) { Bug.delete_all }

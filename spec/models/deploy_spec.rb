@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Deploy do
+RSpec.describe Deploy, type: :model do
   context "[hooks]" do
     it "should queue up a DeployFixMarker job" do
       if RSpec.configuration.use_transactional_fixtures
@@ -39,20 +39,20 @@ describe Deploy do
       it "should set it to true if a release is created" do
         @env.project.update_attribute :uses_releases, false
         FactoryGirl.create :release, environment: @env
-        expect(@env.project(true).uses_releases?).to be_true
+        expect(@env.project(true).uses_releases?).to eql(true)
       end
 
       it "should not set it to false if there is a subsequent deploy" do
         @env.project(true).update_attribute :uses_releases, true
         FactoryGirl.create :deploy, environment: @env
-        expect(@env.project.uses_releases?).to be_true
+        expect(@env.project.uses_releases?).to eql(true)
       end
 
       it "should not set it to true if the override is set" do
         @env.project.uses_releases = false
         @env.project.uses_releases_override = true
         FactoryGirl.create :release, environment: @env
-        expect(@env.project(true).uses_releases?).to be_false
+        expect(@env.project(true).uses_releases?).to eql(false)
       end
     end
   end

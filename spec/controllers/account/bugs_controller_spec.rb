@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Account::BugsController do
+RSpec.describe Account::BugsController, type: :controller do
   describe "#index" do
     def sort(bugs, field, reverse=false)
       bugs.sort_by! { |b| [b.send(field), b.number] }

@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe SourceMap do
+RSpec.describe SourceMap, type: :model do
   context "[hooks]" do
     it "should source-map pending occurrences when created" do
       if RSpec.configuration.use_transactional_fixtures

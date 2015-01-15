@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Blamer::Recency do
+RSpec.describe Blamer::Recency do
   before :each do
     Project.delete_all
     @project   = FactoryGirl.create(:project)
@@ -243,7 +243,7 @@ describe Blamer::Recency do
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       expect(bug.file).to eql('/library/file')
       expect(bug.line).to eql(27)
-      expect(bug.special_file?).to be_false
+      expect(bug.special_file?).to eql(false)
       expect(bug.blamed_revision).to be_nil
     end
 
@@ -265,7 +265,7 @@ describe Blamer::Recency do
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       expect(bug.file).to eql('fake/project/file')
       expect(bug.line).to eql(11)
-      expect(bug.special_file?).to be_false
+      expect(bug.special_file?).to eql(false)
       expect(bug.blamed_revision).to be_nil
     end
 
@@ -284,7 +284,7 @@ describe Blamer::Recency do
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       expect(bug.file).to eql('0x0000001B')
       expect(bug.line).to eql(1)
-      expect(bug.special_file?).to be_true
+      expect(bug.special_file?).to eql(true)
     end
 
     it "should set special_file but use the backtrace elements for an obfuscated Java bug" do
@@ -301,7 +301,7 @@ describe Blamer::Recency do
       bug         = Blamer::Recency.new(@occurrence).find_or_create_bug!
       expect(bug.file).to eql('A.java')
       expect(bug.line).to eql(15)
-      expect(bug.special_file?).to be_true
+      expect(bug.special_file?).to eql(true)
     end
 
     it "should abs Java line numbers, which can apparently be negative" do

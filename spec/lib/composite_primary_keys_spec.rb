@@ -12,18 +12,18 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe ActiveRecord::Base do
+RSpec.describe ActiveRecord::Base do
   describe "#touch" do
     it "should update a single-key record" do
       user = FactoryGirl.create(:user, created_at: 1.day.ago, updated_at: 1.day.ago)
-      expect { expect(user.touch).to be_true }.to change(user, :updated_at)
+      expect { expect(user.touch).to eql(true) }.to change(user, :updated_at)
     end
 
     it "should update a multi-key record" do
       nt = FactoryGirl.create(:notification_threshold, last_tripped_at: 1.day.ago)
-      expect { expect(nt.touch(:last_tripped_at)).to be_true }.to change(nt, :last_tripped_at)
+      expect { expect(nt.touch(:last_tripped_at)).to eql(true) }.to change(nt, :last_tripped_at)
     end
   end
 end

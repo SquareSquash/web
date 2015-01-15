@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Project do
+RSpec.describe Project, type: :model do
   describe '#repo' do
     it "should check out the repository and return a Repository object" do
       Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all

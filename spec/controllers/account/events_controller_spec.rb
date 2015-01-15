@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Account::EventsController do
+RSpec.describe Account::EventsController, type: :controller do
   include EventDecoration
 
   describe "#index" do

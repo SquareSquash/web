@@ -12,11 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe AccountsController do
+RSpec.describe AccountsController, type: :controller do
   describe "#update" do
-    before :all do
+    before :each do
       @user  = FactoryGirl.create(:user)
       @attrs = {password: 'newpass', password_confirmation: 'newpass', first_name: 'NewFN', last_name: 'NewLN'}
     end
@@ -36,7 +36,7 @@ describe AccountsController do
 
         expect(@user.reload.first_name).to eql('NewFN')
         expect(@user.last_name).to eql('NewLN')
-        expect(@user.authentic?('newpass')).to be_true
+        expect(@user.authentic?('newpass')).to eql(true)
       end
 
       it "should render the account page on failure" do
@@ -47,8 +47,6 @@ describe AccountsController do
       it "should not update the password if it's not provided" do
         @user.reload
         patch :update, user: @attrs.merge('password' => '')
-        expect(response).to redirect_to(account_url)
-
         expect { @user.reload }.not_to change(@user, :crypted_password)
       end
     end

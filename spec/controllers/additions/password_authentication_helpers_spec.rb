@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
 if Squash::Configuration.authentication.strategy == 'password'
   class FakeController
@@ -23,7 +23,7 @@ if Squash::Configuration.authentication.strategy == 'password'
     include PasswordAuthenticationHelpers
   end
 
-  describe PasswordAuthenticationHelpers do
+  RSpec.describe PasswordAuthenticationHelpers, type: :model do
     before(:each) { @controller = FakeController.new }
 
     describe "#log_in" do
@@ -31,17 +31,17 @@ if Squash::Configuration.authentication.strategy == 'password'
 
       it "should accept a valid username and password" do
         expect(@controller).to receive(:log_in_user).once.with(@user)
-        expect(@controller.log_in(@user.username, 'password123')).to be_true
+        expect(@controller.log_in(@user.username, 'password123')).to eql(true)
       end
 
       it "should not accept an unknown username" do
         expect(@controller).not_to receive :log_in_user
-        expect(@controller.log_in('unknown', 'password123')).to be_false
+        expect(@controller.log_in('unknown', 'password123')).to eql(false)
       end
 
       it "should not accept an invalid password" do
         expect(@controller).not_to receive :log_in_user
-        expect(@controller.log_in(@user.username, 'password-wrong')).to be_false
+        expect(@controller.log_in(@user.username, 'password-wrong')).to eql(false)
       end
     end
   end

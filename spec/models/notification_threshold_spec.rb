@@ -12,12 +12,12 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe NotificationThreshold do
+RSpec.describe NotificationThreshold, type: :model do
   describe "#tripped?" do
-    before :all do
-      @threshold = FactoryGirl.create(:notification_threshold, threshold: 10, period: 1.minute, last_tripped_at: 2.minutes.ago)
+    before :each do
+      @threshold = FactoryGirl.create(:notification_threshold, threshold: 10, period: 10.minutes, last_tripped_at: 20.minutes.ago)
     end
 
     it "should return false if the threshold has not yet been exceeded within the period" do

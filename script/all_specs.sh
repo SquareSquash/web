@@ -253,8 +253,8 @@ YAML
 ##### MRI 1.9 (password auth)
 function run_mri19() {
     reset_config
-    rvm 1.9.3@squash exec ${BUNDLE}
-    rvm 1.9.3@squash exec ${COMMAND}
+    rvm 1.9@squash exec ${BUNDLE}
+    rvm 1.9@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI 1.9 with password auth ******"
@@ -264,8 +264,8 @@ function run_mri19() {
 ##### MRI 2.0 (password auth)
 function run_mri20() {
     reset_config
-    rvm 2.0.0@squash exec ${BUNDLE}
-    rvm 2.0.0@squash exec ${COMMAND}
+    rvm 2.0@squash exec ${BUNDLE}
+    rvm 2.0@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI 2.0 with password auth ******"
@@ -281,8 +281,8 @@ function restore() {
 
 check_clean
 
-rvm 1.9.3 exec rvm gemset create squash
-rvm 2.0.0 exec rvm gemset create squash
+rvm 1.9 exec rvm gemset create squash
+rvm 2.0 exec rvm gemset create squash
 rvm 2.1 exec rvm gemset create squash
 rvm jruby exec rvm gemset create squash
 

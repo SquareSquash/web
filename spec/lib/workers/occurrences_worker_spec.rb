@@ -12,11 +12,11 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
 THIS_FILE = Pathname.new(__FILE__).relative_path_from(Rails.root).to_s
 
-describe OccurrencesWorker do
+RSpec.describe OccurrencesWorker do
   before :all do
     Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
     @project   = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
@@ -95,7 +95,7 @@ describe OccurrencesWorker do
         Deploy.delete_all
         occ = OccurrencesWorker.new(@params.merge('build' => 'new')).perform
         expect(occ.bug.deploy.revision).to eql(@commit.sha)
-        expect(occ.bug.deploy.deployed_at).to be_within(5).of(Time.now)
+        expect(occ.bug.deploy.deployed_at).to be_within(1.minute).of(Time.now)
         expect(occ.bug.deploy.build).to eql('new')
       end
 
@@ -158,8 +158,8 @@ describe OccurrencesWorker do
         expect(occ.message).to eql("Well crap")
         occ.faulted_backtrace.zip(@exception.backtrace).each do |(element), bt_line|
           next if bt_line.include?('.java') # we test the java portions of the backtrace elsewhere
-          expect(bt_line.include?("#{element['file']}:#{element['line']}")).to be_true
-          expect(bt_line.end_with?(":in `#{element['method']}'")).to(be_true) if element['method']
+          expect(bt_line.include?("#{element['file']}:#{element['line']}")).to eql(true)
+          expect(bt_line.end_with?(":in `#{element['method']}'")).to(eql(true)) if element['method']
         end
 
         expect(occ.bug.environment.name).to eql('production')
@@ -399,7 +399,7 @@ describe OccurrencesWorker do
         bug.update_attribute :fixed_at, Time.now - 15.days
         OccurrencesWorker.new(@params).perform
         expect(bug.reload).not_to be_fixed
-        expect(bug.fix_deployed?).to be_false
+        expect(bug.fix_deployed?).to eql(false)
       end
 
       it "should set a cause for a bug being reopened" do

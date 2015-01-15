@@ -14,9 +14,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Comment do
+RSpec.describe Comment, type: :comment do
   context "[database rules]" do
     it "should set number sequentially for a given bug" do
       bug1  = FactoryGirl.create(:bug)

@@ -12,9 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
-describe Jira::IssuesController do
+RSpec.describe Jira::IssuesController, type: :controller do
   describe "#show" do
     it "should return information about a JIRA issue" do
       FakeWeb.register_uri :get,
