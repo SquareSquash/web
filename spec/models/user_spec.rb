@@ -133,7 +133,7 @@ RSpec.describe User, type: :model do
   end
 
   describe "#email" do
-    before :all do
+    before :each do
       @user  = FactoryGirl.create(:user)
       @email = FactoryGirl.create(:email, user: @user)
     end

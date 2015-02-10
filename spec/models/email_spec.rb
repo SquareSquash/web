@@ -89,6 +89,8 @@ RSpec.describe Email, type: :model do
 
   context "[hooks]" do
     it "should downgrade another primary email when set as primary" do
+      Email.delete_all
+
       user  = FactoryGirl.create(:user)
       email = user.emails.first
       expect(email).to be_primary
