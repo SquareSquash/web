@@ -261,8 +261,8 @@ class ProjectsController < ApplicationController
     def filter_paths_string() filter_paths.join("\n") end
     def whitelist_paths_string() whitelist_paths.join("\n") end
 
-    def filter_paths_string=(str) self.filter_paths = (str || '').split("\n") end
-    def whitelist_paths_string=(str) self.whitelist_paths = (str || '').split("\n") end
+    def filter_paths_string=(str) self.filter_paths = (str || '').split(/\r?\n/) end
+    def whitelist_paths_string=(str) self.whitelist_paths = (str || '').split(/\r?\n/) end
 
     def owner_username() owner.username end
     def owner_username=(name) self.owner = User.find_by_username(name) end
