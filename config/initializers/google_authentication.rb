@@ -1,4 +1,7 @@
-# Copyright 2014 Square Inc.
+# encoding: utf-8
+
+#TODO: License
+# Copyright 2015 Powershop Ltd.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -12,10 +15,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-conditionally('authentication.strategy', 'ldap') do
-  gem 'net-ldap', github: 'ruby-ldap/ruby-net-ldap', require: 'net/ldap'
-end
-
-conditionally('authentication.strategy', 'google') do
-  gem 'simple_google_auth'
-end
+SimpleGoogleAuth.configure do |config|
+  config.client_id     = Squash::Configuration.authentication.google.client_id
+  config.client_secret = Squash::Configuration.authentication.google.client_secret
+  config.redirect_uri  = Squash::Configuration.authentication.google.redirect_uri
+  config.authenticate  = lambda {|d| true }
+end if Squash::Configuration.authentication.strategy == 'google'
