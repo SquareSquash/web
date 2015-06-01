@@ -26,23 +26,18 @@ module GoogleAuthenticationHelpers
     log_in_user User.find_or_create_by_google_auth_data!(google_auth_data)
   end
 
-  # We don't want to redirect to a the Squash login page with this
-  # authenticator
-  def login_required
+  def third_party_login_required
+    #TODO(willjr): Safer logging data!!
     logger.info "Current User = #{current_user.inspect}"
     logger.info "Google Auth Data = #{google_auth_data.inspect}"
 
-    return true if logged_in?
-
     respond_to do |format|
-      format.xml { head :unauthorized }
-      format.json { head :unauthorized }
-      format.atom { head :unauthorized }
       format.html do
         logger.info "Redirecting to Big G for Authentication"
         # If we're Google authenticated, find/create user
         # If we're not google-authenticated, then go get it!
-        redirect_if_not_google_authenticated unless log_in
+        return true if log_in
+        redirect_if_not_google_authenticated
       end
     end
     return false

@@ -17,6 +17,7 @@
 
 class SessionsController < ApplicationController
   skip_before_filter :login_required, only: [:new, :create]
+  # skip_before_filter :login_required, only: [:new, :create] unless Squash::Configuration.authentication.third_party_login
   before_filter :must_be_unauthenticated, except: :destroy
 
   respond_to :html

@@ -86,6 +86,14 @@ module AuthenticationHelpers
     end
   end
 
+  # A `before_filter` that requires a session authenticated by a 3rd-party login
+  # service (e.g. Google Auth).
+  # By default (`true`) it assumes to 3P service, and should be overridden in a
+  # *_helper.rb
+  def third_party_login_required
+   true
+  end
+
   # A `before_filter` that requires an unauthenticated session to continue. If
   # the session is authenticated...
   #

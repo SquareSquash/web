@@ -46,11 +46,6 @@ module GoogleAuthentication
       e.user.tap {|u| u.google_auth_data = auth_data }
     end
 
-    #TODO(willjr): Remove?
-    # def self.create_by_google_auth_data!(auth_data)
-    #   User.create!(google_auth_data: auth_data)
-    # end
-
     def self.find_or_create_by_google_auth_data!(auth_data)
       # find_by_google_auth_data(auth_data) || create_by_google_auth_data(auth_data)
       find_by_google_auth_data(auth_data) or
@@ -60,6 +55,11 @@ module GoogleAuthentication
 
   #####
   # Instance methods
+
+  # @return [Boolean] Is this a third-party login service?
+  def third_party_login?
+    true
+  end
 
   # @return [String] The unique Google ID for the authenticated account
   def google_user_id
