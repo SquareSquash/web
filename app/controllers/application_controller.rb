@@ -152,6 +152,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  before_filter :third_party_login_required
   before_filter :login_required
 
   protected
