@@ -28,7 +28,7 @@ module AuthenticationHelpers
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_user, :logged_in?, :logged_out?
+    helper_method :current_user, :logged_in?, :logged_out?, :third_party_login?
   end
 
   # Clears a user session.
@@ -92,6 +92,10 @@ module AuthenticationHelpers
   # *_helper.rb
   def third_party_login_required
    true
+  end
+
+  def third_party_login?
+    false
   end
 
   # A `before_filter` that requires an unauthenticated session to continue. If

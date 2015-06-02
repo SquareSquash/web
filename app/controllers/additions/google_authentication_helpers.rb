@@ -31,6 +31,8 @@ module GoogleAuthenticationHelpers
     logger.info "Current User = #{current_user.inspect}"
     logger.info "Google Auth Data = #{google_auth_data.inspect}"
 
+    return true if logged_in?
+
     respond_to do |format|
       format.html do
         logger.info "Redirecting to Big G for Authentication"
@@ -41,5 +43,9 @@ module GoogleAuthenticationHelpers
       end
     end
     return false
+  end
+
+  def third_party_login?
+    true
   end
 end

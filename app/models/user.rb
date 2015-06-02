@@ -90,13 +90,6 @@ class User < ActiveRecord::Base
 
   include "#{Squash::Configuration.authentication.strategy}_authentication".camelize.constantize
 
-  # @return [Boolean] Is this a third-party login service?
-  # NB: by default, no
-  def third_party_login?
-    false
-  end
-
-
   # @return [String] The user's full name, or as much of it as available, or the
   #   `username`.
 
