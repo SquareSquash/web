@@ -17,7 +17,6 @@
 
 class SessionsController < ApplicationController
   skip_before_filter :login_required, only: [:new, :create]
-  # skip_before_filter :login_required, only: [:new, :create] unless Squash::Configuration.authentication.third_party_login
   before_filter :must_be_unauthenticated, except: :destroy
 
   respond_to :html
@@ -93,7 +92,11 @@ class SessionsController < ApplicationController
   # * `GET /logout`
 
   def destroy
-    log_out
-    redirect_to login_url, notice: t('controllers.sessions.destroy.logged_out')
+    if third_party_login?
+      redirect_to root_url, notice: t('controllers.sessions.destroy.third_party_logout')
+    else
+      log_out
+      redirect_to login_url, notice: t('controllers.sessions.destroy.logged_out')
+    end
   end
 end

@@ -56,11 +56,6 @@ module GoogleAuthentication
   #####
   # Instance methods
 
-  # @return [Boolean] Is this a third-party login service?
-  def third_party_login?
-    true
-  end
-
   # @return [String] The unique Google ID for the authenticated account
   def google_user_id
     google_auth_data.try(:fetch, "sub", nil)
