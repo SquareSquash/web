@@ -39,6 +39,10 @@ module GoogleAuthentication
     # Because we need an associated email object for the google_email_address
     # validates_associated :emails  ?
 
+    # @return [User] Searches the Users for an entry that matches appropriate Google Auth data
+    # @return [nil] If it can't find a user that matches the provided Google Auth data
+    #
+    # In this case, we search for a matching email address
     def self.find_by_google_auth_data(auth_data)
       return nil unless auth_data && auth_data["email"]
       e = (Email.find_by(email: auth_data["email"]) or return nil)
@@ -46,15 +50,14 @@ module GoogleAuthentication
       e.user.tap {|u| u.google_auth_data = auth_data }
     end
 
+    # @return [User] Finds or Creates a User from Google Auth data
+    # @raise [RecordInvalid] If it fails to create the User (this should never happen!)
     def self.find_or_create_by_google_auth_data!(auth_data)
-      # find_by_google_auth_data(auth_data) || create_by_google_auth_data(auth_data)
       find_by_google_auth_data(auth_data) or
         User.create!(google_auth_data: auth_data)
     end
   end
 
-  #####
-  # Instance methods
 
   # @return [String] The unique Google ID for the authenticated account
   def google_user_id
@@ -66,8 +69,7 @@ module GoogleAuthentication
     google_auth_data.try(:fetch, "email", nil)
   end
 
-  # @return [String] Calculate a username that's not already in-use for a new
-  #                  Google account / email-address
+  # @return [String] Calculate a username that's not already in-use for a new Google account / email-address
   def unique_username
     errors.add(:username, "google_auth_data is null") if google_auth_data.nil?
     [sanitised_google_username, sanitised_google_username_id].each do |a_username|
@@ -88,9 +90,11 @@ module GoogleAuthentication
     [sanitised_username(google_email_address), google_user_id].join("-")
   end
 
+  # @return [String] A username extracted from a Google email-address, and then sanitised.
+  #
+  # In this context, "sanitised" means certain disallowed char's are replaced with "_" as Google also
+  # allows `.` and `'` in a G.Apps email username but Squash doesn't.
   def sanitised_username(an_email_address)
-    # Google also allows "." and "'" in a G.Apps email username
-    # but Squash doesn't:
     m = an_email_address.match(/^(.+)@.+$/) or
       raise InvalidGoogleUsernameError, "Can't extract username from #{an_email_address.inspect}"
     m[1].gsub(/[\.\']/, "_")
