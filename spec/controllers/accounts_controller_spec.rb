@@ -21,9 +21,10 @@ RSpec.describe AccountsController, type: :controller do
       @attrs = {password: 'newpass', password_confirmation: 'newpass', first_name: 'NewFN', last_name: 'NewLN'}
     end
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       patch :update, user: @attrs
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
       expect { @user.reload }.not_to change(@user, :first_name)
     end
 

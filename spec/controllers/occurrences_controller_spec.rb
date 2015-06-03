@@ -27,9 +27,10 @@ RSpec.describe OccurrencesController, type: :controller do
       occurrences
     end
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :index, polymorphic_params(@bug, true)
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -66,9 +67,10 @@ RSpec.describe OccurrencesController, type: :controller do
       @bug = FactoryGirl.create(:bug, environment: @env)
     end
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :histogram, polymorphic_params(@bug, true)
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -108,9 +110,10 @@ RSpec.describe OccurrencesController, type: :controller do
   describe "#aggregate" do
     before(:all) { @bug = FactoryGirl.create(:bug) }
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :aggregate, polymorphic_params(@bug, true)
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -187,9 +190,10 @@ RSpec.describe OccurrencesController, type: :controller do
   describe "#show" do
     before(:all) { @occurrence = FactoryGirl.create(:rails_occurrence) }
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :aggregate, polymorphic_params(@occurrence, false)
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
