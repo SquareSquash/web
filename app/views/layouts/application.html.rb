@@ -185,9 +185,7 @@ module Views
               navbar_environments('large') if @project
               li(id: 'quicknav-container') { input type: 'search', id: 'quicknav', placeholder: 'Search' }
               li { link_to "My Account", account_url }
-              unless third_party_login?
-                li { link_to(logout_url) { i class: 'icon-signout'} }
-              end
+              li { link_to(logout_url) { i class: 'icon-signout'} }
             else
               li(id: 'quicknav-container') { text! '&nbsp;' }
               li { link_to "Log In", login_url }

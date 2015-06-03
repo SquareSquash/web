@@ -20,32 +20,33 @@
 # or her.
 
 module GoogleAuthenticationHelpers
-  def log_in
-    return false unless google_auth_data
-    # If you're authenticated by Google, if this fails, it should asplode:
-    log_in_user User.find_or_create_by_google_auth_data!(google_auth_data)
-  end
+  extend ActiveSupport::Concern
 
-  def third_party_login_required
-    #TODO(willjr): Safer logging data!!
-    logger.info "Current User = #{current_user.inspect}"
-    logger.info "Google Auth Data = #{google_auth_data.inspect}"
-
-    return true if logged_in?
-
-    respond_to do |format|
-      format.html do
-        logger.info "Redirecting to Big G for Authentication"
-        # If we're Google authenticated, find/create user
-        # If we're not google-authenticated, then go get it!
-        return true if log_in
-        redirect_if_not_google_authenticated
-      end
+  included do
+    def self.third_party_login?
+      true
     end
-    return false
   end
 
-  def third_party_login?
-    true
+  def log_in
+    unless google_auth_data
+      logger.tagged('AuthenticationHelpers') { logger.info "Denying login: not Google Auth data provided." }
+      return false
+    end
+
+    unless user = User.find_or_create_by_google_auth_data(google_auth_data)
+      logger.tagged('AuthenticationHelpers') { logger.info "Denying login to #{google_auth_data["email"]}: could not find or create." }
+      return false
+    end
+
+    log_in_user user
+  end
+
+  def login_required_redirect
+    logger.info "Redirecting to Big G for Authentication"
+
+    # If we're Google authenticated, find/create user
+    # If we're not google-authenticated, then go get it!
+    redirect_if_not_google_authenticated unless log_in
   end
 end
