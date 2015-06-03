@@ -47,6 +47,13 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "#username" do
+    it "should return the sanitised user-name from a Google email address" do
+      auth_data = { "email" => "email.test@example.com", "sub" => "uid-123" }
+      expect(FactoryGirl.create(:user, google_auth_data: auth_data).username).to eql("email_test")
+    end if Squash::Configuration.authentication.strategy == 'google'
+  end
+
   describe "#email" do
     it "should return the user's corporate email address" do
       expect(FactoryGirl.create(:user, username: 'email-test').email).to eql("email-test@#{Squash::Configuration.mailer.domain}")
@@ -55,6 +62,11 @@ RSpec.describe User, type: :model do
     it "should return the user's corporate email address" do
       expect(FactoryGirl.create(:user, email_address: 'email-test@example.com').email).to eql("email-test@example.com")
     end if Squash::Configuration.authentication.strategy == 'password'
+
+    it "should return the user's corporate email address" do
+      auth_data = { "email" => "email-test@example.com", "sub" => "uid-123" }
+      expect(FactoryGirl.create(:user, google_auth_data: auth_data).email).to eql("email-test@example.com")
+    end if Squash::Configuration.authentication.strategy == 'google'
   end
 
   describe "#distinguished_name" do
@@ -119,6 +131,11 @@ RSpec.describe User, type: :model do
     it "should downcase the username" do
       expect(FactoryGirl.create(:user, username: 'TestCase').username).to eql('testcase')
     end
+
+    it "should downcase the Google Auth username" do
+      auth_data = { "email" => "Email.Test@example.com", "sub" => "uid-123" }
+      expect(FactoryGirl.create(:user, google_auth_data: auth_data).username).to eql("email_test")
+    end if Squash::Configuration.authentication.strategy == 'google'
   end
 
   describe "#watches?" do

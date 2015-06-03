@@ -14,12 +14,24 @@
 
 FactoryGirl.define do
   factory :user do
-    sequence(:username) { |i| "user-#{i}" }
     first_name 'Sancho'
     last_name 'Sample'
-    if Squash::Configuration.authentication.strategy == 'password'
+
+    case Squash::Configuration.authentication.strategy
+    when 'password'
+      sequence(:username) { |i| "user-#{i}" }
       sequence(:email_address) { |i| "email-#{i}@example.com" }
       password 'correct horse battery staple'
+
+    when 'ldap'
+      sequence(:username) { |i| "user-#{i}" }
+
+    when 'google'
+      sequence(:google_auth_data) do |i|
+        { "email" => "email-#{i}@example.com",
+          "sub" => "uid-#{i}"
+        }
+      end
     end
   end
 end
