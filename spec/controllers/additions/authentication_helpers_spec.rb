@@ -97,6 +97,12 @@ RSpec.describe AuthenticationHelpers, type: :integration do
     end
   end
 
+  describe "#third_party_login?" do
+    it "should return false for being a 3rd-party login service" do
+      expect(@controller.send(:third_party_login?)).to be_false
+    end unless Squash::Configuration.authentication.strategy == 'google'
+  end
+
   describe "#must_be_unauthenticated" do
     it "should return false and redirect if the user is logged in" do
       expect(@controller).to receive(:respond_to).once
