@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-require 'spec_helper'
+require 'rails_helper'
 
 if Squash::Configuration.authentication.strategy == 'google'
   class FakeController
@@ -23,9 +23,11 @@ if Squash::Configuration.authentication.strategy == 'google'
 
     include AuthenticationHelpers
     include GoogleAuthenticationHelpers
+
+    def google_auth_data; end
   end
 
-  describe GoogleAuthenticationHelpers do
+  RSpec.describe GoogleAuthenticationHelpers, type: :model do
     before(:each) { @controller = FakeController.new }
 
     describe "#log_in" do
