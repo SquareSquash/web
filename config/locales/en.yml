@@ -323,7 +323,6 @@ en:
         missing_field: You must provide a username and a password.
       destroy:
         logged_out: You have been logged out.
-        third_party_logout: Logging-out doesn't make sense with a 3rd Party login service.
     users:
       create:
         success: "Welcome to Squash, %{name}!"

@@ -18,14 +18,14 @@
 module GoogleAuthentication
   extend ActiveSupport::Concern
 
-  class GoogleAuthError <RuntimeError; end
-  class InvalidGoogleUsernameError <GoogleAuthError; end
+  class InvalidGoogleAuthError <RuntimeError; end
+  class InvalidGoogleUsernameError <InvalidGoogleAuthError; end
 
   included do
     attr_accessor :google_auth_data
 
     # We choose the username:
-    before_validation(on: :create) {|obj| obj.username = unique_username }
+    before_validation(on: :create) {|obj| obj.username ||= unique_username.downcase }
 
     validates :google_auth_data,
       presence: true,
@@ -52,33 +52,33 @@ module GoogleAuthentication
 
     # @return [User] Finds or Creates a User from Google Auth data
     # @raise [RecordInvalid] If it fails to create the User (this should never happen!)
-    def self.find_or_create_by_google_auth_data!(auth_data)
+    def self.find_or_create_by_google_auth_data(auth_data)
       find_by_google_auth_data(auth_data) or
-        User.create!(google_auth_data: auth_data)
+        User.create(google_auth_data: auth_data)
     end
   end
 
-
   # @return [String] The unique Google ID for the authenticated account
   def google_user_id
-    google_auth_data.try(:fetch, "sub", nil)
+    google_auth_data["sub"]
   end
 
   # @return [String] The Google email for the authenticated account
   def google_email_address
-    google_auth_data.try(:fetch, "email", nil)
+    google_auth_data["email"]
   end
+
+  private
 
   # @return [String] Calculate a username that's not already in-use for a new Google account / email-address
   def unique_username
-    errors.add(:username, "google_auth_data is null") if google_auth_data.nil?
+    raise InvalidGoogleAuthError, "google_auth_data is null" if google_auth_data.nil?
+
     [sanitised_google_username, sanitised_google_username_id].each do |a_username|
       logger.info "Searching for #{a_username.inspect}"
       return a_username unless User.where(username: a_username).exists?
     end
   end
-
-  private
 
   # @return [String] The username part of the Google email, sanitised for Squash's use
   def sanitised_google_username
@@ -95,6 +95,7 @@ module GoogleAuthentication
   # In this context, "sanitised" means certain disallowed char's are replaced with "_" as Google also
   # allows `.` and `'` in a G.Apps email username but Squash doesn't.
   def sanitised_username(an_email_address)
+    raise InvalidGoogleUsernameError, "Can't extract username from #{an_email_address.inspect}" if an_email_address.nil?
     m = an_email_address.match(/^(.+)@.+$/) or
       raise InvalidGoogleUsernameError, "Can't extract username from #{an_email_address.inspect}"
     m[1].gsub(/[\.\']/, "_")
