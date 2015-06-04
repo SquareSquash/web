@@ -332,8 +332,9 @@ if step < 2
   say
   say "Now we'll cover authentication.".bold
 
-  auth = choose("How will users authenticate to Squash?", %w(password LDAP))
-  if auth == 'LDAP'
+  auth = choose("How will users authenticate to Squash?", %w(password LDAP GoogleAuth))
+  case auth
+  when 'LDAP'
     ldap_host  = query("What's the hostname of your LDAP server?")
     ldap_ssl   = prompt("Is your LDAP service using SSL?")
     ldap_port  = query("What port is your LDAP service running on?", ldap_ssl ? '636' : '389').to_i
@@ -356,7 +357,8 @@ if step < 2
                  }
              }.to_yaml)
     end
-  elsif auth == 'password'
+
+  when 'password'
     say "Updating config/environments/common/authentication.yml..."
     File.open('config/environments/common/authentication.yml', 'w') do |f|
       f.puts({
@@ -364,6 +366,25 @@ if step < 2
                  'registration_enabled' => true,
                  'password' => {
                      'salt' => SecureRandom.base64
+                 }
+             }.to_yaml)
+    end
+
+  when 'GoogleAuth'
+    say "You will need your Google OAuth API Credentials from your project"
+    say "under https://console.developers.google.com/project to answer the following:"
+    google_client_id = query("What's your Google OAuth Client ID?")
+    google_client_secret = query("What's your Google OAuth Client Secret?")
+    google_redirect_uri = query("What Google OAuth Redirect URI do you plan to use for Squash?")
+
+    say "Updating config/environments/common/authentication.yml..."
+    File.open('config/environments/common/authentication.yml', 'w') do |f|
+      f.puts({
+                 'strategy'   => 'google',
+                 'google' => {
+                     'client_id'     => google_client_id,
+                     'client_secret' => google_client_secret,
+                     'redirect_uri'  => google_redirect_uri
                  }
              }.to_yaml)
     end
