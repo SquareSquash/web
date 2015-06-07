@@ -14,7 +14,8 @@
 
 # Controller and view mixin with shared methods pertaining for authenticating
 # and authorizing {User Users}. For specifics on different authentication
-# methods, see {PasswordAuthenticationHelpers} and {LdapAuthenticationHelpers}.
+# methods, see {PasswordAuthenticationHelpers}, {LdapAuthenticationHelpers}
+# and {GoogleAuthenticationHelpers}.
 #
 # The ID of the authenticated user is stored in the session. The presence of a
 # valid user ID in `session[:user_id]` is indicative of an authenticated
@@ -40,7 +41,7 @@ module AuthenticationHelpers
   # Clears a user session.
 
   def log_out
-    # Why doesn't this use #reset_session ?
+    #TODO: Why doesn't this use #reset_session ?
     session[:user_id] = nil
     @current_user     = nil
   end
