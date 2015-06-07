@@ -12,7 +12,8 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-# Includes methods for authentication with LDAP. Information for the LDAP server
+# Includes methods for authentication with Google OAuth.
+# NONO: Information for the LDAP server
 # is stored in the `authentication.yml` Configoro file for the current
 # environment. A successful BIND yields an authenticated session.
 #
