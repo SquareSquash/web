@@ -159,6 +159,8 @@ GEM
     serialbox (1.0.0)
       activesupport
       json
+    simple_google_auth (0.2.0)
+      rails (>= 3.2.0)
     slugalicious (2.1.0)
       rails (>= 4.0)
       stringex
@@ -250,6 +252,7 @@ DEPENDENCIES
   rspec-rails
   safe_yaml
   sass-rails
+  simple_google_auth
   slugalicious
   sourcemap
   sprockets (< 2.12.0)
