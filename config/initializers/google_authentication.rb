@@ -19,5 +19,10 @@ SimpleGoogleAuth.configure do |config|
   config.client_id     = Squash::Configuration.authentication.google.client_id
   config.client_secret = Squash::Configuration.authentication.google.client_secret
   config.redirect_uri  = Squash::Configuration.authentication.google.redirect_uri
-  config.authenticate  = lambda {|d| true }
+  config.authenticate  = lambda do |data|
+    allowed_domains = Squash::Configuration.authentication.google.allowed_domains
+    fail "Must provide a list of accepted Google domains" if allowed_domains.nil? || allowed_domains.empty?
+
+    ! allowed_domains.select {|domain| data.email.ends_with? "@#{domain}" }.empty?
+  end
 end if Squash::Configuration.authentication.strategy == 'google'
