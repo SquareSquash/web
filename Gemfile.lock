@@ -72,6 +72,9 @@ GEM
       activesupport
     connection_pool (2.2.0)
     diff-lcs (1.2.5)
+    dotenv (2.0.1)
+    dotenv-rails (2.0.1)
+      dotenv (= 2.0.1)
     email_validation (1.2.0)
       localized_each_validator (>= 1.0.1)
     erubis (2.7.0)
@@ -272,6 +275,7 @@ DEPENDENCIES
   coffee-rails
   composite_primary_keys
   configoro (>= 1.2.4)
+  dotenv-rails
   email_validation
   erector!
   factory_girl_rails

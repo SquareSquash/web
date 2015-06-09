@@ -12,6 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
+# Configoro will do ERB replacement, so we need to have the env-vars loaded before that:
+gem 'dotenv-rails', :require => 'dotenv/rails-now'
+
 # Load our frozen Configoro
 require File.join(File.dirname(__FILE__), '..', 'vendor', 'configoro', 'simple')
 
