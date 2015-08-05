@@ -17,11 +17,11 @@ require 'rails_helper'
 RSpec.describe Project, type: :model do
   describe '#repo' do
     it "should check out the repository and return a Repository object" do
-      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
-      repo = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git").repo
+      Project.where(repository_url: 'https://github.com/RISCfuture/better_caller.git').delete_all
+      repo = FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git').repo
       expect(repo).to be_kind_of(Git::Base)
       expect(repo.index).to be_nil # should be bare
-      expect(repo.repo.path).to eql(Rails.root.join('tmp', 'repos', 'dcc31d9e2fd24f244590edcd7d73baa89e907785.git').to_s)
+      expect(repo.repo.path).to eql(Rails.root.join('tmp', 'repos', '624502932dfb6785124fbcc3c03cfb5e20f81d8f.git').to_s)
     end
   end
 
@@ -91,15 +91,15 @@ RSpec.describe Project, type: :model do
     end
 
     it "should automatically set commit_url_format if able" do
-      expect(FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
+      expect(FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
       expect(FactoryGirl.create(:project, repository_url: 'https://RISCfuture@github.com/RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
-      Project.where(repository_url: 'git@github.com:RISCfuture/better_caller.git').delete_all
-      expect(FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
+      Project.where(repository_url: 'https://github.com/RISCfuture/better_caller.git').delete_all
+      expect(FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
     end
 
     it "should not overwrite a custom commit_url_format" do
-      Project.where(repository_url: 'git@github.com:RISCfuture/better_caller.git').delete_all
-      expect(FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git', commit_url_format: 'http://example.com/%{commit}').commit_url_format).to eql('http://example.com/%{commit}')
+      Project.where(repository_url: 'https://github.com/RISCfuture/better_caller.git').delete_all
+      expect(FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git', commit_url_format: 'http://example.com/%{commit}').commit_url_format).to eql('http://example.com/%{commit}')
     end
   end
 

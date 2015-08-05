@@ -58,7 +58,7 @@ RSpec.describe ProjectsController, type: :controller do
 
   describe "#create" do
     it "should require a logged-in user" do
-      expect { post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/better_caller.git'}, format: 'json' }.not_to change(Project, :count)
+      expect { post :create, project: {name: 'New Project', repository_url: 'https://github.com/RISCfuture/better_caller.git'}, format: 'json' }.not_to change(Project, :count)
       expect(response.status).to eql(401)
     end
 
@@ -69,11 +69,11 @@ RSpec.describe ProjectsController, type: :controller do
       end
 
       it "should create the new project" do
-        post :create, project: {name: 'New Project', repository_url: 'git@github.com:RISCfuture/better_caller.git'}, format: 'json'
+        post :create, project: {name: 'New Project', repository_url: 'https://github.com/RISCfuture/better_caller.git'}, format: 'json'
         expect(response.status).to eql(201)
         json = JSON.parse(response.body)
         expect(json['name']).to eql('New Project')
-        expect(json['repository_url']).to eql('git@github.com:RISCfuture/better_caller.git')
+        expect(json['repository_url']).to eql('https://github.com/RISCfuture/better_caller.git')
       end
 
       it "should validate project connectivity" do
@@ -121,7 +121,7 @@ RSpec.describe ProjectsController, type: :controller do
   describe "#update" do
     before :each do
       Project.delete_all
-      @project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
+      @project = FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git')
     end
 
     it "should require a logged-in user" do
