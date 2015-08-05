@@ -91,10 +91,12 @@ RSpec.describe Project, type: :model do
     end
 
     it "should automatically set commit_url_format if able" do
-      expect(FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
+      expect(FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
       expect(FactoryGirl.create(:project, repository_url: 'https://RISCfuture@github.com/RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
+
       Project.where(repository_url: 'https://github.com/RISCfuture/better_caller.git').delete_all
-      expect(FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
+
+      expect(FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git').commit_url_format).to eql('https://github.com/RISCfuture/better_caller/commit/%{commit}')
     end
 
     it "should not overwrite a custom commit_url_format" do
