@@ -26,9 +26,10 @@ RSpec.describe Project::MembershipsController, type: :controller do
       @memberships = @project.memberships.to_a # get the owner's membership too
     end
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :index, polymorphic_params(@project, true)
-      expect(response).to redirect_to login_url(next: request.fullpath)
+      expect(response).to redirect_to login_required_redirection_url(next: request.fullpath)
     end
 
     context '[authenticated]' do

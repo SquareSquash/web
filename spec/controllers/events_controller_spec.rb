@@ -34,9 +34,10 @@ RSpec.describe EventsController, type: :controller do
       @user      = membership.user
     end
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :index, polymorphic_params(@bug, true)
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
     end
 
     context '[authenticated]' do

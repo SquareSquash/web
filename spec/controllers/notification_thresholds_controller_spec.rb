@@ -69,9 +69,10 @@ RSpec.describe NotificationThresholdsController, type: :controller do
     before(:all) { @env = FactoryGirl.create(:environment) }
     before(:each) { @bug = FactoryGirl.create(:bug, environment: @env) }
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       delete :destroy, polymorphic_params(@bug, true)
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
       expect(@bug.reload).not_to be_fixed
     end
 

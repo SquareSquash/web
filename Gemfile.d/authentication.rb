@@ -15,3 +15,7 @@
 conditionally('authentication.strategy', 'ldap') do
   gem 'net-ldap', github: 'ruby-ldap/ruby-net-ldap', require: 'net/ldap'
 end
+
+conditionally('authentication.strategy', 'google') do
+  gem 'simple_google_auth'
+end
