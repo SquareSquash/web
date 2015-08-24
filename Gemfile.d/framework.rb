@@ -12,7 +12,9 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-gem 'rails', '4.0.13'
+gem 'rails', '4.2.3'
+gem 'responders'
+gem 'psych' # fix TypeError: superclass mismatch for class Mark
 
-gem 'configoro', '>= 1.2.4'
+gem 'configoro'
 gem 'rack-cors', require: 'rack/cors'

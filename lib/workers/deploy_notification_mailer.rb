@@ -38,7 +38,7 @@ class DeployNotificationMailer
 
   def perform
     User.where(id: @bug.notify_on_deploy).each do |user|
-      NotificationMailer.deploy(@bug, user).deliver
+      NotificationMailer.deploy(@bug, user).deliver_now
     end
   end
 end

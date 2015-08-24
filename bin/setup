@@ -203,7 +203,7 @@ puts "If something's not right, you can abort this script at any time; it's",
 say
 say "Checking the basic environment..."
 
-if File.absolute_path(Dir.getwd) != File.absolute_path(File.dirname(__FILE__))
+if File.absolute_path(Dir.getwd) != File.absolute_path(File.dirname(__FILE__) + '/..')
   say "You are not running this script from the Rails project's root directory.".red.bold
   say "Please cd into the project root and re-run this script.".magenta
   exit 1
@@ -486,7 +486,5 @@ say " ", "false.".bold.yellow, "When you deploy Squash to production, create a p
 say "  and copy the generated API key to this file.".yellow
 puts
 say "* Test that all specs pass by running".yellow, 'rspec spec.'.bold.yellow
-puts
-puts "* You can delete this setup script now if you wish.".yellow
 
 FileUtils.rm '/tmp/squash_install_progress'

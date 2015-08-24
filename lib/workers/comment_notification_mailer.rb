@@ -42,6 +42,6 @@ class CommentNotificationMailer
     recipients.delete @comment.user_id
     recipients.uniq!
 
-    User.where(id: recipients).each { |user| NotificationMailer.comment(@comment, user).deliver }
+    User.where(id: recipients).each { |user| NotificationMailer.comment(@comment, user).deliver_now }
   end
 end

@@ -50,8 +50,8 @@ module Squash
     # like if you have constraints or database-specific column types
     config.active_record.schema_format = :sql
 
-    # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-    config.assets.precompile << 'flot/excanvas.js'
+    # Do not swallow errors in after_commit/after_rollback callbacks.
+    config.active_record.raise_in_transactional_callbacks = true
 
     # Use custom generators
     config.generators do |g|

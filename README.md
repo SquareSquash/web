@@ -25,10 +25,10 @@ Pull requests are more than welcome; please check out
 How to Install
 --------------
 
-To get started, run the `setup.rb` file in the project root. This script will
-ask you a series of questions and generate a preliminary configuration for your
-site install. When the script is completed, you can run `git status` to see what
-files it changed, and refine your configuration from there.
+To get started, run the `bin/setup` file. This script will ask you a series of 
+questions and generate a preliminary configuration for your site install. When 
+the script is completed, you can run `git status` to see what files it changed, 
+and refine your configuration from there.
 
 Once the script is complete, Squash should run for most typical development
 environments. Simply run `rails s` and visit the site in your Web browser. You
