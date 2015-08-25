@@ -206,7 +206,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (>= 2.8, < 4.0)
-    sql_origin (1.1.0)
+    sql_origin (1.1.2)
       rails (>= 4.0)
     squash_ios_symbolicator (1.1.1)
       plist
