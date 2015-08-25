@@ -18,7 +18,7 @@ FactoryGirl.define do
     first_name 'Sancho'
     last_name 'Sample'
     if Squash::Configuration.authentication.strategy == 'password'
-      sequence(:email_address) { |i| "email-#{i}@example.com" }
+      sequence(:email_address) { |i| "default-email-#{i}@example.com" }
       password 'correct horse battery staple'
     end
   end
