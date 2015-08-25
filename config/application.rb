@@ -68,6 +68,13 @@ module Squash
         resource '/api/1.0/notify', headers: :any, methods: [:post]
       end
     end
+
+    require config.root.join('app', 'middleware', 'ping')
+    if config.force_ssl
+      config.middleware.insert_before ActionDispatch::SSL, Ping
+    else
+      config.middleware.insert_before Rack::Runtime, Ping
+    end
   end
 end
 
