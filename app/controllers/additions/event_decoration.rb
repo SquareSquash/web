@@ -56,15 +56,15 @@ module EventDecoration
       when 'comment' then 'comment'
       when 'deploy' then 'truck'
       when 'dupe' then 'copy'
-      when 'email' then 'envelope'
-      when 'open' then 'exclamation-sign'
-      when 'reopen' then 'warning-sign'
+      when 'email' then 'envelope-o'
+      when 'open' then 'exclamation-circle'
+      when 'reopen' then 'warning-triangle'
       when 'close'
         case event.data['status']
-          when 'fixed' then 'ok-sign'
-          when 'irrelevant' then 'remove-sign'
+          when 'fixed' then 'check-circle'
+          when 'irrelevant' then 'minus-circle'
         end
-      else 'question-sign'
+      else 'question-circle'
     end
   end
 end

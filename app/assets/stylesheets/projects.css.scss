@@ -32,7 +32,7 @@ body#projects-index {
     &>p { margin-bottom: 20px; }
   }
 
-  a.icon-star { text-decoration: none; }
+  a.fa-star, a.fa-star-o { text-decoration: none; }
 }
 
 body#projects-show {

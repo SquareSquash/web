@@ -32,7 +32,7 @@ class root.ValueInspector
       @element.append(@object.slice(0, 50) + '&hellip;')
       $('<br/>').appendTo @element
       @object = { to_s: @object }
-    $('<i/>').addClass('icon-search').appendTo @element
+    $('<i/>').addClass('fa fa-search').appendTo @element
     $('<a/>').text("View in Value Inspector").appendTo(@element).click =>
       this.show()
       false

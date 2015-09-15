@@ -33,9 +33,9 @@ class root.Flash
     @close.click => this.remove()
 
     switch @type
-      when 'alert'   then $('<i/>').addClass('icon-exclamation-sign').prependTo(@element)
-      when 'success' then $('<i/>').addClass('icon-ok-sign').prependTo(@element)
-      when 'notice'  then $('<i/>').addClass('icon-info-sign').prependTo(@element)
+      when 'alert'   then $('<i/>').addClass('fa fa-exclamation-circle').prependTo(@element)
+      when 'success' then $('<i/>').addClass('fa fa-check-circle').prependTo(@element)
+      when 'notice'  then $('<i/>').addClass('fa fa-info-circle').prependTo(@element)
 
     @element.oneTime 500, => @element.addClass 'flash-shown'
     @element.oneTime(5000, => this.remove()) if @type == 'success'
