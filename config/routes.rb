@@ -28,6 +28,7 @@ Squash::Application.routes.draw do
         resources :events, only: :index
         resources :comments, except: [:show, :new, :edit]
         resource :notification_threshold, only: [:create, :update, :destroy]
+        resource :beetil_incident, only: :create
       end
     end
     resources :memberships, controller: 'project/memberships', only: [:index, :create, :update, :destroy], constraints: {id: /[^\/]+?/, format: 'json'}
@@ -58,6 +59,11 @@ Squash::Application.routes.draw do
     resources :issues, only: :show
     resources :statuses, only: :index
   end unless Squash::Configuration.jira.disabled?
+
+  namespace :beetil do
+    resources :projects, only: :index
+    resources :issues, only: :show
+  end
 
   get 'login' => 'sessions#new'
   post 'login' => 'sessions#create'

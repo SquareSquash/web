@@ -36,6 +36,7 @@ function PageManager() {
       this.setupJIRALink();
       this.loadJIRAProjects();
     <% end %>
+    this.setupBeetilLink();
   };
 
   this.setupManagementForm = function() {
@@ -261,6 +262,24 @@ function PageManager() {
 
   this.setupHistogram = function() {
     new Histogram($('#histogram'), "<%= histogram_project_environment_bug_occurrences_url(@project, @environment, @bug, format: 'json') %>");
+  };
+
+  this.setupBeetilLink = function() {
+    var field = $('#bug_beetil_number'),
+          info = $('#beetil-name');
+
+    var fieldChanged = function() {
+      if (field.val() == '') return;
+
+      // TODO ajax to beetil_issues to get the name of the beetil
+      var hardcoded_beetil_url = "https://desk.gotoassist.com/goto?q=";
+      var issue = {key: field.val(), title: "Incident"}
+      var url = hardcoded_beetil_url + issue.key;
+      $('<a/>').attr({href: url, target: '_blank'}).text(issue.title).appendTo(info);
+    };
+
+    fieldChanged();
+    field.change(fieldChanged);
   };
 
   <% unless Squash::Configuration.jira.disabled? %>

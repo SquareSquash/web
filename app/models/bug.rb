@@ -141,6 +141,9 @@ class Bug < ActiveRecord::Base
       jira_issue:           {type: String, allow_nil: true},
       jira_status_id:       {type: Fixnum, allow_nil: true, numericality: {only_integer: true, greater_than_or_equal_to: 0}},
 
+      beetil_number:        {type: Fixnum, allow_nil: true},
+      beetil_status_id:     {type: Fixnum, allow_nil: true, numericality: {only_integer: true, greater_than_or_equal_to: 0}},
+
       page_threshold:       {type: Fixnum, numericality: {greater_than: 0}, allow_nil: true},
       page_period:          {type: Fixnum, numericality: {greater_than: 0}, allow_nil: true},
       page_last_tripped_at: {type: Time, allow_nil: true}

@@ -251,6 +251,27 @@ module Views
               f.select :jira_status_id, [["Loading…", nil]], disabled: true
               p "With this option, you can automatically close one or more bugs when a JIRA issue is resolved.", class: 'help-block'
             end unless Squash::Configuration.jira.disabled?
+
+            div do
+              f.label :beetil_number
+              div(class: 'field-group') do
+                span(class: 'input-append') do
+                  f.text_field :beetil_number, placeholder: "12345", size: 14
+                  span " ", class: 'add-on', id: 'beetil-status'
+                end
+                p class: 'help-block', id: 'beetil-name'
+
+
+                p do
+                  text "or "
+                  link_to "create a new Incident", "https://desk.gotoassist.com/services/delivery/incidents/new", :target => "_blank"
+                end
+
+                p do
+                  button_to "create new Beetil incident (TBA)", project_environment_bug_beetil_incident_url(@project, @environment, @bug), :'data-sqmethod' => 'POST', disabled: true
+                end
+              end
+            end
           end
 
           fieldset do
