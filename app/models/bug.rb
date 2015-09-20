@@ -188,6 +188,7 @@ class Bug < ActiveRecord::Base
            :cannot_change_original_to_duplicate,
            :cannot_be_duplicate_of_foreign_bug
 
+  set_nil_if_blank :beetil_number
   before_validation(on: :create) { |obj| obj.revision = obj.revision.downcase if obj.revision }
   before_validation { |obj| obj.fixed_at = Time.now if obj.fixed? && !obj.fixed_was }
   before_create { |obj| obj.notify_on_occurrence = [] } # if anyone can explain to me why this defaults to [1] and not []...
