@@ -274,7 +274,7 @@ function PageManager() {
 
       // TODO ajax to beetil_issues to get the name of the beetil
       var hardcoded_beetil_url = "https://desk.gotoassist.com/goto?q=";
-      var issue = {key: field.val(), title: "Incident"}
+      var issue = {key: field.val(), title: "Incident" + " B#" + field.val()};
       var url = hardcoded_beetil_url + issue.key;
       $('<a/>').attr({href: url, target: '_blank'}).text(issue.title).appendTo(info);
     };
