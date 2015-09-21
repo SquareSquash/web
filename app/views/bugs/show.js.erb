@@ -269,6 +269,7 @@ function PageManager() {
           info = $('#beetil-name');
 
     var fieldChanged = function() {
+      info.empty();
       if (field.val() == '') return;
 
       // TODO ajax to beetil_issues to get the name of the beetil
