@@ -1,6 +1,64 @@
 require 'net/http'
 
 module BeetilApi
+  class V1Client
+    attr_reader :api_host, :api_token
+    def initialize(api_host: nil, api_token: nil)
+      @api_host = api_host
+      @api_token = api_token
+    end
+
+    def current_user
+      get '/v1/users/current_user.json'
+    end
+
+    def services
+      get '/v1/services.json'
+    end
+
+    def incident(number)
+      get "/v1/incidents/#{number}.json?incident_properties=id,title,resolved_at,closed_at"
+    end
+
+    def create_incident(incident_data)
+      post "/v1/incidents.json", "incident", incident_data
+    end
+
+
+    protected
+    def basic_auth
+      Base64.encode64 "x:#{api_token}"
+    end
+
+    def get(url)
+      do_request url, Net::HTTP::Get, "Authorization" => "Basic #{basic_auth}"
+    end
+
+    def post(url, thing, data)
+      nested_form_data = data.each_with_object({}) do |(k,v), hash|
+        hash["#{thing}[#{k}]"] = v
+      end
+
+      do_request url, Net::HTTP::Post, "Authorization" => "Basic #{basic_auth}" do |request|
+        puts nested_form_data.inspect
+        request.set_form_data nested_form_data
+      end
+    end
+
+    def do_request(url, request_class, headers = {})
+      uri = URI.parse("#{api_host}#{url}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == 'https'
+
+      request = request_class.new(uri.request_uri, headers.merge("Accept" => "application/json"))
+      yield request if block_given?
+      response = http.request(request)
+      # TODO : handle error response
+      JSON.parse(response.body)
+    end
+  end
+
+
   class Client
     def initialize(client_id: nil, client_secret: nil, redirect_uri: nil, api_host: nil, authenticate_path: nil)
       @client_id = client_id
@@ -67,6 +125,7 @@ module BeetilApi
     def post(url, data)
       @client.do_request url, Net::HTTP::Post, "Authorization" => "Bearer #{access_token}", "Accept" => "application/json" do |request|
         puts data.inspect
+        #TODO, there's a bug here with nested form params
         request.set_form_data data
       end
     end

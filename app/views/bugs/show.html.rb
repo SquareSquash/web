@@ -227,6 +227,11 @@ module Views
 
       def management_tab
         p { em "How are things going with this bug?" }
+
+        p do
+          button_to "create new Beetil incident", project_environment_bug_beetil_incident_url(@project, @environment, @bug), :'data-sqmethod' => 'POST'
+        end
+
         form_for [@project, @environment, @bug], format: 'json', html: {class: 'labeled whitewashed', id: 'management-form'} do |f|
           fieldset do
             h5 "We’re working on it."
@@ -260,16 +265,6 @@ module Views
                   span " ", class: 'add-on', id: 'beetil-status'
                 end
                 p class: 'help-block', id: 'beetil-name'
-
-
-                p do
-                  text "or "
-                  link_to "create a new Incident", "https://desk.gotoassist.com/services/delivery/incidents/new", :target => "_blank"
-                end
-
-                p do
-                  button_to "create new Beetil incident (TBA)", project_environment_bug_beetil_incident_url(@project, @environment, @bug), :'data-sqmethod' => 'POST', disabled: true
-                end
               end
             end
           end

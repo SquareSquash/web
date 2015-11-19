@@ -276,6 +276,15 @@ en:
       name: "%{first_name} %{last_name}"
     bug:
       name: "Bug #%{number}"
+      beetil_data:
+        description: |
+          %{last_occurrence_message}
+
+          Occurrence: %{last_occurrence_url}
+
+          Full information: %{url}
+        not_applicable: N/A
+        summary: "%{class_name} on %{file_name}:%{line}"
     occurrence:
       name: "Occurrence #%{number}"
   controllers:
