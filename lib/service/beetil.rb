@@ -99,7 +99,7 @@ module Service::Beetil
   end
 
   def v1_client
-    @v1_client ||= BeetilApi::V1Client.new(api_host: ENV['BEETIL_API_HOST'], api_token: ENV['BEETIL_V1_TOKEN'])
+    @v1_client ||= BeetilApi::V1Client.new(api_host: ENV['BEETIL_API_HOST'], api_token: Rails.application.secrets[:beetil_api][:v1_token])
   end
 
   protected
