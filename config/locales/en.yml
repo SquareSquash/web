@@ -278,7 +278,9 @@ en:
       name: "Bug #%{number}"
       beetil_data:
         description: |
+          ===
           %{last_occurrence_message}
+          ===
 
           Occurrence: %{last_occurrence_url}
 
