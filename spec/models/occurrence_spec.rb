@@ -118,20 +118,20 @@ RSpec.describe Occurrence, type: :model do
         it "should send an incident if always_notify_pagerduty is set" do
           @project.update_attribute :always_notify_pagerduty, true
           expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once.with(
-                                                            /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
-                                                            @bug.pagerduty_incident_key,
-                                                            an_instance_of(Hash)
-                                                        )
+              /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+              @bug.pagerduty_incident_key,
+              an_instance_of(Hash)
+          )
           FactoryGirl.create :rails_occurrence, bug: @bug
         end
 
         it "should send an incident to PagerDuty once the critical threshold is breached" do
           FactoryGirl.create_list :rails_occurrence, 2, bug: @bug
           expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once.with(
-                                                            /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
-                                                            @bug.pagerduty_incident_key,
-                                                            an_instance_of(Hash)
-                                                        )
+              /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+              @bug.pagerduty_incident_key,
+              an_instance_of(Hash)
+          )
           FactoryGirl.create :rails_occurrence, bug: @bug
         end
 
@@ -179,10 +179,10 @@ RSpec.describe Occurrence, type: :model do
 
         it "should send an incident to PagerDuty once if the page threshold is breached" do
           expect_any_instance_of(Service::PagerDuty).to receive(:trigger).once.with(
-                                                            /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
-                                                            @bug.pagerduty_incident_key,
-                                                            an_instance_of(Hash)
-                                                        )
+              /#{Regexp.escape @bug.class_name} in #{Regexp.escape File.basename(@bug.file)}:#{@bug.line}/,
+              @bug.pagerduty_incident_key,
+              an_instance_of(Hash)
+          )
           FactoryGirl.create_list :rails_occurrence, 3, bug: @bug
         end
 
@@ -273,7 +273,7 @@ RSpec.describe Occurrence, type: :model do
       bt2 = [{'file' => 'bar.rb', 'line' => 321, 'symbol' => 'foo'}]
       expect(FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
                                                          {'name' => '2', 'faulted' => true, 'backtrace' => bt2}]).
-                 faulted_backtrace).to eql(bt2)
+          faulted_backtrace).to eql(bt2)
     end
 
     it "should return an empty array if there is no at-fault backtrace" do
@@ -281,7 +281,7 @@ RSpec.describe Occurrence, type: :model do
       bt2 = [{'file' => 'bar.rb', 'line' => 321, 'symbol' => 'foo'}]
       expect(FactoryGirl.build(:occurrence, backtraces: [{'name' => "1", 'faulted' => false, 'backtrace' => bt1},
                                                          {'name' => '2', 'faulted' => false, 'backtrace' => bt2}]).
-                 faulted_backtrace).to eql([])
+          faulted_backtrace).to eql([])
     end
   end
 
@@ -605,9 +605,9 @@ RSpec.describe Occurrence, type: :model do
     end
 
     it "should sourcemap the occurrence" do
-      map =  GemSourceMap::Map.new([
-                                    GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(25, 1)),
-                                ], 'http://test.host/example/asset.js')
+      map = GemSourceMap::Map.new([
+                                      GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(25, 1)),
+                                  ], 'http://test.host/example/asset.js')
       FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map
 
       @occurrence.backtraces = [{"name"      => "Thread 0",
@@ -630,11 +630,11 @@ RSpec.describe Occurrence, type: :model do
 
     it "should apply multiple source maps" do
       map1 = GemSourceMap::Map.new([
-                                    GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(25, 1)),
-                                ], 'http://test.host/example/asset.js')
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(25, 1)),
+                                   ], 'http://test.host/example/asset.js')
       map2 = GemSourceMap::Map.new([
-                                    GemSourceMap::Mapping.new('app/assets/javascripts/source.js.coffee', GemSourceMap::Offset.new(25, 1), GemSourceMap::Offset.new(11, 1)),
-                                ], 'app/assets/javascripts/source.js')
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source.js.coffee', GemSourceMap::Offset.new(25, 1), GemSourceMap::Offset.new(11, 1)),
+                                   ], 'app/assets/javascripts/source.js')
 
       FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map1, from: 'hosted', to: 'compiled'
       FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map2, from: 'compiled', to: 'coffee'
@@ -657,13 +657,78 @@ RSpec.describe Occurrence, type: :model do
                                                                "column" => 1}]}])
     end
 
+    it "should search for sourcemaps in previous revisions if digest_in_asset_names is true" do
+      @occurrence.bug.environment.project.update_attribute :digest_in_asset_names, true
+
+      map1 = GemSourceMap::Map.new([
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(25, 1)),
+                                   ], 'http://test.host/example/asset.js')
+      map2 = GemSourceMap::Map.new([
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source.js.coffee', GemSourceMap::Offset.new(25, 1), GemSourceMap::Offset.new(11, 1)),
+                                   ], 'app/assets/javascripts/source.js')
+
+      FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: 'e80f7f4a578a869f54b8ff675220e9d3071ea513', map: map1, from: 'hosted', to: 'compiled'
+      FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map2, from: 'compiled', to: 'coffee'
+
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" => [{"type"    => "js:hosted",
+                                                  "url"     => "http://test.host/example/asset.js",
+                                                  "line"    => 3,
+                                                  "column"  => 140,
+                                                  "symbol"  => "foo",
+                                                  "context" => nil}]}]
+      @occurrence.sourcemap!
+
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
+                                              "faulted"   => true,
+                                              "backtrace" => [{"file"   => "app/assets/javascripts/source.js.coffee",
+                                                               "line"   => 11,
+                                                               "column" => 1}]}])
+    end
+
+    it "should not search for sourcemaps in previous revisions if digest_in_asset_names is false" do
+      @occurrence.bug.environment.project.update_attribute :digest_in_asset_names, false
+
+      map1 = GemSourceMap::Map.new([
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(25, 1)),
+                                   ], 'http://test.host/example/asset.js')
+      map2 = GemSourceMap::Map.new([
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source.js.coffee', GemSourceMap::Offset.new(25, 1), GemSourceMap::Offset.new(11, 1)),
+                                   ], 'app/assets/javascripts/source.js')
+
+      FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: 'e80f7f4a578a869f54b8ff675220e9d3071ea513', map: map1, from: 'hosted', to: 'compiled'
+      FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map2, from: 'compiled', to: 'coffee'
+
+      @occurrence.backtraces = [{"name"      => "Thread 0",
+                                 "faulted"   => true,
+                                 "backtrace" => [{"type"    => "js:hosted",
+                                                  "url"     => "http://test.host/example/asset.js",
+                                                  "line"    => 3,
+                                                  "column"  => 140,
+                                                  "symbol"  => "foo",
+                                                  "context" => nil}]}]
+      @occurrence.sourcemap!
+
+      expect(@occurrence.changes).to be_empty
+      expect(@occurrence.backtraces).to eql([{"name"      => "Thread 0",
+                                              "faulted"   => true,
+                                              "backtrace" => [{"type"    => "js:hosted",
+                                                               "url"     => "http://test.host/example/asset.js",
+                                                               "line"    => 3,
+                                                               "column"  => 140,
+                                                               "symbol"  => "foo",
+                                                               "context" => nil}]}])
+    end
+
     it "should use a custom sourcemap" do
       map1 = GemSourceMap::Map.new([
-                                    GemSourceMap::Mapping.new('app/assets/javascripts/source1.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(1, 1)),
-                                ], 'http://test.host/example/asset.js')
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source1.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(1, 1)),
+                                   ], 'http://test.host/example/asset.js')
       map2 = GemSourceMap::Map.new([
-                                    GemSourceMap::Mapping.new('app/assets/javascripts/source2.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(2, 2)),
-                                ], 'http://test.host/example/asset.js')
+                                       GemSourceMap::Mapping.new('app/assets/javascripts/source2.js', GemSourceMap::Offset.new(3, 140), GemSourceMap::Offset.new(2, 2)),
+                                   ], 'http://test.host/example/asset.js')
 
       sm1 = FactoryGirl.create :source_map, environment: @occurrence.bug.environment, revision: @occurrence.revision, map: map1
       sm2 = FactoryGirl.create :source_map, map: map2

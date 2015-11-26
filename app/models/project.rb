@@ -89,6 +89,13 @@ require 'securerandom'
 # | `pagerduty_enabled`       | If `true`, new Occurrences are sent to PagerDuty. Note that PagerDuty "acknowledge" and "resolve" events are sent regardless of this value. |
 # | `pagerduty_service_key`   | The service key assigned to this project by PagerDuty.                                                                                      |
 # | `always_notify_pagerduty` | If `true`, all new Bugs are sent to PagerDuty. If `false`, only those Bugs that exceed the critical threshold are sent.                     |
+#
+# Source-Mapping
+# --------------
+#
+# |                         |                                                                                                                                                                                                                                                                                                                  |
+# |:------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+# | `digest_in_asset_names` | If `true`, it is assumed that this application uniquely names its JavaScript assets. This allows Squash to search more than just the current revision's source maps when locating one matching an asset name, and allows the application to only upload new source maps when a JavaScript file actually changes. |
 
 class Project < ActiveRecord::Base
   # The directory where repositories are checked out.
@@ -133,7 +140,9 @@ class Project < ActiveRecord::Base
       uses_releases_override:    {type: Boolean, default: false},
 
       disable_message_filtering: {type: Boolean, default: false},
-      blamer_type:               {presence: true, default: 'Blamer::Recency'}
+      blamer_type:               {presence: true, default: 'Blamer::Recency'},
+
+      digest_in_asset_names:     {type: Boolean, default: true}
   )
 
   validates :owner,
