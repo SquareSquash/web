@@ -206,6 +206,98 @@ RSpec.describe OccurrencesWorker do
 
           @project.update_attribute :disable_message_filtering, false
         end
+
+        it "should filter PII from the query" do
+          @params['query'] = 'email=foo@bar.com&name=Tim'
+          occ              = OccurrencesWorker.new(@params).perform
+          expect(occ.query).to eql('email=[EMAIL?]&name=Tim')
+        end
+
+        it "should filter PII from the fragment" do
+          @params['fragment'] = 'email=foo@bar.com&name=Tim'
+          occ                 = OccurrencesWorker.new(@params).perform
+          expect(occ.fragment).to eql('email=[EMAIL?]&name=Tim')
+        end
+
+        it "should filter PII from the parent_exceptions' messages and instance variables" do
+          @params['parent_exceptions'] = [{"class_name"  => "ActiveRecord::RecordNotUnique",
+                                           "message"     =>
+                                               "Mysql2::Error: Duplicate entry 'test@foobar.com' for key 'index_guest_visitors_on_email': UPDATE `guest_visitors` SET `email` = 'test@foobar.com' WHERE `guest_visitors`.`id` = 77870 /* engines/guest/app/controllers/guest/groups_controller.rb:155:in `update' */",
+                                           "backtraces"  =>
+                                               [{"name"      => "Active Thread/Fiber",
+                                                 "faulted"   => true,
+                                                 "backtrace" =>
+                                                     [{"file"   =>
+                                                           "/app/go/shared/bundle/ruby/2.2.0/gems/mysql2-0.4.1/lib/mysql2/client.rb",
+                                                       "line"   => 85,
+                                                       "symbol" => "_query"},
+                                                      {"file"   =>
+                                                           "/app/go/shared/bundle/ruby/2.2.0/gems/mysql2-0.4.1/lib/mysql2/client.rb",
+                                                       "line"   => 85,
+                                                       "symbol" => "block in query"}]}],
+                                           "association" => "original_exception",
+                                           "ivars"       =>
+                                               {"original_exception"          =>
+                                                    {"language"   => "ruby",
+                                                     "class_name" => "Mysql2::Error",
+                                                     "inspect"    =>
+                                                         "#<Mysql2::Error: Duplicate entry 'test@foobar.com' for key 'index_guest_visitors_on_email'>",
+                                                     "yaml"       =>
+                                                         "--- !ruby/exception:Mysql2::Error\nmessage: Duplicate entry 'test@foobar.com' for key 'index_guest_visitors_on_email'\nserver_version: 50626\nerror_number: 1062\nsql_state: '23000'\n",
+                                                     "json"       =>
+                                                         "{\"server_version\":50626,\"error_number\":1062,\"sql_state\":\"test@foobar.com\"}",
+                                                     "to_s"       =>
+                                                         "Duplicate entry 'test@foobar.com' for key 'index_guest_visitors_on_email'"},
+                                                "_squash_controller_notified" => true}}]
+          occ                          = OccurrencesWorker.new(@params).perform
+          expect(occ.parent_exceptions.first['message']).to eql("Mysql2::Error: Duplicate entry '[EMAIL?]' for key 'index_guest_visitors_on_email': UPDATE `guest_visitors` SET `email` = '[EMAIL?]' WHERE `guest_visitors`.`id` = 77870 /* engines/guest/app/controllers/guest/groups_controller.rb:155:in `update' */")
+          expect(occ.parent_exceptions.first['ivars']['original_exception']['inspect']).to eql("#<Mysql2::Error: Duplicate entry '[EMAIL?]' for key 'index_guest_visitors_on_email'>")
+          expect(occ.parent_exceptions.first['ivars']['original_exception']['yaml']).to eql("--- !ruby/exception:Mysql2::Error\nmessage: Duplicate entry '[EMAIL?]' for key 'index_guest_visitors_on_email'\nserver_version: 50626\nerror_number: 1062\nsql_state: '23000'\n")
+          expect(occ.parent_exceptions.first['ivars']['original_exception']['json']).to eql("{\"server_version\":50626,\"error_number\":1062,\"sql_state\":\"[EMAIL?]\"}")
+          expect(occ.parent_exceptions.first['ivars']['original_exception']['to_s']).to eql("Duplicate entry '[EMAIL?]' for key 'index_guest_visitors_on_email'")
+        end
+
+        it "should filter PII from the session" do
+          @params['session'] = {"email" => "test@foobar.com",
+                                "other" => "something"}
+          occ                = OccurrencesWorker.new(@params).perform
+          expect(occ.session['email']).to eql('[EMAIL?]')
+        end
+
+        it "should filter PII from the headers" do
+          @params['headers'] = {"email" => "test@foobar.com",
+                                "other" => "something"}
+          occ                = OccurrencesWorker.new(@params).perform
+          expect(occ.headers['email']).to eql('[EMAIL?]')
+        end
+
+        it "should filter PII from the flash" do
+          @params['flash'] = {"email" => "test@foobar.com",
+                              "other" => "something"}
+          occ              = OccurrencesWorker.new(@params).perform
+          expect(occ.flash['email']).to eql('[EMAIL?]')
+        end
+
+        it "should filter PII from the params" do
+          @params['params'] = {"email" => "test@foobar.com",
+                               "other" => "something"}
+          occ               = OccurrencesWorker.new(@params).perform
+          expect(occ.params['email']).to eql('[EMAIL?]')
+        end
+
+        it "should filter PII from the cookies" do
+          @params['cookies'] = {"email" => "test@foobar.com",
+                                "other" => "something"}
+          occ                = OccurrencesWorker.new(@params).perform
+          expect(occ.cookies['email']).to eql('[EMAIL?]')
+        end
+
+        it "should filter PII from the ivars" do
+          @params['ivars'] = {"email" => "test@foobar.com",
+                              "other" => "something"}
+          occ              = OccurrencesWorker.new(@params).perform
+          expect(occ.ivars['email']).to eql('[EMAIL?]')
+        end
       end
 
       it "should stick any attributes it doesn't recognize into the metadata attribute" do
