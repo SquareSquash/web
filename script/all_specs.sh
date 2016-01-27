@@ -114,8 +114,8 @@ function check_clean() {
 ##### MRI (password auth)
 function run_password() {
     reset_config
-    rvm 2.2@squash exec ${BUNDLE}
-    rvm 2.2@squash exec ${COMMAND}
+    rvm 2.3@squash exec ${BUNDLE}
+    rvm 2.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth ******"
@@ -129,8 +129,8 @@ function run_cursors() {
 ---
 cursors: true
 YAML
-    rvm 2.2@squash exec ${BUNDLE}
-    rvm 2.2@squash exec ${COMMAND}
+    rvm 2.3@squash exec ${BUNDLE}
+    rvm 2.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth w/PostgreSQL cursors ******"
@@ -148,8 +148,8 @@ password:
   salt: abc123
 registration_enabled: false
 YAML
-    rvm 2.2@squash exec ${BUNDLE}
-    rvm 2.2@squash exec ${COMMAND}
+    rvm 2.3@squash exec ${BUNDLE}
+    rvm 2.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with password auth w/registration disabled ******"
@@ -180,8 +180,8 @@ ldap:
   tree_base: cn=users,dc=mycompany,dc=com
   search_key: uid
 YAML
-    rvm 2.2@squash exec ${BUNDLE}
-    rvm 2.2@squash exec ${COMMAND}
+    rvm 2.3@squash exec ${BUNDLE}
+    rvm 2.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with LDAP auth, no bind DN ******"
@@ -203,8 +203,8 @@ ldap:
   bind_dn: cn=admins,ou=System,dc=mycompany,dc=com
   bind_password: password123
 YAML
-    rvm 2.2@squash exec ${BUNDLE}
-    rvm 2.2@squash exec ${COMMAND}
+    rvm 2.3@squash exec ${BUNDLE}
+    rvm 2.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with LDAP auth + bind DN ******"
@@ -224,8 +224,8 @@ resque:
   pool:
     squash: 2
 YAML
-    rvm 2.2@squash exec ${BUNDLE}
-    rvm 2.2@squash exec ${COMMAND}
+    rvm 2.3@squash exec ${BUNDLE}
+    rvm 2.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with Resque ******"
@@ -242,8 +242,8 @@ sidekiq:
   redis:
     queue: "localhost:6379"
 YAML
-    rvm 2.2@squash exec ${BUNDLE}
-    rvm 2.2@squash exec ${COMMAND}
+    rvm 2.3@squash exec ${BUNDLE}
+    rvm 2.3@squash exec ${COMMAND}
 
     echo
     echo "***** That was MRI with Sidekiq ******"
@@ -272,6 +272,17 @@ function run_mri21() {
     echo
 }
 
+##### MRI 2.2 (password auth)
+function run_mri22() {
+    reset_config
+    rvm 2.2@squash exec ${BUNDLE}
+    rvm 2.2@squash exec ${COMMAND}
+
+    echo
+    echo "***** That was MRI 2.2 with password auth ******"
+    echo
+}
+
 ##### Reset configuration
 function restore() {
     git checkout Gemfile.lock
@@ -284,6 +295,7 @@ check_clean
 rvm 2.0 exec rvm gemset create squash
 rvm 2.1 exec rvm gemset create squash
 rvm 2.2 exec rvm gemset create squash
+rvm 2.3 exec rvm gemset create squash
 rvm jruby exec rvm gemset create squash
 
 run_password
@@ -296,5 +308,6 @@ run_resque
 run_sidekiq
 run_mri20
 run_mri21
+run_mri22
 
 restore

@@ -12,7 +12,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-gem 'rails', '4.2.4'
+gem 'rails', '4.2.5.1'
 gem 'responders'
 gem 'psych' # fix TypeError: superclass mismatch for class Mark
 
