@@ -114,7 +114,7 @@ module Views
           return
         end
 
-        @project.environments.order('name ASC').limit(20).in_groups_of(2, nil) do |environments|
+        @project.environments.order('name ASC').in_groups_of(2, nil) do |environments|
           div(class: 'row') do
             environments.each_with_index do |environment, idx|
               div(class: 'six columns') do
