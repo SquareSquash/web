@@ -20,9 +20,10 @@ RSpec.describe ProjectsController, type: :controller do
   describe "#index" do
     before(:all) { @user = FactoryGirl.create(:user) }
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :index
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
     end
 
     context '[authenticated]' do
@@ -90,9 +91,10 @@ RSpec.describe ProjectsController, type: :controller do
   describe "#edit" do
     before(:each) { @project = FactoryGirl.create(:project) }
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       get :edit, id: @project.to_param
-      expect(response).to redirect_to(login_url(next: request.fullpath))
+      expect(response).to redirect_to(login_required_redirection_url(next: request.fullpath))
     end
 
     it "should allow a project member" do
@@ -219,9 +221,10 @@ RSpec.describe ProjectsController, type: :controller do
   describe "#destroy" do
     before(:each) { @project = FactoryGirl.create(:project) }
 
+    include_context "setup for required logged-in user"
     it "should require a logged-in user" do
       delete :destroy, id: @project.to_param
-      expect(response.status).to redirect_to(login_url(next: request.fullpath))
+      expect(response.status).to redirect_to(login_required_redirection_url(next: request.fullpath))
       expect { @project.reload }.not_to raise_error
     end
 

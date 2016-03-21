@@ -16,7 +16,7 @@
 # {AuthenticationHelpers} for more information on how authentication works.
 
 class SessionsController < ApplicationController
-  skip_before_filter :login_required, only: [:new, :create]
+  skip_before_filter :login_required, only: [:new, :create] unless ApplicationController.third_party_login?
   before_filter :must_be_unauthenticated, except: :destroy
 
   respond_to :html
@@ -93,6 +93,7 @@ class SessionsController < ApplicationController
 
   def destroy
     log_out
+    reset_session if third_party_login?
     redirect_to login_url, notice: t('controllers.sessions.destroy.logged_out')
   end
 end

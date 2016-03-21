@@ -82,6 +82,28 @@ FakeWeb.allow_net_connect = false
 require Rails.root.join('config', 'initializers', 'active_record_observer_hooks')
 # see comments in this file for more info
 
+# Common login-testing strategies in the specs
+#
+if Squash::Configuration.authentication.strategy == 'google'
+  RSpec.shared_context "setup for required logged-in user" do
+    unless Squash::Configuration.authentication.strategy == 'google'
+      def login_required_redirection_url(*args)
+        login_url(*args)
+      end
+
+    else
+      before :each do
+        allow(SecureRandom).to receive(:hex).and_return('1234')
+      end
+
+      def login_required_redirection_url(*args)
+        controller.instance_eval { google_authentication_uri }
+      end
+    end
+
+  end
+end
+
 # Logs a user in for spec purposes.
 #
 # @params [User] user A user.

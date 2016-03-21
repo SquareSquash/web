@@ -14,7 +14,8 @@
 
 # Controller and view mixin with shared methods pertaining for authenticating
 # and authorizing {User Users}. For specifics on different authentication
-# methods, see {PasswordAuthenticationHelpers} and {LdapAuthenticationHelpers}.
+# methods, see {PasswordAuthenticationHelpers}, {LdapAuthenticationHelpers}
+# and {GoogleAuthenticationHelpers}.
 #
 # The ID of the authenticated user is stored in the session. The presence of a
 # valid user ID in `session[:user_id]` is indicative of an authenticated
@@ -28,12 +29,19 @@ module AuthenticationHelpers
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_user, :logged_in?, :logged_out?
+    helper_method :current_user, :logged_in?, :logged_out?, :third_party_login?
+
+    # An overridable method to let the base view disable certain elements that
+    # aren't appropriate when using a 3rd-party Login Service (e.g. Logout button)
+    def self.third_party_login?
+      false
+    end
   end
 
   # Clears a user session.
 
   def log_out
+    #TODO: Why doesn't this use #reset_session ?
     session[:user_id] = nil
     @current_user     = nil
   end
@@ -78,12 +86,21 @@ module AuthenticationHelpers
         format.xml { head :unauthorized }
         format.json { head :unauthorized }
         format.atom { head :unauthorized }
-        format.html do
-          redirect_to login_url(next: request.fullpath), notice: t('controllers.authentication.login_required')
-        end
+        format.html { login_required_redirect }
       end
       return false
     end
+  end
+
+  # An overridable method for selecting where a not-logged-in redirect goes
+  # Primarily used by 3rd-party Login Services
+
+  def login_required_redirect
+    redirect_to login_url(next: request.fullpath), notice: t('controllers.authentication.login_required')
+  end
+
+  def third_party_login?
+    self.class.third_party_login?
   end
 
   # A `before_filter` that requires an unauthenticated session to continue. If
