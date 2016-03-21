@@ -71,7 +71,7 @@ jQuery.fn.liveUpdate = (endpoint, handler, options) ->
             element.effect('highlight')
         error: =>
           element.empty()
-          if options.showWhenError then $('<i/>').addClass('icon-exclamation-sign').appendTo element
+          if options.showWhenError then $('<i/>').addClass('fa fa-exclamation-circle').appendTo element
 
   liveUpdates.push updater
   $(document).stopTime 'liveUpdate'

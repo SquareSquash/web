@@ -20,8 +20,8 @@ require 'rails_helper'
 RSpec.describe CommitsController, type: :controller do
   describe '#index' do
     before :all do
-      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
-      @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
+      Project.where(repository_url: 'https://github.com/RISCfuture/better_caller.git').delete_all
+      @project = FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git')
     end
 
     it "should require a logged-in user" do
@@ -42,8 +42,8 @@ RSpec.describe CommitsController, type: :controller do
 
   describe "#context" do
     before :all do
-      Project.where(repository_url: "git@github.com:RISCfuture/better_caller.git").delete_all
-      @project = FactoryGirl.create(:project, repository_url: "git@github.com:RISCfuture/better_caller.git")
+      Project.where(repository_url: 'https://github.com/RISCfuture/better_caller.git').delete_all
+      @project = FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git')
     end
     before(:each) { @valid_params = {project_id: @project.to_param, id: '30e7c2ff8758f4f19bfbc0a57e26c19ab69d1d44', file: 'lib/better_caller/extensions.rb', line: 7, format: 'json'} }
 

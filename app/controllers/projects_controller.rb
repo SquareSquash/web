@@ -241,7 +241,7 @@ class ProjectsController < ApplicationController
      :all_mailing_list, :critical_threshold, :sender, :locale,
      :sends_emails_outside_team, :trusted_email_domain, :pagerduty_enabled,
      :pagerduty_service_key, :always_notify_pagerduty, :uses_releases,
-     :disable_message_filtering, :blamer_type]
+     :disable_message_filtering, :blamer_type, :digest_in_asset_names]
   end
 
   def project_params_for_creation

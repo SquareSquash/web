@@ -60,4 +60,4 @@ input.error, select.error, textarea.error {
   background-color: $red !important;
 }
 
-*:invalid { border: 1px solid $red !important; }
+input:invalid, textarea:invalid, select:invalid { border: 1px solid $red !important; }

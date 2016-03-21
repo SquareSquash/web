@@ -66,13 +66,13 @@ ul#events {
 
   // colors for feed icons
 
-  i.icon-exclamation-sign { color: #880000; } // occur
-  i.icon-warning-sign { color: #dc143c; }     // reopen
-  i.icon-truck { color: #8b4513; }            // deploy
-  i.icon-user { color: #2f4f4f; }             // assign
-  i.icon-ok-sign { color: #008200; }          // fixed
-  i.icon-remove-sign { color: #6495ed; }      // unimportant
-  i.icon-comment { color: #483d8b; }          // comment
-  i.icon-copy { color: #7f007f; }             // dupe
-  i.icon-envelope { color: #555555; }         // email
+  i.fa-exclamation-circle { color: #880000; }   // occur
+  i.fa-exclamation-triangle { color: #dc143c; } // reopen
+  i.fa-truck { color: #8b4513; }                // deploy
+  i.fa-user { color: #2f4f4f; }                 // assign
+  i.fa-check-circle { color: #008200; }         // fixed
+  i.fa-times-circle { color: #6495ed; }         // unimportant
+  i.fa-comment { color: #483d8b; }              // comment
+  i.fa-files-o { color: #7f007f; }              // dupe
+  i.fa-envelope-o { color: #555555; }           // email
 }

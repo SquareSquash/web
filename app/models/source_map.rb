@@ -89,6 +89,7 @@
 # |        |                                                                                  |
 # |:-------|:---------------------------------------------------------------------------------|
 # | `map`  | A serialized source map.                                                         |
+# | `filename` | The name of the file this source map maps from. |
 # | `from` | An identifier indicating what kind of JavaScript code this source map maps from. |
 # | `to`   | An identifier indicating what kind of JavaScript code this source map maps to.   |
 
@@ -103,7 +104,11 @@ class SourceMap < ActiveRecord::Base
   validates :from, :to,
             presence: true,
             length:   {maximum: 24}
+  validates :filename,
+            presence: true,
+            strict:   true
 
+  before_validation :set_filename, on: :create
   after_commit(on: :create) do |map|
     BackgroundRunner.run SourceMapWorker, map.id
   end
@@ -154,5 +159,11 @@ class SourceMap < ActiveRecord::Base
         'line'   => mapping.original.line,
         'column' => mapping.original.column
     }
+  end
+
+  private
+
+  def set_filename
+    self.filename = map.filename
   end
 end

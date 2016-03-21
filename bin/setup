@@ -203,7 +203,7 @@ puts "If something's not right, you can abort this script at any time; it's",
 say
 say "Checking the basic environment..."
 
-if File.absolute_path(Dir.getwd) != File.absolute_path(File.dirname(__FILE__))
+if File.absolute_path(Dir.getwd) != File.absolute_path(File.dirname(__FILE__) + '/..')
   say "You are not running this script from the Rails project's root directory.".red.bold
   say "Please cd into the project root and re-run this script.".magenta
   exit 1
@@ -301,17 +301,6 @@ if step < 1
                    'protocol' => https ? 'https' : 'http'
                }
            }.to_yaml)
-  end
-
-  unless https
-    say "Updating config/environments/production.rb..."
-    prod_config = File.read('config/environments/production.rb')
-    prod_config.sub! 'config.force_ssl = true', 'config.force_ssl = false'
-    prod_config.sub! 'config.middleware.insert_before ::ActionDispatch::SSL, Ping',
-                     'config.middleware.insert_before ::Rack::Runtime, Ping'
-    File.open('config/environments/production.rb', 'w') do |f|
-      f.puts prod_config
-    end
   end
 
   url = query("What URL will production Squash be available at?", "http#{'s' if https}://#{hostname}")
@@ -507,7 +496,5 @@ say " ", "false.".bold.yellow, "When you deploy Squash to production, create a p
 say "  and copy the generated API key to this file.".yellow
 puts
 say "* Test that all specs pass by running".yellow, 'rspec spec.'.bold.yellow
-puts
-puts "* You can delete this setup script now if you wish.".yellow
 
 FileUtils.rm '/tmp/squash_install_progress'

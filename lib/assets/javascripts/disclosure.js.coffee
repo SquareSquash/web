@@ -22,7 +22,7 @@ jQuery.fn.details = ->
       header = container.find('>summary')
       container.children(':not(summary)').wrapAll $('<div/>')
       content = container.find('>div')
-      triangle = $('<i/>').addClass('icon-play').prependTo(header)
+      triangle = $('<i/>').addClass('fa fa-play').prependTo(header)
       shown = false
 
       if container.data('open')
@@ -36,15 +36,3 @@ jQuery.fn.details = ->
         shown = !shown
         content.slideToggle()
   this
-
-# Adds disclosure-triangle support to a DETAILS tag if native support does not
-# exist.
-#
-jQuery.fn.detailsIfNecessary = ->
-  if navigator.userAgent.indexOf('Chrome') != -1 then return this
-  if navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Version/6.0') != -1 then return this
-  this.details()
-
-
-$(document).ready ->
-  $('details').detailsIfNecessary()

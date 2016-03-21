@@ -89,7 +89,7 @@ class OccurrencesWorker
 
     # these must be done after Blamer runs
     add_user_agent_data occurrence
-    occurrence.message = pii_filter(MessageTemplateMatcher.instance.matched_substring(class_name, occurrence.message)) unless project.disable_message_filtering?
+    filter_pii(occurrence, class_name) unless project.disable_message_filtering?
     occurrence.message = occurrence.message.truncate(1000)
     occurrence.message ||= occurrence.class_name # hack for Java
 
@@ -220,7 +220,37 @@ class OccurrencesWorker
     occurrence.browser_engine_version = ua.engine_version
   end
 
-  def pii_filter(str)
+  def filter_pii(occurrence, class_name)
+    occurrence.message = filter_pii_string(MessageTemplateMatcher.instance.matched_substring(class_name, occurrence.message))
+
+    occurrence.query    = filter_pii_string(occurrence.query) if occurrence.query
+    occurrence.path     = filter_pii_string(occurrence.path) if occurrence.path
+    occurrence.fragment = filter_pii_string(occurrence.fragment) if occurrence.fragment
+
+    occurrence.parent_exceptions.each do |parent|
+      parent['message'] = filter_pii_string(MessageTemplateMatcher.instance.matched_substring(parent['class_name'], parent['message']))
+      parent['ivars'].each { |name, param| parent['ivars'][name] = filter_pii_param(param) }
+    end if occurrence.parent_exceptions
+    %w(session headers flash params cookies ivars).each do |field|
+      occurrence.send(field).each do |name, value|
+        occurrence.send(field)[name] = filter_pii_param(value)
+      end if occurrence.send(field)
+    end
+  end
+
+  def filter_pii_param(param)
+    case param
+      when String
+        filter_pii_string param
+      when Hash
+        param.each do |representation, value|
+          next if %w(language class_name).include?(representation)
+          param[representation] = filter_pii_string(value)
+        end
+    end
+  end
+
+  def filter_pii_string(str)
     str.gsub(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b/i, '[EMAIL?]').
         gsub(/\b(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?\b/, '[PHONE?]').
         gsub(/\b[0-9][0-9\-]{6,}[0-9]\b/, '[CC/BANK?]')
