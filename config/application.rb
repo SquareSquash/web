@@ -50,8 +50,8 @@ module Squash
     # like if you have constraints or database-specific column types
     config.active_record.schema_format = :sql
 
-    # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-    config.assets.precompile << 'flot/excanvas.js'
+    # Do not swallow errors in after_commit/after_rollback callbacks.
+    config.active_record.raise_in_transactional_callbacks = true
 
     # Use custom generators
     config.generators do |g|
@@ -67,6 +67,13 @@ module Squash
         origins *Squash::Configuration.dogfood.allowed_origins
         resource '/api/1.0/notify', headers: :any, methods: [:post]
       end
+    end
+
+    require config.root.join('app', 'middleware', 'ping')
+    if config.force_ssl
+      config.middleware.insert_before ActionDispatch::SSL, Ping
+    else
+      config.middleware.insert_before Rack::Runtime, Ping
     end
   end
 end

@@ -750,12 +750,12 @@ class Occurrence < ActiveRecord::Base
           found_at_least_one_applicable_sourcemap = false
           next unless elem['type'].start_with?('js:')
 
-          type = elem['type'][3..-1]
+          type         = elem['type'][3..-1]
           # try every valid source map on this line
           sourcemapped = nil
           Array.wrap(sourcemaps[type]).each do |map|
-            file                 = (map.from == 'hosted' ? elem['url'] : elem['file'])
-            sourcemapped         = map.resolve(file, elem['line'], elem['column'])
+            file         = (map.from == 'hosted' ? elem['url'] : elem['file'])
+            sourcemapped = map.resolve(file, elem['line'], elem['column'])
 
             if sourcemapped
               sourcemapped['type'] = "js:#{map.to}"
@@ -763,6 +763,23 @@ class Occurrence < ActiveRecord::Base
               break
             end
           end
+
+          if !sourcemapped && elem['type'] == 'js:hosted' && bug.environment.project.digest_in_asset_names?
+            # It's possible the most recent version of this asset was generated
+            # in a previous deploy. Search all source maps for one that can
+            # resolve our file name.
+            if (matching_sourcemap = bug.environment.source_maps.where(filename: elem['url'], from: 'hosted').first)
+              sourcemapped = matching_sourcemap.resolve(elem['url'], elem['line'], elem['column'])
+              if sourcemapped
+                sourcemapped['type'] = "js:#{matching_sourcemap.to}"
+
+                # Since this digest was generated in a previous deploy, we need
+                # to add all the sourcemaps generated in that deploy to our list
+                sourcemaps.merge! bug.environment.source_maps.where(revision: matching_sourcemap.revision).group_by(&:from)
+              end
+            end
+          end
+
           # if we found one that applies
           if sourcemapped
             # change the backtrace

@@ -185,7 +185,7 @@ module Views
               navbar_environments('large') if @project
               li(id: 'quicknav-container') { input type: 'search', id: 'quicknav', placeholder: 'Search' }
               li { link_to "My Account", account_url }
-              li { link_to(logout_url) { i class: 'icon-signout'} }
+              li { link_to(logout_url) { i class: 'fa fa-sign-out'} }
             else
               li(id: 'quicknav-container') { text! '&nbsp;' }
               li { link_to "Log In", login_url }
@@ -205,11 +205,11 @@ module Views
             end
             if logged_in?
               li(id: 'quicknav-container') { text! '&nbsp;' }
-              li { link_to(logout_url) { i class: 'icon-signout'} }
-              li { a class: 'icon-chevron-down', rel: 'dropdown', href: '#expanded-nav' } if logged_in?
+              li { link_to(logout_url) { i class: 'fa fa-sign-out'} }
+              li { a class: 'fa fa-chevron-down', rel: 'dropdown', href: '#expanded-nav' } if logged_in?
             else
               li(id: 'quicknav-container') { text! '&nbsp;' }
-              li { link_to(login_url) { i class: 'icon-signin' } }
+              li { link_to(login_url) { i class: 'fa fa-sign-in' } }
             end
           end
         end
@@ -226,7 +226,7 @@ module Views
         li(class: 'with-dropdown') do
           a(rel: 'dropdown', href: "#navbar-projects-#{suffix}") do
             text(@project ? @project.name : "Projects")
-            i class: 'icon-chevron-down'
+            i class: 'fa fa-chevron-down'
           end
 
           ul(id: "navbar-projects-#{suffix}", class: 'subnav') do
@@ -265,7 +265,7 @@ module Views
         li(class: 'with-dropdown') do
           a(rel: 'dropdown', href: "#navbar-envs-#{suffix}") do
             text(@environment ? @environment.name : "Environments")
-            i class: 'icon-chevron-down'
+            i class: 'fa fa-chevron-down'
           end
 
           ul(id: "navbar-envs-#{suffix}", class: 'subnav') do

@@ -14,12 +14,6 @@
 
 # Sends notifications of {Bug} events, such as new Bugs and critical Bugs. See
 # the `mailer.yml` Configoro file for mail-related configuration options.
-#
-# This mailer conditionally sends emails. Some of the mail methods will return
-# `nil`. Sadly, thanks to Rails magic, this means these methods _actually_
-# return an empty `Mail::Message` instance. In order to ensure that only the
-# appropriate messages are delivered, the {.deliver} method should be used to
-# send all emails.
 
 class NotificationMailer < ActionMailer::Base
   helper :mail, :application

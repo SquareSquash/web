@@ -13,13 +13,13 @@
 #    limitations under the License.
 
 gem 'sass-rails'
-gem 'sprockets', '< 2.12.0' # fix nil error
+gem 'sprockets' # fix nil error
 gem 'libv8', platform: :mri
-gem 'therubyracer', '>= 0.11.1', platform: :mri
+gem 'therubyracer', platform: :mri
 gem 'therubyrhino', platform: :jruby
 gem 'less-rails'
 
-gem 'font-awesome-rails', '< 4.0'
+gem 'font-awesome-rails'
 
 gem 'coffee-rails'
 gem 'closure-compiler'

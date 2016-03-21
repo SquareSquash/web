@@ -94,10 +94,10 @@ function PageManager() {
         { key: 'occurrences', title: "Counts", sortable: false, htmlGenerator: function(bug) {
           var sp = $('<span/>');
           sp.append(bug.occurrences_count);
-          $('<i/>').addClass('icon-exclamation-sign').appendTo(sp);
+          $('<i/>').addClass('fa fa-exclamation-circle').appendTo(sp);
           if (bug.comments_count > 0) {
             sp.append(' ' + bug.comments_count);
-            $('<i/>').addClass('icon-comment').appendTo(sp);
+            $('<i/>').addClass('fa fa-comment').appendTo(sp);
           }
           return sp;
         } },
@@ -106,7 +106,7 @@ function PageManager() {
         } },
         { key: 'user_name', title: "Assigned To", sortable: false, textGenerator: function(bug) { return bug.assigned_user ? bug.assigned_user.name : "no one"; } },
         { key: 'unwatch', title: '', sortable: false, htmlGenerator: function(bug) {
-          return $('<a/>').addClass('icon-star icon-large unwatch').attr('href', '#').click(function() {
+          return $('<a/>').addClass('fa fa-star icon-large unwatch').attr('href', '#').click(function() {
             $.ajax(bug.watch_url, {
               type: 'POST',
               success: function() { table.refreshData(); },
@@ -147,10 +147,10 @@ function PageManager() {
                           { key: 'occurrences', title: "Counts", sortable: false, htmlGenerator: function(bug) {
                             var sp = $('<span/>');
                             sp.append(bug.occurrences_count);
-                            $('<i/>').addClass('icon-exclamation-sign').appendTo(sp);
+                            $('<i/>').addClass('fa fa-exclamation-circle').appendTo(sp);
                             if (bug.comments_count > 0) {
                               sp.append(' ' + bug.comments_count);
-                              $('<i/>').addClass('icon-comment').appendTo(sp);
+                              $('<i/>').addClass('fa fa-comment').appendTo(sp);
                             }
                             return sp;
                           } },

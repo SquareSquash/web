@@ -47,7 +47,7 @@ module Views
       def bug_title
         h1 do
           text @bug.class_name
-          a id: 'watch', href: '#', class: "icon-star#{'-empty' unless current_user.watches?(@bug)}", alt: "Watch/unwatch this bug"
+          a id: 'watch', href: '#', class: "fa fa-star#{'-o' unless current_user.watches?(@bug)}", alt: "Watch/unwatch this bug"
         end
       end
 
@@ -438,12 +438,12 @@ Date:   #{l commit.author.date, format: :git}
         deletions = diff.patch.split("\n").select { |l| l.start_with?('-') }.size - 1
         additions = diff.patch.split("\n").select { |l| l.start_with?('+') }.size - 1
 
-        icon = if diff.type == 'new' then 'plus-sign'
-               elsif diff.type == 'deleted' then 'minus-sign'
-               elsif diff.type == 'renamed' then 'share-alt'
+        icon = if diff.type == 'new' then 'plus-circle'
+               elsif diff.type == 'deleted' then 'minus-circle'
+               elsif diff.type == 'renamed' then 'share'
                else 'edit' end
         title = <<-HTML.html_safe
-          <i class="icon-#{icon}"></i>
+          <i class="fa fa-#{icon}"></i>
           <strong>#{diff.path}</strong>
           <code class=short>#{diff.type}</code>
           <span class="additions-deletions">
