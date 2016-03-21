@@ -25,14 +25,14 @@ RSpec.describe NotificationMailer do
   describe "#blame" do
     it "should create an email event" do
       allow(@bug).to receive(:blamed_email).and_return('foo@bar.com')
-      NotificationMailer.blame(@bug).deliver
+      NotificationMailer.blame(@bug).deliver_now
       expect(@bug.events.count).to eql(@count + 1)
       expect(@bug.events.order('id DESC').first.kind).to eql('email')
       expect(@bug.events.order('id DESC').first.data['recipients']).to eql(['foo@bar.com'])
     end
 
     it "... unless no email was sent" do
-      NotificationMailer.blame(@bug).deliver
+      NotificationMailer.blame(@bug).deliver_now
       expect(@bug.events.count).to eql(@count)
     end
   end
@@ -40,14 +40,14 @@ RSpec.describe NotificationMailer do
   describe "#critical" do
     it "should create an email event" do
       @bug.environment.project.critical_mailing_list = 'foo@bar.com'
-      NotificationMailer.critical(@bug).deliver
+      NotificationMailer.critical(@bug).deliver_now
       expect(@bug.events.count).to eql(@count + 1)
       expect(@bug.events.order('id DESC').first.kind).to eql('email')
       expect(@bug.events.order('id DESC').first.data['recipients']).to eql(['foo@bar.com'])
     end
 
     it "... unless no email was sent" do
-      NotificationMailer.critical(@bug).deliver
+      NotificationMailer.critical(@bug).deliver_now
       expect(@bug.events.count).to eql(@count)
     end
   end

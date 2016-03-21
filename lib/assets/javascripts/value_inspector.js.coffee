@@ -32,7 +32,7 @@ class root.ValueInspector
       @element.append(@object.slice(0, 50) + '&hellip;')
       $('<br/>').appendTo @element
       @object = { to_s: @object }
-    $('<i/>').addClass('icon-search').appendTo @element
+    $('<i/>').addClass('fa fa-search').appendTo @element
     $('<a/>').text("View in Value Inspector").appendTo(@element).click =>
       this.show()
       false
@@ -136,7 +136,7 @@ class root.ValueInspector
           tr = $('<tr/>').appendTo(table)
           $('<td/>').append($('<tt />').text(name)).appendTo tr
           $('<td/>').append(this.buildJSONFields(value)).appendTo tr
-      details.detailsIfNecessary()
+      details
     else
       $('<span/>').text(if typeof object == 'undefined' then 'undefined' else if typeof object == 'object' then 'null' else object.toString())
 

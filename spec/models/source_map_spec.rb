@@ -22,7 +22,7 @@ RSpec.describe SourceMap, type: :model do
       end
 
       Project.delete_all
-      project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
+      project = FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git')
       env     = FactoryGirl.create(:environment, project: project)
 
       bug        = FactoryGirl.create(:bug,
@@ -60,7 +60,7 @@ RSpec.describe SourceMap, type: :model do
       end
 
       Project.delete_all
-      project = FactoryGirl.create(:project, repository_url: 'git@github.com:RISCfuture/better_caller.git')
+      project = FactoryGirl.create(:project, repository_url: 'https://github.com/RISCfuture/better_caller.git')
       env     = FactoryGirl.create(:environment, project: project)
 
       bug1       = FactoryGirl.create(:bug,

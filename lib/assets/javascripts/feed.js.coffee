@@ -42,7 +42,7 @@ class root.Feed
       success: (events) =>
         if events.length == 0
           p = $('<p/>').addClass('no-results').text(" bugs to populate your feed.").appendTo(@element)
-          $('<i/>').addClass('icon-star').prependTo p
+          $('<i/>').addClass('fa fa-star').prependTo p
           return
 
         last_bug_url = null
@@ -57,7 +57,7 @@ class root.Feed
             last_bug_url = event.bug.url if @options.bugHeader
 
             li = $('<li/>').addClass('event').appendTo(last_group_ul)
-            $('<i/>').addClass("icon-#{event.icon}").appendTo li
+            $('<i/>').addClass("fa fa-#{event.icon}").appendTo li
             p = $('<div/>').addClass('event-content').appendTo(li)
             if event.kind == 'open'
               this.renderOpenEvent event, p

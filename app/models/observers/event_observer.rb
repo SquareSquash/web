@@ -44,7 +44,7 @@ class EventObserver < ActiveRecord::Observer
         event.user && event.assignee && event.user != event.assignee
 
       Squash::Ruby.fail_silently do
-        NotificationMailer.assign(event.bug, event.user, event.assignee).deliver
+        NotificationMailer.assign(event.bug, event.user, event.assignee).deliver_now
       end
     end
 
@@ -54,7 +54,7 @@ class EventObserver < ActiveRecord::Observer
         !(event.data['status'] == 'fixed' && event.bug.irrelevant?) &&     # an irrelevant bug was not marked as fixed
         !(event.data['status'] == 'irrelevant' && event.bug.fixed?)        # a fixed bug was not marked as irrelevant
       Squash::Ruby.fail_silently do
-        NotificationMailer.resolved(event.bug, event.user).deliver
+        NotificationMailer.resolved(event.bug, event.user).deliver_now
       end
     end
   end

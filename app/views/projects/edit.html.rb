@@ -413,6 +413,23 @@ end
             p "If you uncheck this, PagerDuty will not be notified of any new occurrences. Acknowledgements and resolutions of existing incidents will still be sent.", class: 'help-block'
           end unless Squash::Configuration.pagerduty.disabled
 
+          fieldset do
+            h5 "Asset Compilation"
+
+            f.label(:digest_in_asset_names, class: 'checkbox-label') do
+              f.check_box :digest_in_asset_names
+              text "My application generates unique asset names (with a digest) for JavaScript files"
+            end
+
+            p do
+              text "If your application generates digested asset names (such as "
+              kbd "application-abc123.js"
+              text "), check this option. Squash will search more than just the current revision when locating JavaScript source maps. This prevents you from having to generate and upload source maps for every deploy, even ones that don't modify a JavaScript asset."
+            end
+
+            p "Ruby on Rails applications that use Sprockets do generate digested asset names."
+          end
+
           div(class: 'form-actions') { f.submit class: 'default' }
         end
       end

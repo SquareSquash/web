@@ -168,8 +168,8 @@ function PageManager() {
       $.ajax("<%= watch_project_environment_bug_url(@project, @environment, @bug, format: 'json') %>", {
         type: 'POST',
         success: function(_, _, xhr) {
-          if (xhr.status == 204) $('#watch').removeClass('icon-star').addClass('icon-star-empty');
-          else if (xhr.status == 201) $('#watch').removeClass('icon-star-empty').addClass('icon-star');
+          if (xhr.status == 204) $('#watch').removeClass('fa fa-star').addClass('fa fa-star-o');
+          else if (xhr.status == 201) $('#watch').removeClass('fa fa-star-o').addClass('fa fa-star');
           else
             new Flash('alert').text("Couldn’t watch or unwatch this bug.");
         },
@@ -278,19 +278,19 @@ function PageManager() {
 
         if (field.val() == '') return;
 
-        $('<i/>').addClass('icon-refresh').appendTo(status);
+        $('<i/>').addClass('fa fa-refresh').appendTo(status);
         $.ajax("<%= jira_issue_url('REPLACEME') %>".replace('REPLACEME', field.val()), {
           type: 'GET',
           success: function(issue) {
             status.empty();
-            $('<i/>').addClass('icon-ok text-success').appendTo(status);
+            $('<i/>').addClass('fa fa-check-circle text-success').appendTo(status);
             var url = "<%= Squash::Configuration.jira.api_host %><%= Squash::Configuration.jira.api_root %>/browse/" + issue.key;
             $('<a/>').attr({href: url, target: '_blank'}).text(issue.fields.summary).appendTo(info);
             if (statusesLoaded) statusSelector.removeAttr('disabled');
           },
           error: function(xhr) {
             status.empty();
-            $('<i/>').addClass('icon-remove text-error').appendTo(status);
+            $('<i/>').addClass('fa fa-times-circle text-error').appendTo(status);
             if (xhr.status == 404)
               $('<span/>').addClass('text-error').text("Couldn’t find that JIRA issue.").appendTo(info);
             else

@@ -798,7 +798,7 @@ RSpec.describe Bug, type: :model do
         @bug.update_attribute :fix_deployed, true
 
         expect(ActionMailer::Base.deliveries.size).to eql(2)
-        expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to eql([@user1.email, @user2.email])
+        expect(ActionMailer::Base.deliveries.map(&:to).flatten.sort).to match_array([@user1.email, @user2.email])
         ActionMailer::Base.deliveries.each { |d| expect(d.subject).to include('was deployed') }
       end
     end

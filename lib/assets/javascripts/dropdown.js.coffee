@@ -19,7 +19,7 @@
 #
 $(window).ready ->
   roll_everything_up = ->
-    $('a[rel=dropdown]>.icon-chevron-up').removeClass('icon-chevron-up').addClass 'icon-chevron-down'
+    $('a[rel=dropdown]>.fa-chevron-up').removeClass('fa fa-chevron-up').addClass 'fa fa-chevron-down'
     $('nav .shown').removeClass 'shown'
 
   # Clicking on a dropdown link toggles the dropdown
@@ -30,7 +30,7 @@ $(window).ready ->
     roll_everything_up()
     target.toggleClass('shown')
     if target.hasClass('shown')
-      link.find('.icon-chevron-down').removeClass('icon-chevron-down').addClass 'icon-chevron-up'
+      link.find('.fa-chevron-down').removeClass('fa fa-chevron-down').addClass 'fa fa-chevron-up'
 
     e.preventDefault()
     return false
@@ -50,17 +50,17 @@ $(window).ready ->
 # other tab items are not shown, but clicking this button toggles the
 # "full-size-only" class on all sibling `<LI>`s.
 #
-# The class of the link itself ("icon-chevron-down" or "icon-chevron-up") is
-# used to track the state of the menu.
+# The class of the link itself ("fa-chevron-down" or "fa-chevron-up") is used to
+# track the state of the menu.
 #
 $(window).ready ->
   $('a[rel="list-expansion"]').click (e) ->
     link = $(e.currentTarget)
     lis = link.closest('li').siblings('li')
 
-    if link.hasClass('icon-chevron-down')
+    if link.hasClass('fa-chevron-down')
       lis.removeClass 'full-size-only'
-      link.removeClass('icon-chevron-down').addClass 'icon-chevron-up'
+      link.removeClass('fa fa-chevron-down').addClass 'fa fa-chevron-up'
     else
       lis.addClass 'full-size-only'
-      link.removeClass('icon-chevron-up').addClass 'icon-chevron-down'
+      link.removeClass('fa fa-chevron-up').addClass 'fa fa-chevron-down'

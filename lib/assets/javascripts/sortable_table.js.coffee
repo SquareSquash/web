@@ -64,9 +64,9 @@ class root.SortableTable
         if column.sortable
           i = $('<i/>').appendTo(th)
           if @sort_key == column.key
-            if @sort_dir == 'asc' then i.addClass('icon-sort-up') else i.addClass('icon-sort-down')
+            if @sort_dir == 'asc' then i.addClass('fa fa-sort-up') else i.addClass('fa fa-sort-down')
           else
-            i.addClass('icon-sort')
+            i.addClass('fa fa-sort')
           th.addClass 'sortable'
           th.click =>
             this.sort column.key
@@ -74,7 +74,7 @@ class root.SortableTable
     $(window).scroll (e) =>
       if $(window).scrollTop() >= $(document).height() - $(window).height() && !@loading_more && @last && !@end_of_scroll
         @loading_more ||= $('<div/>').addClass('alert info').text(" Loading more…").insertAfter(@element)
-        $('<i/>').addClass('icon-refresh').prependTo(@loading_more)
+        $('<i/>').addClass('fa fa-refresh').prependTo(@loading_more)
         $.ajax @endpoint,
           data: $.param($.extend({}, this.additionalParams(), this.sortParameters(), { last: @last }))
           type: 'GET',
@@ -140,7 +140,7 @@ class root.SortableTable
         else
           column.sorted = false
     this.updateHead()
-    @element.find("#header-#{this.sortKey()}>i").removeClass().addClass('icon-refresh')
+    @element.find("#header-#{this.sortKey()}>i").removeClass().addClass('fa fa-refresh')
     this.refreshData()
 
   # @private
@@ -148,8 +148,8 @@ class root.SortableTable
     @element.find('thead>tr>th').removeClass('sorted')
     @element.find('thead>tr>th>i').remove()
     @element.find("#header-#{this.sortKey()}").addClass 'sorted'
-    $('<i/>').addClass("icon-sort-#{if this.sortDir() == 'asc' then 'up' else 'down'}").appendTo @element.find("#header-#{this.sortKey()}")
-    $('<i/>').addClass("icon-sort").appendTo @element.find("thead>tr>th.sortable[id!=header-#{this.sortKey()}]")
+    $('<i/>').addClass("fa fa-sort-#{if this.sortDir() == 'asc' then 'up' else 'down'}").appendTo @element.find("#header-#{this.sortKey()}")
+    $('<i/>').addClass("fa fa-sort").appendTo @element.find("thead>tr>th.sortable[id!=header-#{this.sortKey()}]")
 
   # @private
   sortKey: ->

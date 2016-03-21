@@ -20,7 +20,7 @@ FactoryGirl.define do
     case Squash::Configuration.authentication.strategy
     when 'password'
       sequence(:username) { |i| "user-#{i}" }
-      sequence(:email_address) { |i| "email-#{i}@example.com" }
+      sequence(:email_address) { |i| "default-email-#{i}@example.com" }
       password 'correct horse battery staple'
 
     when 'ldap'
