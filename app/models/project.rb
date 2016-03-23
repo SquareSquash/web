@@ -136,6 +136,8 @@ class Project < ActiveRecord::Base
       pagerduty_service_key:     {presence: {if: :pagerduty_enabled}},
       always_notify_pagerduty:   {type: Boolean, default: false},
 
+      beetil_service_key:        {type: String, allow_nil: true},
+
       uses_releases:             {type: Boolean, default: false},
       uses_releases_override:    {type: Boolean, default: false},
 

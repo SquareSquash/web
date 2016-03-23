@@ -384,7 +384,8 @@ class BugsController < ApplicationController
     bug.as_json(only: [:number, :class_name, :message_template, :file, :line, :occurrences_count, :comments_count, :latest_occurrence]).merge(
         href:                 project_environment_bug_url(@project, @environment, bug),
         notify_on_deploy:     bug.notify_on_deploy.include?(current_user.id),
-        notify_on_occurrence: bug.notify_on_occurrence.include?(current_user.id)
+        notify_on_occurrence: bug.notify_on_occurrence.include?(current_user.id),
+        beetil_number:        bug.beetil_number || "",
     )
   end
 
@@ -393,6 +394,7 @@ class BugsController < ApplicationController
                                 :resolution_revision, :fixed, :fix_deployed,
                                 :irrelevant, :duplicate_of, :duplicate_of_id,
                                 :jira_isssue, :jira_status_id, :page_threshold,
+                                :beetil_number,
                                 :page_period)
   end
 

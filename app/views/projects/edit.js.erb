@@ -41,4 +41,25 @@ $(document).ready(function() {
 
     return false;
   });
+
+
+  loadBeetilProjects = function() {
+    var dropdown = $('#beetil-projects');
+    $.ajax("<%= beetil_projects_url(format: 'json') %>", {
+      type: 'GET',
+      success: function(projects) {
+        $('<option/>').attr('selected', 'selected').appendTo(dropdown);
+        $.each(projects, function(_, project) {
+          $('<option/>').attr('value', project.id).text(project.name).appendTo(dropdown);
+        });
+
+        dropdown.change(function() {
+          $('#project_beetil_service_key').val(dropdown.val());
+        });
+        dropdown.removeAttr('disabled');
+      },
+      error: function() { new Flash('alert').text("Couldn’t load the list of Beetil projects."); }
+    });
+  };
+  loadBeetilProjects();
 });
