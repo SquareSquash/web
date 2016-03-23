@@ -48,6 +48,7 @@ class Environment < ActiveRecord::Base
   has_one :default_project, class_name: 'Project', foreign_key: 'default_environment_id', inverse_of: :default_environment
   has_many :deploys, dependent: :delete_all, inverse_of: :environment
   has_many :bugs, dependent: :delete_all, inverse_of: :environment
+  has_many :occurrences, through: :bugs
   has_many :source_maps, inverse_of: :environment, dependent: :delete_all
 
   include HasMetadataColumn

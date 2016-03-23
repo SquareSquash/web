@@ -194,6 +194,7 @@ en:
 
   blamer:
     recency: Recency-based blamer
+    message: Message-based blamer
     simple: Git-free blamer
 
   date:
