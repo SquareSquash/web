@@ -173,6 +173,8 @@ GEM
     rake (10.5.0)
     redcarpet (3.3.4)
     redis (3.2.2)
+    redis-namespace (1.5.2)
+      redis (~> 3.0, >= 3.0.4)
     ref (2.0.0)
     responders (2.1.1)
       railties (>= 4.2.0, < 5.1)
@@ -208,8 +210,6 @@ GEM
       concurrent-ruby (~> 1.0)
       connection_pool (~> 2.2, >= 2.2.0)
       redis (~> 3.2, >= 3.2.1)
-    simple_google_auth (0.2.0)
-      rails (>= 3.2.0)
     sinatra (1.4.7)
       rack (~> 1.5)
       rack-protection (~> 1.4)
@@ -307,12 +307,12 @@ DEPENDENCIES
   rails (= 4.2.5.2)
   rails-observers
   redcarpet
+  redis-namespace
   responders
   rspec-rails
   safe_yaml
   sass-rails
   sidekiq
-  simple_google_auth
   sinatra
   slim
   slugalicious
@@ -332,4 +332,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   1.11.2
+   1.12.0.pre.2
