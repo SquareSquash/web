@@ -245,7 +245,7 @@ class OccurrencesWorker
       when Hash
         param.each do |representation, value|
           next if %w(language class_name).include?(representation)
-          param[representation] = filter_pii_string(value)
+          param[representation] = filter_pii_param(value)
         end
     end
   end
