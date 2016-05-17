@@ -298,6 +298,14 @@ RSpec.describe OccurrencesWorker do
           occ              = OccurrencesWorker.new(@params).perform
           expect(occ.ivars['email']).to eql('[EMAIL?]')
         end
+
+        it "should handle nils gracefully" do
+          @params['ivars'] = {"foo" => { "email" => nil },
+                              "other" => "something"}
+          expect {
+            occ            = OccurrencesWorker.new(@params).perform
+          }.not_to raise_error
+        end
       end
 
       it "should stick any attributes it doesn't recognize into the metadata attribute" do
