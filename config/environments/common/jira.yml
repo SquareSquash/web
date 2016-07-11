@@ -1,9 +1,12 @@
 ---
-disabled: true
+disabled: false
 authentication:
-  strategy: basic
-  user: YOUR_USERNAME
-  password: YOUR_PASSWORD
-api_host: "https://yourcompany.com"
-api_root: "/jira"
+  strategy: oauth
+  consumer_key: 97d861d04544acff696aa1203ec53197
+  private_key_file: priv.pem
+  token: mdMFj8Pfx2sj5xS4nK3Ovz6f8uAGuKqb
+  secret: <%= ENV["JIRA_SQUASH_SECRET"] %>
+
+api_host: "https://powershop.atlassian.net"
+api_root: ""
 create_issue_details: "/secure/CreateIssueDetails!init.jspa"

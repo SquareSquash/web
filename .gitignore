@@ -2,3 +2,6 @@
 .yardoc
 node_modules
 tmp/cache/*
+.byebug_history
+.vscode
+*.pem
