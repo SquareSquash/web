@@ -23,7 +23,9 @@ module Blamer
         b
       else
         occurrence.message = occurrence.message.gsub(/\A"/, '').gsub(/"\Z/, '').strip
-        occurrences = environment.occurrences.where("\"occurrences\".\"metadata\" LIKE ?", "%#{occurrence.message}%").joins(:bug).where(bugs: bug_search_criteria)
+        json_message = ActiveSupport::JSON.encode(occurrence.message)
+
+        occurrences = environment.occurrences.where("\"occurrences\".\"metadata\" LIKE ?", "%#{json_message}%").joins(:bug).where(bugs: bug_search_criteria)
 
         if occurrences.empty?
           environment.bugs.create! bug_attributes.merge(bug_search_criteria).merge(class_name: occurrence.bug.class_name)
