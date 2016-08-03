@@ -22,8 +22,7 @@ module Blamer
         b.deploy = deploy
         b
       else
-        # This call to partition is used to remove speech marks (") from around the message.
-        occurrence.message = occurrence.message.partition(/[^"]+/)[1]
+        occurrence.message = occurrence.message.gsub(/\A"/, '').gsub(/"\Z/, '').strip
         occurrences = environment.occurrences.where("\"occurrences\".\"metadata\" LIKE ?", "%#{occurrence.message}%").joins(:bug).where(bugs: bug_search_criteria)
 
         if occurrences.empty?
