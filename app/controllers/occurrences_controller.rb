@@ -53,7 +53,7 @@ class OccurrencesController < ApplicationController
   before_filter :find_occurrence, only: :show
 
   respond_to :html, only: [:show, :count]
-  respond_to :json, :atom, only: :index
+  respond_to :json, :atom, only: [:index, :show]
 
   # Generally, displays a list of Occurrences.
   #
@@ -239,7 +239,7 @@ class OccurrencesController < ApplicationController
   # | `id` | The Occurrence number (not ID). |
 
   def show
-    respond_with @project, @environment, @bug
+    respond_with @project, @environment, @bug, @occurrence
   end
 
   private

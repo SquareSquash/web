@@ -56,6 +56,13 @@ RSpec.describe OccurrencesController, type: :controller do
           expect(response.status).to eql(200)
           expect(JSON.parse(response.body).map { |r| r['number'] }).to eql(@occurrences.map(&:number)[50, 50])
         end
+
+        it "should load single occurrences" do
+          occurrence = @occurrences[49]
+          get :show, polymorphic_params(occurrence, false, format: 'json')
+          response.status.should eql(200)
+          response.body.should == occurrence.to_json
+        end
       end
     end
   end
