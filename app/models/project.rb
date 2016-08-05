@@ -158,6 +158,8 @@ class Project < ActiveRecord::Base
   validates :repository_url,
             presence:   true,
             length:     {maximum: 255}
+  validate :is_repository_valid_protocol
+  validate :is_repository_valid_extension
   validate :default_environment_belongs_to_project
   validate :can_clone_repo, if: :validate_repo_connectivity
 
@@ -296,6 +298,14 @@ class Project < ActiveRecord::Base
 
   def default_environment_belongs_to_project
     errors.add(:default_environment_id, :wrong_project) if default_environment && default_environment.project_id != id
+  end
+
+  def is_repository_valid_protocol
+    errors.add(:repository_url, :invalid_protocol) unless repository_url =~ %r{\A(https://)|(\w+@[\w\.]+:)}
+  end
+
+  def is_repository_valid_extension
+    errors.add(:repository_url, :invalid_extension) unless repository_url =~ /\.git\z/
   end
 
   def set_commit_url_format
