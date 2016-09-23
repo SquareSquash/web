@@ -14,6 +14,8 @@
 
 # Configure ActionMailer
 
+ActionMailer::Base.delivery_method = Squash::Configuration.mailer.strategy
+
 if Squash::Configuration.mailer.strategy == 'smtp'
   ActionMailer::Base.smtp_settings = Squash::Configuration.mailer.smtp_settings.symbolize_keys
 end
