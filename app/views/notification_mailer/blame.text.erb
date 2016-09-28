@@ -15,8 +15,6 @@ in <%= @bug.file %>
 in <%= @bug.file %>:<%= @bug.line %>
 <% end %>
 
-<%= @bug.message_template %>
-
 ----
 
 Is it your fault?
@@ -37,17 +35,6 @@ Is this not really a bug?
 
 You should take one of the above three actions -- don't just let the bug sit
 there!
-
-----
-
-<% if @bug.occurrences.first %>
-
-Stack trace of initial occurrence:
-
-<%= render_backtrace(@bug.occurrences.first.faulted_backtrace).indent(2) %>
-
-----
-<% end %>
 
         Yours truly,
         Squash
