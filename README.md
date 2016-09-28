@@ -240,9 +240,10 @@ delivered if all of the following conditions are met:
 
 ### Authentication and Authorization
 
-Authentication is done using either password verification or LDAP; see
-{AuthenticationHelpers} and related controller mixins, as well as the
-model mixins under `app/models/additions` for more information.
+Authentication is done using either password verification, LDAP or Google OAuth
+(via the `simple_google_auth` gem); see {AuthenticationHelpers} and related
+controller mixins, as well as the model mixins under `app/models/additions`
+for more information.
 
 There are four permissions levels that a User can have, specific to an
 individual Project:

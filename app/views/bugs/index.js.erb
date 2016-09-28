@@ -35,7 +35,11 @@ $(document).ready(function() {
                                   } },
                                   { key: 'latest', title: "Latest", sortable: 'desc', htmlGenerator: function(bug) {
                                     return $('<time/>').attr('datetime', bug.latest_occurrence).liveUpdate();
-                                  } }
+                                  } },
+                                  { title: "B#", sortable: false, textGenerator: function(bug) {
+                                    // TODO link to beetil
+                                    return bug.beetil_number;
+                                  } },
                                 ],
                                 {
                                   sort_key:    'latest',

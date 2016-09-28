@@ -12,26 +12,21 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-FactoryGirl.define do
-  factory :user do
-    first_name 'Sancho'
-    last_name 'Sample'
+# Controller that loads Beetil projects.
 
-    case Squash::Configuration.authentication.strategy
-    when 'password'
-      sequence(:username) { |i| "user-#{i}" }
-      sequence(:email_address) { |i| "default-email-#{i}@example.com" }
-      password 'correct horse battery staple'
+class Beetil::ProjectsController < ApplicationController
+  skip_before_filter :login_required
+  respond_to :json
 
-    when 'ldap'
-      sequence(:username) { |i| "user-#{i}" }
+  # Returns a list of Beetil projects.
+  #
+  # * `GET /beetil/projects`
 
-    when 'google'
-      sequence(:google_auth_data) do |i|
-        { "email" => "email-#{i}@example.com",
-          "sub" => "uid-#{i}"
-        }
-      end
+  def index
+    # TODO this call is very, very slow (5-10s)
+    @projects = Service::Beetil.projects
+    respond_with(@projects) do |format|
+      format.json { render json: @projects.to_a.sort_by(&:name).to_json }
     end
   end
 end

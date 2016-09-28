@@ -1,3 +1,8 @@
 ---
-strategy: password
-registration_enabled: true
+strategy: google
+google:
+  client_id: dummy
+  client_secret: dummy
+  redirect_uri: dummy
+  allowed_domains:
+    - dummy

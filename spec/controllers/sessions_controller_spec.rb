@@ -21,76 +21,93 @@ RSpec.describe SessionsController, type: :controller do
   end
 
   describe "#create" do
-    before :each do
-      if defined?(Net::LDAP)
-        @ldap = double('Net::LDAP', :host= => nil, :port= => nil, :auth => nil)
-        allow(Net::LDAP).to receive(:new).and_return(@ldap)
-      end
-    end
-
-    context '[valid credentials]' do
+    context "[using internal login service]" do
       before :each do
-        allow(@ldap).to receive(:bind).and_return(true)
-        allow(@ldap).to receive :encryption
-
-        entry = OpenStruct.new(:givenname => %w(Sancho), :sn => %w(Sample), :dn => 'some dn')
-        allow(@ldap).to receive(:search).and_yield(entry)
-      end if defined?(Net::LDAP)
-
-      it "should log in a valid username and password" do
-        post :create, username: @user.username, password: 'password123'
-        expect(response).to redirect_to(root_url)
-        expect(session[:user_id]).to eql(@user.id)
+        if defined?(Net::LDAP)
+          @ldap = double('Net::LDAP', :host= => nil, :port= => nil, :auth => nil)
+          allow(Net::LDAP).to receive(:new).and_return(@ldap)
+        end
       end
 
-      it "should create users that don't exist" do
-        post :create, username: 'new-user', password: 'password123'
-        expect(response).to redirect_to(root_url)
-        expect(User.find(session[:user_id]).username).to eql('new-user')
-      end if Squash::Configuration.authentication.strategy == 'ldap'
+      context '[valid credentials]' do
+        before :each do
+          allow(@ldap).to receive(:bind).and_return(true)
+          allow(@ldap).to receive :encryption
 
-      it "should redirect a user to :next if in the params" do
-        url = project_url(FactoryGirl.create(:project))
-        post :create, username: @user.username, password: 'password123', next: url
-        expect(response).to redirect_to(url)
+          entry = {:givenname => %w(Sancho), :sn => %w(Sample)}
+          allow(entry).to receive(:dn).and_return('some dn')
+          allow(@ldap).to receive(:search).and_yield(entry)
+        end if defined?(Net::LDAP)
+
+        it "should log in a valid username and password" do
+          post :create, username: @user.username, password: 'password123'
+          expect(response).to redirect_to(root_url)
+          expect(session[:user_id]).to eql(@user.id)
+        end
+
+        it "should create users that don't exist" do
+          post :create, username: 'new-user', password: 'password123'
+          expect(response).to redirect_to(root_url)
+          expect(User.find(session[:user_id]).username).to eql('new-user')
+        end if Squash::Configuration.authentication.strategy == 'ldap'
+
+        it "should redirect a user to :next if in the params" do
+          url = project_url(FactoryGirl.create(:project))
+          post :create, username: @user.username, password: 'password123', next: url
+          expect(response).to redirect_to(url)
+        end
+
+        it "should use LDAP when creating a user" do
+          post :create, username: 'sancho', password: 'password123'
+          user = User.find(session[:user_id])
+          expect(user.first_name).to eql('Sancho')
+          expect(user.last_name).to eql('Sample')
+        end if Squash::Configuration.authentication.strategy == 'ldap'
       end
 
-      it "should use LDAP when creating a user" do
-        post :create, username: 'sancho', password: 'password123'
-        user = User.find(session[:user_id])
-        expect(user.first_name).to eql('Sancho')
-        expect(user.last_name).to eql('Sample')
-      end if Squash::Configuration.authentication.strategy == 'ldap'
-    end
+      it "should not log in an invalid username and password" do
+        allow(@ldap).to receive(:bind).and_return(false) if defined?(Net::LDAP)
+        post :create, username: 'username', password: 'wrong'
+        expect(response).to render_template('new')
+        expect(session[:user_id]).to be_nil
+      end
 
-    it "should not log in an invalid username and password" do
-      allow(@ldap).to receive(:bind).and_return(false) if defined?(Net::LDAP)
-      post :create, username: 'username', password: 'wrong'
-      expect(response).to render_template('new')
-      expect(session[:user_id]).to be_nil
-    end
+      # these two are really applicable to LDAP moreso than password auth
+      it "should not allow a blank password" do
+        post :create, username: 'username'
+        expect(response).to render_template('new')
+        expect(session[:user_id]).to be_nil
+      end
 
-    # these two are really applicable to LDAP moreso than password auth
-    it "should not allow a blank password" do
-      post :create, username: 'username'
-      expect(response).to render_template('new')
-      expect(session[:user_id]).to be_nil
-    end
-
-    it "should not allow a blank username" do
-      post :create, password: 'password123'
-      expect(response).to render_template('new')
-      expect(session[:user_id]).to be_nil
-    end
+      it "should not allow a blank username" do
+        post :create, password: 'password123'
+        expect(response).to render_template('new')
+        expect(session[:user_id]).to be_nil
+      end
+    end unless Squash::Configuration.authentication.strategy == 'google'
+    context "[using 3rd-party login service]" do
+      it "should not log in a user" do
+        post :create
+        expect(response.location).to match(%r{^https://accounts.google.com})
+      end
+    end if Squash::Configuration.authentication.strategy == 'google'
   end
 
   describe "#destroy" do
-    before(:each) { login_as FactoryGirl.create(:user) }
-    it "should log out a user" do
-      delete :destroy
-      expect(session[:user_id]).to be_nil
-      expect(response).to redirect_to(login_url)
-      expect(flash[:notice]).to include('logged out')
-    end
+    context "[using internal login service]" do
+      before(:each) { login_as FactoryGirl.create(:user) }
+      it "should log out a user" do
+        delete :destroy
+        expect(session[:user_id]).to be_nil
+        expect(response).to redirect_to(login_url)
+        expect(flash[:notice]).to include('logged out')
+      end
+    end unless Squash::Configuration.authentication.strategy == 'google'
+    context "[using 3rd-party login service]" do 
+      it "should not reset the session var" do
+        delete :destroy
+        expect(session).to be {}
+      end
+    end if Squash::Configuration.authentication.strategy == 'google'
   end
 end

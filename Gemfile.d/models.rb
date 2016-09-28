@@ -23,6 +23,7 @@ gem 'validates_timeliness'
 gem 'find_or_create_on_scopes'
 gem 'composite_primary_keys'
 gem 'rails-observers'
+gem 'redis-namespace'
 
 conditionally('activerecord.cursors', true) do
   gem 'activerecord-postgresql-cursors'

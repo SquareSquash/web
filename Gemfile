@@ -5,3 +5,5 @@ source 'https://rubygems.org'
 Dir.glob(File.join(File.dirname(__FILE__), 'Gemfile.d', '*.rb')).sort.each do |file|
   eval File.read(file), binding, file
 end
+
+gem 'byebug'
