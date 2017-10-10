@@ -20,7 +20,7 @@ Squash consists of the following components:
 This project is the front-end and the API.
 
 Pull requests are more than welcome; please check out
-[CONTRIBUTING.md](file.CONTRIBUTING.html) for details.
+[CONTRIBUTING.md](doc/CONTRIBUTING.md) for details.
 
 How to Install
 --------------
