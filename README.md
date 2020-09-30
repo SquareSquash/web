@@ -1,4 +1,4 @@
-Squash: A squarish bug spray
+Squash: A Squarish Bug Spray
 ============================
 
 **An open-source project from [Square](http://github.com/square)**
