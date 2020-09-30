@@ -25,20 +25,20 @@ Pull requests are more than welcome; please check out
 How to Install
 --------------
 
-To get started, run the `bin/setup` file. This script will ask you a series of 
+1) To get started, run the `bin/setup` file. This script will ask you a series of 
 questions and generate a preliminary configuration for your site install. When 
 the script is completed, you can run `git status` to see what files it changed, 
 and refine your configuration from there.
 
-Once the script is complete, Squash should run for most typical development
+2) Once the script is complete, Squash should run for most typical development
 environments. Simply run `rails s` and visit the site in your Web browser. You
 should be able to start using it immediately. You can also verify correctness by
 running `rspec spec`.
 
-Configuring and deploying the production instance is entirely up to you and your
+3) Configuring and deploying the production instance is entirely up to you and your
 particular production environment.
 
-Additional configuration options can be found in the following locations:
+4) Additional configuration options can be found in the following locations:
 
 * `config/application.rb`
 * `config/environments/*.rb`
@@ -127,7 +127,6 @@ Documentation
 Comprehensive documentation is written in YARD- and Markdown-formatted comments
 throughout the source. To view this documentation as an HTML site, run
 `rake yard`.
-
 CoffeeScript libraries are documented using the YARD format as well, but YARD
 does not as yet recognize them as documentable files. A `.codoopts` file is
 included in case you wish to use [Codo](https://github.com/netzpirat/codo) to
@@ -226,7 +225,7 @@ Deploys and other minor tasks. These workers are run asynchronously using
 
 ### Mailers
 
-Notification mails are sent by the {NotificationMailer}. It and any other
+Notification mails are sent by the (NotificationMailer). It and any other
 mailers live in `app/mailers`.
 
 `NotificationMailer` conditionally delivers emails. An email will only be
@@ -359,9 +358,9 @@ more usable format.
 
 Currently, the supported conversions are:
 
-* symbolication of iOS exceptions (see {Symbolication}),
-* deobfuscation of Java exceptions (see {ObfuscationMap}),
-* and source-mapping of JavaScript exceptions (see {SourceMap}).
+* symbolication of iOS exceptions (see [Symbolication]),
+* deobfuscation of Java exceptions (see [ObfuscationMap]),
+* and source-mapping of JavaScript exceptions (see [SourceMap]).
 
 Client libraries are responsible for delivering the raw stack trace data to
 Squash when an exception occurs, and for delivering lookup tables to Squash upon
@@ -463,4 +462,4 @@ can do this by running the `jira_oauth.rb` script:
 rails runner script/jira_oauth.rb
 ````
 
-Follow the instructions to set up your JIRA integration.
+* Follow the above given instructions to set up your JIRA integration.
