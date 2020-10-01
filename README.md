@@ -1,4 +1,4 @@
-Squash: A squarish bug spray
+Squash: A epic way to remove bugs
 ============================
 
 **An open-source project from [Square](http://github.com/square)**
@@ -9,11 +9,11 @@ Squash consists of the following components:
 
 * **Client libraries:** Client libraries for different systems (Ruby, Ruby on
   Rails, Cocoa with Objective-C, etc.) catch and record errors when they occur,
-  then send them to the API endpoint. Client libraries can be found under the
+  then send them to the API end point. Client libraries can be found under the
   [SquareSquash organization](https://github.com/SquareSquash).
-* **Front-end:** This website displays Bug information and helps the engineer
+* **Front-end:** This website displays Bug info and helps the engineer
   find the root cause for a Bug, and fix it. It also lets engineers manage,
-  assign, and comment on Bugs, as well as view statistics about the Bug.
+  assign and comment on Bugs as well as view statistics about the Bug.
 * **API endpoints:** These routes (part of the front-end app) receive exception
   notifications from the client libraries and process them.
 
